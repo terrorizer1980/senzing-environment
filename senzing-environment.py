@@ -19,6 +19,7 @@
 
 from glob import glob
 import argparse
+import configparser
 import json
 import linecache
 import logging
@@ -29,10 +30,10 @@ import time
 
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
-__date__ = '2019-07-16'
-__updated__ = '2020-01-17'
+__date__ = '2020-04-23'
+__updated__ = '2020-04-23'
 
-SENZING_PRODUCT_ID = "5xxx"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
+SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
 
 # Working with bytes.
@@ -50,12 +51,12 @@ configuration_locator = {
         "env": "SENZING_DEBUG",
         "cli": "debug"
     },
-    "password": {
+    "xpassword": {
         "default": None,
         "env": "SENZING_PASSWORD",
         "cli": "password"
     },
-    "senzing_dir": {
+    "xsenzing_dir": {
         "default": "/opt/senzing",
         "env": "SENZING_DIR",
         "cli": "senzing-dir"
@@ -77,6 +78,9 @@ keys_to_redact = [
     "password",
 ]
 
+report_warnings = []
+report_errors = []
+
 # -----------------------------------------------------------------------------
 # Define argument parser
 # -----------------------------------------------------------------------------
@@ -86,43 +90,13 @@ def get_parser():
     ''' Parse commandline arguments. '''
 
     subcommands = {
-        'task1': {
-            "help": 'Example task #1.',
+        'docker-host': {
+            "help": 'Show information on docker host.',
             "arguments": {
                 "--debug": {
                     "dest": "debug",
                     "action": "store_true",
                     "help": "Enable debugging. (SENZING_DEBUG) Default: False"
-                },
-                "--password": {
-                    "dest": "password",
-                    "metavar": "SENZING_PASSWORD",
-                    "help": "Example of information redacted in the log. Default: None"
-                },
-                "--senzing-dir": {
-                    "dest": "senzing_dir",
-                    "metavar": "SENZING_DIR",
-                    "help": "Location of Senzing. Default: /opt/senzing"
-                },
-            },
-        },
-        'task2': {
-            "help": 'Example task #2.',
-            "arguments": {
-                "--debug": {
-                    "dest": "debug",
-                    "action": "store_true",
-                    "help": "Enable debugging. (SENZING_DEBUG) Default: False"
-                },
-                "--password": {
-                    "dest": "password",
-                    "metavar": "SENZING_PASSWORD",
-                    "help": "Example of information redacted in the log. Default: None"
-                },
-                "--senzing-dir": {
-                    "dest": "senzing_dir",
-                    "metavar": "SENZING_DIR",
-                    "help": "Location of Senzing. Default: /opt/senzing"
                 },
             },
         },
@@ -144,7 +118,7 @@ def get_parser():
         },
     }
 
-    parser = argparse.ArgumentParser(prog="template-python.py", description="Example python skeleton. For more information, see https://github.com/Senzing/template-python")
+    parser = argparse.ArgumentParser(prog="senzing-environment.py", description="Manage Senzing runtime environment. For more information, see https://github.com/Senzing/senzing-environment")
     subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands (SENZING_SUBCOMMAND):')
 
     for subcommand_key, subcommand_values in subcommands.items():
@@ -174,6 +148,17 @@ MESSAGE_DEBUG = 900
 
 message_dictionary = {
     "100": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}I",
+    "101": "------------------------------------------------------------------------------",
+    "150": "---- Environment variables ---------------------------------------------------",
+    "151": "  {0} = {1}",
+    "152": "  {0} defaults to {1}",
+    "153": "  {0} is not set",
+    "190": "---- File --------------------------------------------------------------------",
+    "191": "---- Path on workstation: {0}",
+    "192": "---- Path inside  docker: {0}",
+    "193": "---- Contents:",
+    "194": "{0}",
+    "350": "---- Warnings ----------------------------------------------------------------",
     "292": "Configuration change detected.  Old: {0} New: {1}",
     "293": "For information on warnings and errors, see https://github.com/Senzing/stream-loader#errors",
     "294": "Version: {0}  Updated: {1}",
@@ -183,6 +168,8 @@ message_dictionary = {
     "298": "Exit {0}",
     "299": "{0}",
     "300": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}W",
+    "350": "---- Warnings ----------------------------------------------------------------",
+    "352": "Environment variable not set: {0}",
     "499": "{0}",
     "500": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}E",
     "695": "Unknown database scheme '{0}' in database url '{1}'",
@@ -191,6 +178,7 @@ message_dictionary = {
     "698": "Program terminated with error.",
     "699": "{0}",
     "700": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}E",
+    "750": "---- Errors ------------------------------------------------------------------",
     "885": "License has expired.",
     "886": "G2Engine.addRecord() bad return code: {0}; JSON: {1}",
     "888": "G2Engine.addRecord() G2ModuleNotInitialized: {0}; JSON: {1}",
@@ -425,6 +413,100 @@ def exit_silently():
     ''' Exit program. '''
     sys.exit(0)
 
+
+# -----------------------------------------------------------------------------
+# Utility functions
+# -----------------------------------------------------------------------------
+
+def log_environment_variables():
+
+    # List variables and default values.
+
+    environment_variables = {
+        "GIT_ACCOUNT": None,
+        "GIT_REPOSITORY": None,
+        "GIT_ACCOUNT_DIR": None,
+        "GIT_REPOSITORY_DIR": None,
+        "JUPYTER_NOTEBOOKS_SHARED_DIR": "~",
+        "POSTGRES_PASSWORD": "postgres",
+        "POSTGRES_USERNAME": "postgres",
+        "RABBITMQ_DIR": None,
+        "RABBITMQ_USERNAME": "user",
+        "RABBITMQ_PASSWORD": "bitnami",
+        "SENZING_DATA_SOURCE": "TEST",
+        "SENZING_DATA_VERSION_DIR": "/opt/senzing/data/1.0.0",
+        "SENZING_ENTITY_TYPE": "TEST",
+        "SENZING_ETC_DIR": "/etc/opt/senzing",
+        "SENZING_G2_DIR": "/opt/senzing/g2",
+        "SENZING_VAR_DIR": "/var/opt/senzing",
+    }
+
+    # Log values.
+
+    logging.info(message_info(150))
+    for key, default_value in environment_variables.items():
+        environment_value = os.environ.get(key)
+        if environment_value:
+            logging.info(message_info(151, key, environment_value))
+        elif default_value:
+            logging.info(message_info(152, key, default_value))
+        else:
+            logging.info(message_info(153, key))
+            report_warnings.append(message_warning(352, key))
+
+def log_files():
+
+    # List variables and default values.
+
+    files = {
+        "G2Module.ini": {
+            "docker": "/etc/opt/senzing/G2Module.ini",
+            "dockerHost": "{0}/G2Module.ini".format(os.environ.get("SENZING_ETC_DIR", "/etc/opt/senzing"))
+        }
+    }
+
+    # Log file contents.
+
+    for file, values in files.items():
+        logging.info(message_info(190))
+        logging.info(message_info(191, values.get("dockerHost")))
+        logging.info(message_info(192, values.get("docker")))
+        logging.info(message_info(193))
+        with open(values.get("dockerHost"), "r", newline=None) as input_file:
+            for input_line in input_file:
+                logging.info(message_info(194, input_line.rstrip()))
+    logging.info(message_info(101))
+
+def inspect_g2module_ini():
+
+    g2module_ini_for_docker =  {
+        "PIPELINE" : {
+            "CONFIGPATH" : "/etc/opt/senzing",
+            "LICENSEFILE" : "/etc/opt/senzing/g2.lic",
+            "RESOURCEPATH" : "/opt/senzing/g2/resources",
+            "SUPPORTPATH" : "/opt/senzing/data",
+        },
+    }
+
+    # Read G2Module.ini.
+
+    filename = "{0}/G2Module.ini".format(os.environ.get("SENZING_ETC_DIR", "/etc/opt/senzing"))
+    config_parser = configparser.ConfigParser()
+    config_parser.optionxform = str  # Maintain case of keys.
+    config_parser.read(filename)
+
+    #  xxx
+
+    for section, options in g2module_ini_for_docker.items():
+        for option, docker_value in options.items():
+            try:
+                value = config_parser.get(section, option)
+                if value != docker_value:
+                    logging.info(message_info(153, section, option, value, docker_value))
+                    report_warnings.append(message_warning(352, section, option, value, docker_value))
+            except:
+                print(">>>>>>>>>>>>>>>> MJD-01")
+
 # -----------------------------------------------------------------------------
 # do_* functions
 #   Common function signature: do_XXX(args)
@@ -447,7 +529,7 @@ def do_docker_acceptance_test(args):
     logging.info(exit_template(config))
 
 
-def do_task1(args):
+def do_docker_host(args):
     ''' Do a task. '''
 
     # Get context from CLI, environment variables, and ini files.
@@ -460,28 +542,16 @@ def do_task1(args):
 
     # Do work.
 
-    print("senzing-dir: {senzing_dir}; debug: {debug}".format(**config))
+    log_environment_variables()
+    log_files()
 
-    # Epilog.
+    # TODO:
+    # Print contents of G2Module.ini
 
-    logging.info(exit_template(config))
 
-
-def do_task2(args):
-    ''' Do a task. Print the complete config object'''
-
-    # Get context from CLI, environment variables, and ini files.
-
-    config = get_configuration(args)
-
-    # Prolog.
-
-    logging.info(entry_template(config))
-
-    # Do work.
-
-    config_json = json.dumps(config, sort_keys=True, indent=4)
-    print(config_json)
+    logging.warning(message_warning(350))
+    for report_warning in report_warnings:
+        logging.warning(report_warning)
 
     # Epilog.
 
