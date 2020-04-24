@@ -158,6 +158,10 @@ message_dictionary = {
     "192": "---- Path inside  docker: {0}",
     "193": "---- Contents:",
     "194": "{0}",
+    "210": "---- G2Module.ini inspection -------------------------------------------------",
+    "211": "G2Module.ini {0}.{1} has correct value for docker: {2}",
+    "212": "G2Module.ini {0}.{1} has incorrect value for docker: {2} should be {3}",
+    "213": "G2Module.ini {0}.{1} Not specified. If specified, it needs to be {2}",
     "350": "---- Warnings ----------------------------------------------------------------",
     "292": "Configuration change detected.  Old: {0} New: {1}",
     "293": "For information on warnings and errors, see https://github.com/Senzing/stream-loader#errors",
@@ -413,10 +417,10 @@ def exit_silently():
     ''' Exit program. '''
     sys.exit(0)
 
-
 # -----------------------------------------------------------------------------
 # Utility functions
 # -----------------------------------------------------------------------------
+
 
 def log_environment_variables():
 
@@ -454,6 +458,7 @@ def log_environment_variables():
             logging.info(message_info(153, key))
             report_warnings.append(message_warning(352, key))
 
+
 def log_files():
 
     # List variables and default values.
@@ -477,9 +482,10 @@ def log_files():
                 logging.info(message_info(194, input_line.rstrip()))
     logging.info(message_info(101))
 
+
 def inspect_g2module_ini():
 
-    g2module_ini_for_docker =  {
+    g2module_ini_for_docker = {
         "PIPELINE" : {
             "CONFIGPATH" : "/etc/opt/senzing",
             "LICENSEFILE" : "/etc/opt/senzing/g2.lic",
@@ -495,17 +501,20 @@ def inspect_g2module_ini():
     config_parser.optionxform = str  # Maintain case of keys.
     config_parser.read(filename)
 
-    #  xxx
+    #  Verify values.
 
+    logging.info(message_info(210))
     for section, options in g2module_ini_for_docker.items():
         for option, docker_value in options.items():
             try:
                 value = config_parser.get(section, option)
-                if value != docker_value:
-                    logging.info(message_info(153, section, option, value, docker_value))
-                    report_warnings.append(message_warning(352, section, option, value, docker_value))
+                if value == docker_value:
+                    logging.info(message_info(211, section, option, value))
+                else:
+                    logging.info(message_info(212, section, option, value, docker_value))
+                    report_warnings.append(message_warning(212, section, option, value, docker_value))
             except:
-                print(">>>>>>>>>>>>>>>> MJD-01")
+                logging.info(message_info(213, section, option, docker_value))
 
 # -----------------------------------------------------------------------------
 # do_* functions
@@ -544,10 +553,10 @@ def do_docker_host(args):
 
     log_environment_variables()
     log_files()
+    inspect_g2module_ini()
 
     # TODO:
     # Print contents of G2Module.ini
-
 
     logging.warning(message_warning(350))
     for report_warning in report_warnings:
