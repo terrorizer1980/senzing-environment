@@ -24,14 +24,16 @@ import json
 import linecache
 import logging
 import os
+import shutil
 import signal
+import stat
 import sys
 import time
 
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-04-23'
+__updated__ = '2020-04-24'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -51,15 +53,10 @@ configuration_locator = {
         "env": "SENZING_DEBUG",
         "cli": "debug"
     },
-    "xpassword": {
-        "default": None,
-        "env": "SENZING_PASSWORD",
-        "cli": "password"
-    },
-    "xsenzing_dir": {
-        "default": "/opt/senzing",
-        "env": "SENZING_DIR",
-        "cli": "senzing-dir"
+    "project_dir": {
+        "default": "~/senzing",
+        "env": "SENZING_PROJECT_DIR",
+        "cli": "project-dir"
     },
     "sleep_time_in_seconds": {
         "default": 0,
@@ -90,6 +87,21 @@ def get_parser():
     ''' Parse commandline arguments. '''
 
     subcommands = {
+        'add-docker-support': {
+            "help": 'Update a G2Project to support docker.',
+            "arguments": {
+                "--debug": {
+                    "dest": "debug",
+                    "action": "store_true",
+                    "help": "Enable debugging. (SENZING_DEBUG) Default: False"
+                },
+                "--project-dir": {
+                    "dest": "project_dir",
+                    "metavar": "SENZING_PROJECT_DIR",
+                    "help": "Specify location of G2Project Default: ~/senzing"
+                },
+            },
+        },
         'docker-host': {
             "help": 'Show information on docker host.',
             "arguments": {
@@ -149,6 +161,14 @@ MESSAGE_DEBUG = 900
 message_dictionary = {
     "100": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}I",
     "101": "------------------------------------------------------------------------------",
+    "102": "Modifying {0}...",
+    "103": "   Changing {0}.{1} from {2} to {3}",
+    "104": "   Keeping  {0}.{1} as {2}",
+    "105": "   {0}.{1} doesn't exist",
+    "106": "   Removed  {0}.{1}",
+    "110": "Backing up {0} as {1}",
+    "111": "Copying {0} to {1}",
+    "112": "Creating file {0}",
     "150": "---- Environment variables ---------------------------------------------------",
     "151": "  {0} = {1}",
     "152": "  {0} defaults to {1}",
@@ -183,6 +203,8 @@ message_dictionary = {
     "699": "{0}",
     "700": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}E",
     "750": "---- Errors ------------------------------------------------------------------",
+    "760": "shutil.Error Cannot copy {0} to {1} Error: {2}",
+    "761": "OSError: Cannot copy {0} to {1} Error: {2}",
     "885": "License has expired.",
     "886": "G2Engine.addRecord() bad return code: {0}; JSON: {1}",
     "888": "G2Engine.addRecord() G2ModuleNotInitialized: {0}; JSON: {1}",
@@ -300,6 +322,11 @@ def get_configuration(args):
                 result[boolean] = True
             else:
                 result[boolean] = False
+
+    # Special case: Remove trailing /
+
+    key = "project_dir"
+    result[key] = os.path.abspath(result[key])
 
     # Special case: Change integer strings to integers.
 
@@ -422,6 +449,40 @@ def exit_silently():
 # -----------------------------------------------------------------------------
 
 
+def inspect_g2module_ini():
+
+    g2module_ini_for_docker = {
+        "PIPELINE" : {
+            "CONFIGPATH" : "/etc/opt/senzing",
+            "LICENSEFILE" : "/etc/opt/senzing/g2.lic",
+            "RESOURCEPATH" : "/opt/senzing/g2/resources",
+            "SUPPORTPATH" : "/opt/senzing/data",
+        },
+    }
+
+    # Read G2Module.ini.
+
+    filename = "{0}/G2Module.ini".format(os.environ.get("SENZING_ETC_DIR", "/etc/opt/senzing"))
+    config_parser = configparser.ConfigParser()
+    config_parser.optionxform = str  # Maintain case of keys.
+    config_parser.read(filename)
+
+    #  Verify values.
+
+    logging.info(message_info(210))
+    for section, options in g2module_ini_for_docker.items():
+        for option, docker_value in options.items():
+            try:
+                value = config_parser.get(section, option)
+                if value == docker_value:
+                    logging.info(message_info(211, section, option, value))
+                else:
+                    logging.info(message_info(212, section, option, value, docker_value))
+                    report_warnings.append(message_warning(212, section, option, value, docker_value))
+            except:
+                logging.info(message_info(213, section, option, docker_value))
+
+
 def log_environment_variables():
 
     # List variables and default values.
@@ -483,7 +544,65 @@ def log_files():
     logging.info(message_info(101))
 
 
-def inspect_g2module_ini():
+def project_copy_etc(config):
+
+    # Pull configuration variables
+
+    project_dir = config.get("project_dir")
+
+    # Synthesize variables.
+
+    host_etc = "{0}/etc".format(project_dir)
+    docker_etc = "{0}/etc-docker".format(project_dir)
+    docker_etc_old = "{0}/etc-docker.{1}".format(project_dir, int(time.time()))
+
+    # If directory exists, back it up.
+
+    if os.path.exists(docker_etc):
+        logging.info(message_info(110, docker_etc, docker_etc_old))
+        shutil.move(docker_etc, docker_etc_old)
+
+    # Copy directory.
+
+    try:
+        logging.info(message_info(111, host_etc, docker_etc))
+        shutil.copytree(host_etc, docker_etc)
+    except shutil.Error as err:
+        exit_error(760, host_etc, docker_etc, err)
+    except OSError as err:
+        exit_error(761, host_etc, docker_etc, err)
+
+
+def project_create_setupenv_docker(config):
+
+    # Pull configuration variables
+
+    project_dir = config.get("project_dir")
+
+    output_filename = "{0}/setupEnv-docker".format(project_dir)
+
+    docstring = """#! /usr/bin/env bash
+export SENZING_DATA_DIR={0}/data
+export SENZING_DATA_VERSION_DIR={0}/data
+export SENZING_ETC_DIR={0}/etc-docker
+export SENZING_G2_DIR={0}
+export SENZING_VAR_DIR={0}/var
+
+export POSTGRES_DIR={0}/var/postgres
+export RABBITMQ_DIR={0}/var/rabbitmq
+
+mkdir -p {0}/var/rabbitmq
+chmod 777 {0}/var/rabbitmq
+    """.format(project_dir)
+
+    logging.info(message_info(112, output_filename))
+    with open(output_filename, "w") as text_file:
+        text_file.write(docstring)
+
+    os.chmod(output_filename, 0o755)
+
+
+def project_modify_G2Module_ini(config):
 
     g2module_ini_for_docker = {
         "PIPELINE" : {
@@ -494,32 +613,84 @@ def inspect_g2module_ini():
         },
     }
 
+    # Pull configuration variables
+
+    project_dir = config.get("project_dir")
+
+    # Synthesize variables.
+
+    filename = "{0}/etc-docker/G2Module.ini".format(project_dir)
+
     # Read G2Module.ini.
 
-    filename = "{0}/G2Module.ini".format(os.environ.get("SENZING_ETC_DIR", "/etc/opt/senzing"))
     config_parser = configparser.ConfigParser()
     config_parser.optionxform = str  # Maintain case of keys.
     config_parser.read(filename)
 
     #  Verify values.
 
-    logging.info(message_info(210))
+    logging.info(message_info(102, filename))
     for section, options in g2module_ini_for_docker.items():
         for option, docker_value in options.items():
             try:
                 value = config_parser.get(section, option)
-                if value == docker_value:
-                    logging.info(message_info(211, section, option, value))
+                if value != docker_value:
+                    config_parser[section][option] = docker_value
+                    logging.info(message_info(103, section, option, value, docker_value))
                 else:
-                    logging.info(message_info(212, section, option, value, docker_value))
-                    report_warnings.append(message_warning(212, section, option, value, docker_value))
+                    logging.info(message_info(104, section, option, value))
             except:
-                logging.info(message_info(213, section, option, docker_value))
+                logging.info(message_info(105, section, option))
+
+    # If needed, modify SQL.CONNECTION
+
+    section = "SQL"
+    option = "CONNECTION"
+    try:
+        old_database_url = config_parser.get(section, option)
+        if old_database_url.find("sqlite") == 0:
+            new_database_url = "sqlite3://na:na@/var/opt/senzing/sqlite/G2C.db"
+            config_parser[section][option] = new_database_url
+            logging.info(message_info(103, section, option, old_database_url, new_database_url))
+    except:
+        logging.info(message_info(105, section, option))
+
+    # Remove SQL.G2CONFIGFILE option.
+
+    config_parser.remove_option('SQL', 'G2CONFIGFILE')
+    logging.info(message_info(106, 'SQL', 'G2CONFIGFILE'))
+
+    # Write out contents.
+
+    with open(filename, 'w') as output_file:
+        config_parser.write(output_file)
 
 # -----------------------------------------------------------------------------
 # do_* functions
 #   Common function signature: do_XXX(args)
 # -----------------------------------------------------------------------------
+
+
+def do_add_docker_support(args):
+    ''' Do a task. '''
+
+    # Get context from CLI, environment variables, and ini files.
+
+    config = get_configuration(args)
+
+    # Prolog.
+
+    logging.info(entry_template(config))
+
+    # Do work.
+
+    project_copy_etc(config)
+    project_modify_G2Module_ini(config)
+    project_create_setupenv_docker(config)
+
+    # Epilog.
+
+    logging.info(exit_template(config))
 
 
 def do_docker_acceptance_test(args):

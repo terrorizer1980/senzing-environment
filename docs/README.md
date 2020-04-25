@@ -2,4 +2,4 @@
 
 Placeholder for [GitHub pages](https://pages.github.com/).
 
-See [https://senzing.github.io/template-python](https://senzing.github.io/template-python).
+See [https://senzing.github.io/senzing-environment](https://senzing.github.io/senzing-environment).
