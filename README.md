@@ -14,9 +14,10 @@ describing where we can improve.   Now on with the show...
 
 ## Overview
 
+The [senzing-environment.py](senzing-environment.py) program helps G2Project directories work with Senzing Docker formations.
+
 ### Contents
 
-1. [Related artifacts](#related-artifacts)
 1. [Expectations](#expectations)
 1. [Demonstrate using Command Line Interface](#demonstrate-using-command-line-interface)
     1. [Prerequisites for CLI](#prerequisites-for-cli)
