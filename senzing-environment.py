@@ -1,20 +1,7 @@
 #! /usr/bin/env python3
 
 # -----------------------------------------------------------------------------
-# template-python.py Example python skeleton.
-# Can be used as a boiler-plate to build new python scripts.
-# This skeleton implements the following features:
-#   1) "command subcommand" command line.
-#   2) A structured command line parser and "-help"
-#   3) Configuration via:
-#      3.1) Command line options
-#      3.2) Environment variables
-#      3.3) Configuration file
-#      3.4) Default
-#   4) Messages dictionary
-#   5) Logging and Log Level support.
-#   6) Entry / Exit log messages.
-#   7) Docker support.
+# senzing-environment.py
 # -----------------------------------------------------------------------------
 
 from glob import glob
