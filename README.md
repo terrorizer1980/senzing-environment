@@ -168,6 +168,27 @@ The following examples require initialization described in
     source ${SENZING_PROJECT_DIR}/setupEnv-docker
     ```
 
+#### Senzing Project work-around
+
+Currently G2Project directories contain symbolic links that do not work within docker containers.
+The following instructions replace the symbolic links.
+
+1. Backup directories.
+   Example:
+
+    ```console
+    mv ${SENZING_PROJECT_DIR}/resources/config ${SENZING_PROJECT_DIR}/resources/config.$(date +%s)
+    mv ${SENZING_PROJECT_DIR}/resources/schema ${SENZING_PROJECT_DIR}/resources/schema.$(date +%s)
+    ```
+
+1. Copy new directories into G2Project.
+   Example:
+
+    ```console
+    cp -r /opt/senzing/g2/resources/config/ ${SENZING_PROJECT_DIR}/resources/
+    cp -r /opt/senzing/g2/resources/schema/ ${SENZING_PROJECT_DIR}/resources/
+    ```
+
 ## Advanced
 
 ### Configuration
