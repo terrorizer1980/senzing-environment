@@ -144,7 +144,7 @@ see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/maste
 The following examples require initialization described in
 [Demonstrate using Command Line Interface](#demonstrate-using-command-line-interface).
 
-#### Senzing Project directory
+#### Senzing project directory
 
 1. :pencil2: Identify Senzing Project directory.
    Example:
@@ -168,10 +168,10 @@ The following examples require initialization described in
     source ${SENZING_PROJECT_DIR}/setupEnv-docker
     ```
 
-#### Senzing Project work-around
+#### Senzing project work-around
 
 Currently G2Project directories contain symbolic links that do not work within docker containers.
-The following instructions replace the symbolic links.
+The following instructions replace the symbolic links with actual directories.
 
 1. Backup directories.
    Example:
