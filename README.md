@@ -144,7 +144,7 @@ see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/maste
 The following examples require initialization described in
 [Demonstrate using Command Line Interface](#demonstrate-using-command-line-interface).
 
-#### Senzing project directory
+#### Add docker support to senzing project directory
 
 1. :pencil2: Identify Senzing Project directory.
    Example:
@@ -159,13 +159,6 @@ The following examples require initialization described in
     ```console
     senzing-environment.py add-docker-support \
       --project-dir ${SENZING_PROJECT_DIR}
-    ```
-
-1. Set environment.
-   Example:
-
-    ```console
-    source ${SENZING_PROJECT_DIR}/setupEnv-docker
     ```
 
 #### Senzing project work-around
@@ -187,6 +180,15 @@ The following instructions replace the symbolic links with actual directories.
     ```console
     cp -r /opt/senzing/g2/resources/config/ ${SENZING_PROJECT_DIR}/resources/
     cp -r /opt/senzing/g2/resources/schema/ ${SENZING_PROJECT_DIR}/resources/
+    ```
+
+#### Set environment for docker
+
+1. Set environment.
+   Example:
+
+    ```console
+    source ${SENZING_PROJECT_DIR}/setupEnv-docker
     ```
 
 ## Advanced
