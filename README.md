@@ -144,7 +144,7 @@ see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/maste
 The following examples require initialization described in
 [Demonstrate using Command Line Interface](#demonstrate-using-command-line-interface).
 
-#### Senzing Project directory
+#### Add docker support to Senzing project directory
 
 1. :pencil2: Identify Senzing Project directory.
    Example:
@@ -160,6 +160,29 @@ The following examples require initialization described in
     senzing-environment.py add-docker-support \
       --project-dir ${SENZING_PROJECT_DIR}
     ```
+
+#### Senzing project work-around
+
+Currently G2Project directories contain symbolic links that do not work within docker containers.
+The following instructions replace the symbolic links with actual directories.
+
+1. Backup existing directories.
+   Example:
+
+    ```console
+    mv ${SENZING_PROJECT_DIR}/resources/config ${SENZING_PROJECT_DIR}/resources/config.$(date +%s)
+    mv ${SENZING_PROJECT_DIR}/resources/schema ${SENZING_PROJECT_DIR}/resources/schema.$(date +%s)
+    ```
+
+1. Copy new directories into G2Project.
+   Example:
+
+    ```console
+    cp -r /opt/senzing/g2/resources/config/ ${SENZING_PROJECT_DIR}/resources/
+    cp -r /opt/senzing/g2/resources/schema/ ${SENZING_PROJECT_DIR}/resources/
+    ```
+
+#### Set environment for docker
 
 1. Set environment.
    Example:
