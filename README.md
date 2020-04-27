@@ -144,7 +144,7 @@ see [Environment Variables](https://github.com/Senzing/knowledge-base/blob/maste
 The following examples require initialization described in
 [Demonstrate using Command Line Interface](#demonstrate-using-command-line-interface).
 
-#### Add docker support to senzing project directory
+#### Add docker support to Senzing project directory
 
 1. :pencil2: Identify Senzing Project directory.
    Example:
