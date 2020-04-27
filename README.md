@@ -173,7 +173,7 @@ The following examples require initialization described in
 Currently G2Project directories contain symbolic links that do not work within docker containers.
 The following instructions replace the symbolic links with actual directories.
 
-1. Backup directories.
+1. Backup existing directories.
    Example:
 
     ```console
