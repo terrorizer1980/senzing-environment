@@ -20,7 +20,7 @@ import time
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-04-24'
+__updated__ = '2020-04-28'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -78,14 +78,15 @@ def get_parser():
             "help": 'Update a G2Project to support docker.',
             "arguments": {
                 "--debug": {
-                    "dest": "debug",
                     "action": "store_true",
+                    "dest": "debug",
                     "help": "Enable debugging. (SENZING_DEBUG) Default: False"
                 },
                 "--project-dir": {
                     "dest": "project_dir",
+                    "help": "Specify location of G2Project Default: ~/senzing",
                     "metavar": "SENZING_PROJECT_DIR",
-                    "help": "Specify location of G2Project Default: ~/senzing"
+                    "required": True
                 },
             },
         },
@@ -93,8 +94,8 @@ def get_parser():
             "help": 'Show information on docker host.',
             "arguments": {
                 "--debug": {
-                    "dest": "debug",
                     "action": "store_true",
+                    "dest": "debug",
                     "help": "Enable debugging. (SENZING_DEBUG) Default: False"
                 },
             },
@@ -104,8 +105,8 @@ def get_parser():
             "arguments": {
                 "--sleep-time-in-seconds": {
                     "dest": "sleep_time_in_seconds",
+                    "help": "Sleep time in seconds. DEFAULT: 0 (infinite)",
                     "metavar": "SENZING_SLEEP_TIME_IN_SECONDS",
-                    "help": "Sleep time in seconds. DEFAULT: 0 (infinite)"
                 },
             },
         },
@@ -155,11 +156,13 @@ message_dictionary = {
     "106": "   Removed  {0}.{1}",
     "110": "Backing up {0} as {1}",
     "111": "Copying {0} to {1}",
-    "112": "Creating file {0}",
+    "112": "{0} - Creating file",
     "150": "---- Environment variables ---------------------------------------------------",
     "151": "  {0} = {1}",
     "152": "  {0} defaults to {1}",
     "153": "  {0} is not set",
+    "171": "{0} - Already exists.  Left unmodified.",
+    "172": "{0} - Modified",
     "190": "---- File --------------------------------------------------------------------",
     "191": "---- Path on workstation: {0}",
     "192": "---- Path inside  docker: {0}",
@@ -189,6 +192,7 @@ message_dictionary = {
     "698": "Program terminated with error.",
     "699": "{0}",
     "700": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}E",
+    "702": "Could not create '{0}' directory. Error: {1}",
     "750": "---- Errors ------------------------------------------------------------------",
     "760": "shutil.Error Cannot copy {0} to {1} Error: {2}",
     "761": "OSError: Cannot copy {0} to {1} Error: {2}",
@@ -432,6 +436,44 @@ def exit_silently():
     sys.exit(0)
 
 # -----------------------------------------------------------------------------
+# Files
+# -----------------------------------------------------------------------------
+
+
+def file_docker_xterm():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+docker run \
+  --interactive \
+  --publish 8254:5000 \
+  --rm \
+  --tty \
+  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
+  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
+  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
+  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
+  senzing/xterm
+"""
+    return 0
+
+
+def file_docker_environment_vars():
+    """#! /usr/bin/env bash
+
+export SENZING_DATA_DIR={0}/data
+export SENZING_DATA_VERSION_DIR={0}/data
+export SENZING_ETC_DIR={0}/docker-etc
+export SENZING_G2_DIR={0}
+export SENZING_VAR_DIR={0}/var
+"""
+    return 0
+
+
+# -----------------------------------------------------------------------------
 # Utility functions
 # -----------------------------------------------------------------------------
 
@@ -540,8 +582,8 @@ def project_copy_etc(config):
     # Synthesize variables.
 
     host_etc = "{0}/etc".format(project_dir)
-    docker_etc = "{0}/etc-docker".format(project_dir)
-    docker_etc_old = "{0}/etc-docker.{1}".format(project_dir, int(time.time()))
+    docker_etc = "{0}/docker-etc".format(project_dir)
+    docker_etc_old = "{0}/docker-etc.{1}".format(project_dir, int(time.time()))
 
     # If directory exists, back it up.
 
@@ -571,7 +613,7 @@ def project_create_setupenv_docker(config):
     docstring = """#! /usr/bin/env bash
 export SENZING_DATA_DIR={0}/data
 export SENZING_DATA_VERSION_DIR={0}/data
-export SENZING_ETC_DIR={0}/etc-docker
+export SENZING_ETC_DIR={0}/docker-etc
 export SENZING_G2_DIR={0}
 export SENZING_VAR_DIR={0}/var
 
@@ -606,7 +648,7 @@ def project_modify_G2Module_ini(config):
 
     # Synthesize variables.
 
-    filename = "{0}/etc-docker/G2Module.ini".format(project_dir)
+    filename = "{0}/docker-etc/G2Module.ini".format(project_dir)
 
     # Read G2Module.ini.
 
@@ -649,8 +691,59 @@ def project_modify_G2Module_ini(config):
 
     # Write out contents.
 
+    logging.info(message_info(172, filename))
     with open(filename, 'w') as output_file:
         config_parser.write(output_file)
+
+
+def create_bin_docker(config):
+
+    # Pull configuration variables.
+
+    project_dir = config.get("project_dir")
+
+    # Map filenames to functions.
+
+    output_files = {
+        "docker-xterm.sh": file_docker_xterm
+    }
+
+    output_directory = "{0}/docker-bin".format(project_dir)
+    output_directory_old = "{0}.{1}".format(output_directory, int(time.time()))
+
+    # If directory exists, back it up.
+
+    if os.path.exists(output_directory):
+        logging.info(message_info(110, output_directory, output_directory_old))
+        shutil.move(output_directory, output_directory_old)
+
+    # Make .../docker-bin directory.
+
+    try:
+        os.makedirs(output_directory, exist_ok=True)
+    except PermissionError as err:
+        exit_error(702, output_directory, err)
+
+
+    # Create docker-environment-vars.sh
+
+    filename = "{0}/docker-environment-vars.sh".format(output_directory)
+    with open(filename, 'w') as file:
+        logging.info(message_warning(157, filename))
+        file.write(file_docker_environment_vars.__doc__.format(project_dir))
+    os.chmod(filename, 0o755)
+
+    # Write files from function docstrings.
+
+    for filename, function in output_files.items():
+        full_filename = "{0}/{1}".format(output_directory, filename)
+        if not os.path.exists(full_filename):
+            logging.info(message_info(112, full_filename))
+            with open(full_filename, 'w') as file:
+                file.write(function.__doc__)
+            os.chmod(full_filename, 0o755)
+        else:
+            logging.info(message_info(171, full_filename))
 
 # -----------------------------------------------------------------------------
 # do_* functions
@@ -674,6 +767,7 @@ def do_add_docker_support(args):
     project_copy_etc(config)
     project_modify_G2Module_ini(config)
     project_create_setupenv_docker(config)
+    create_bin_docker(config)
 
     # Epilog.
 
