@@ -13,6 +13,7 @@ import logging
 import os
 import shutil
 import signal
+import socket
 import stat
 import sys
 import time
@@ -154,15 +155,25 @@ message_dictionary = {
     "104": "   Keeping  {0}.{1} as {2}",
     "105": "   {0}.{1} doesn't exist",
     "106": "   Removed  {0}.{1}",
-    "110": "Backing up {0} as {1}",
-    "111": "Copying {0} to {1}",
-    "112": "{0} - Creating file",
-    "150": "---- Environment variables ---------------------------------------------------",
-    "151": "  {0} = {1}",
-    "152": "  {0} defaults to {1}",
-    "153": "  {0} is not set",
-    "171": "{0} - Already exists.  Left unmodified.",
-    "172": "{0} - Modified",
+    "151": "{0} - Changing permissions from {1:o} to {2:o}",
+    "173": "{0} - Changing owner from {1} to {2}",
+    "153": "{0} - Changing group from {1} to {2}",
+    "154": "{0} - Creating file by copying {1}",
+    "155": "{0} - Deleting",
+    "156": "{0} - Modified. {1}",
+    "157": "{0} - Creating file",
+    "158": "{0} - Creating symlink to {1}",
+    "159": "{0} - Downloading from {1}",
+    "160": "{0} - Copying {1} and modifying",
+    "161": "{0} - Backup of current {1}",
+    "162": "{0} - Creating directory",
+    "163": "{0} - Already exists.  Left unmodified.",
+    "164": "{0} - Copying {1}",
+    "165": "{0} - Creating file",
+    "170": "---- Environment variables ---------------------------------------------------",
+    "171": "  {0} = {1}",
+    "172": "  {0} defaults to {1}",
+    "173": "  {0} is not set",
     "190": "---- File --------------------------------------------------------------------",
     "191": "---- Path on workstation: {0}",
     "192": "---- Path inside  docker: {0}",
@@ -440,38 +451,192 @@ def exit_silently():
 # -----------------------------------------------------------------------------
 
 
-def file_docker_xterm():
-    """#!/usr/bin/env bash
-
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
-source ${SCRIPT_DIR}/docker-environment-vars.sh
-
-docker run \
-  --interactive \
-  --publish 8254:5000 \
-  --rm \
-  --tty \
-  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
-  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
-  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-  senzing/xterm
-"""
-    return 0
-
-
 def file_docker_environment_vars():
     """#! /usr/bin/env bash
 
-export SENZING_DATA_DIR={0}/data
-export SENZING_DATA_VERSION_DIR={0}/data
-export SENZING_ETC_DIR={0}/docker-etc
-export SENZING_G2_DIR={0}
-export SENZING_VAR_DIR={0}/var
+export POSTGRES_DIR={project_dir}/var/postgres
+export RABBITMQ_DIR={project_dir}/var/rabbitmq
+export SENZING_API_SERVER_URL="http://localhost:8250"
+export SENZING_DATABASE_URL=[senzing_database_url]
+export SENZING_DATA_DIR={project_dir}/data
+export SENZING_DATA_VERSION_DIR={project_dir}/data
+export SENZING_ETC_DIR={project_dir}/docker-etc
+export SENZING_G2_DIR={project_dir}
+export SENZING_INPUT_URL="https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json"
+export SENZING_LOCAL_IP_ADDR={local_ip_addr}
+export SENZING_PROJECT_DIR={project_dir}
+export SENZING_RABBITMQ_PASSWORD=bitnami
+export SENZING_RABBITMQ_QUEUE=senzing-rabbitmq-queue
+export SENZING_RABBITMQ_USERNAME=user
+export SENZING_RECORD_MAX=5000
+export SENZING_SQL_CONNECTION="{sql_connection}"
+export SENZING_VAR_DIR={project_dir}/var
 """
     return 0
 
+
+def file_senzing_api_server():
+    pass
+
+
+def file_senzing_debug():
+    pass
+
+
+def file_senzing_init_container():
+    pass
+
+
+def file_senzing_jupyter():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+IMAGE_VERSION=latest
+PORT=9178
+
+echo "senzing-jupyter running on http://localhost:${PORT}"
+
+docker run \
+  --env SENZING_SQL_CONNECTION=${SENZING_SQL_CONNECTION} \\
+  --interactive \\
+  --name senzing-jupyter \\
+  --publish ${PORT}:8888 \\
+  --rm \\
+  --tty \\
+  --volume ${SENZING_PROJECT_DIR}:/notebooks/shared \\
+  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+  senzing/jupyter:${IMAGE_VERSION} start.sh jupyter notebook --NotebookApp.token=''
+"""
+    return 0
+
+
+def file_senzing_mock_data_generator():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+IMAGE_VERSION=1.1.1
+
+docker run \\
+  --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \\
+  --env SENZING_RABBITMQ_HOST=${SENZING_LOCAL_IP_ADDR} \\
+  --env SENZING_RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
+  --env SENZING_RABBITMQ_QUEUE=${SENZING_RABBITMQ_QUEUE} \\
+  --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
+  --env SENZING_RECORD_MAX=${SENZING_RECORD_MAX} \\
+  --env SENZING_RECORD_MONITOR=1000 \\
+  --env SENZING_SUBCOMMAND=url-to-rabbitmq \\
+  --interactive \\
+  --name senzing-mock-data-generator \\
+  --rm \\
+  --tty \\
+  senzing/mock-data-generator:${IMAGE_VERSION}
+"""
+    return 0
+
+
+def file_senzing_phppgadmin():
+    pass
+
+
+def file_senzing_postgres():
+    pass
+
+
+def file_senzing_postgresql_init():
+    pass
+
+
+def file_senzing_rabbitmq():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+IMAGE_VERSION=3.8.2
+
+echo "senzing-rabbitmq running on http://localhost:15672"
+
+mkdir -p ${RABBITMQ_DIR}
+chmod 777 ${RABBITMQ_DIR}
+
+docker run \\
+  --env RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
+  --env RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
+  --interactive \\
+  --name senzing-rabbitmq \\
+  --publish 15672:15672 \\
+  --publish 5672:5672 \\
+  --rm \\
+  --tty \\
+  --volume ${RABBITMQ_DIR}:/bitnami \\
+  bitnami/rabbitmq:${IMAGE_VERSION}
+"""
+    return 0
+
+
+def file_senzing_stream_loader():
+    pass
+
+
+def file_senzing_webapp():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+IMAGE_VERSION=latest
+PORT=8251
+
+echo "senzing-webapp running on http://localhost:${PORT}"
+
+docker run \\
+  --env SENZING_API_SERVER_URL=${SENZING_API_SERVER_URL} \\
+  --env SENZING_WEB_SERVER_PORT=${PORT} \\
+  --interactive \\
+  --name senzing-jupyter \\
+  --publish ${PORT}:${PORT} \\
+  --rm \\
+  --tty \\
+  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+  senzing/entity-search-web-app:${IMAGE_VERSION}
+"""
+    return 0
+
+
+def file_senzing_xterm():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+IMAGE_VERSION=latest
+PORT=8254
+
+echo "senzing-xterm running on http://localhost:${PORT}"
+
+docker run \\
+  --interactive \\
+  --name senzing-xterm \\
+  --publish ${PORT}:5000 \\
+  --rm \\
+  --tty \\
+  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+  senzing/xterm:${IMAGE_VERSION}
+"""
+    return 0
 
 # -----------------------------------------------------------------------------
 # Utility functions
@@ -537,15 +702,15 @@ def log_environment_variables():
 
     # Log values.
 
-    logging.info(message_info(150))
+    logging.info(message_info(170))
     for key, default_value in environment_variables.items():
         environment_value = os.environ.get(key)
         if environment_value:
-            logging.info(message_info(151, key, environment_value))
+            logging.info(message_info(171, key, environment_value))
         elif default_value:
-            logging.info(message_info(152, key, default_value))
+            logging.info(message_info(172, key, default_value))
         else:
-            logging.info(message_info(153, key))
+            logging.info(message_info(173, key))
             report_warnings.append(message_warning(352, key))
 
 
@@ -588,13 +753,13 @@ def project_copy_etc(config):
     # If directory exists, back it up.
 
     if os.path.exists(docker_etc):
-        logging.info(message_info(110, docker_etc, docker_etc_old))
+        logging.info(message_info(161, docker_etc_old, docker_etc))
         shutil.move(docker_etc, docker_etc_old)
 
     # Copy directory.
 
     try:
-        logging.info(message_info(111, host_etc, docker_etc))
+        logging.info(message_info(164, docker_etc, host_etc))
         shutil.copytree(host_etc, docker_etc)
     except shutil.Error as err:
         exit_error(760, host_etc, docker_etc, err)
@@ -608,7 +773,7 @@ def project_create_setupenv_docker(config):
 
     project_dir = config.get("project_dir")
 
-    output_filename = "{0}/setupEnv-docker".format(project_dir)
+    output_filename = "{0}/docker-setupEnv".format(project_dir)
 
     docstring = """#! /usr/bin/env bash
 export SENZING_DATA_DIR={0}/data
@@ -624,7 +789,7 @@ mkdir -p {0}/var/rabbitmq
 chmod 777 {0}/var/rabbitmq
     """.format(project_dir)
 
-    logging.info(message_info(112, output_filename))
+    logging.info(message_info(165, output_filename))
     with open(output_filename, "w") as text_file:
         text_file.write(docstring)
 
@@ -691,7 +856,7 @@ def project_modify_G2Module_ini(config):
 
     # Write out contents.
 
-    logging.info(message_info(172, filename))
+    logging.info(message_info(156, filename, ""))
     with open(filename, 'w') as output_file:
         config_parser.write(output_file)
 
@@ -705,7 +870,11 @@ def create_bin_docker(config):
     # Map filenames to functions.
 
     output_files = {
-        "docker-xterm.sh": file_docker_xterm
+        "senzing-jupyter.sh": file_senzing_jupyter,
+        "senzing-mock-data-generator.sh": file_senzing_mock_data_generator,
+        "senzing-rabbitmq.sh": file_senzing_rabbitmq,
+        "senzing-webapp.sh": file_senzing_webapp,
+        "senzing-xterm.sh": file_senzing_xterm
     }
 
     output_directory = "{0}/docker-bin".format(project_dir)
@@ -714,7 +883,7 @@ def create_bin_docker(config):
     # If directory exists, back it up.
 
     if os.path.exists(output_directory):
-        logging.info(message_info(110, output_directory, output_directory_old))
+        logging.info(message_info(161, output_directory_old, output_directory))
         shutil.move(output_directory, output_directory_old)
 
     # Make .../docker-bin directory.
@@ -724,13 +893,26 @@ def create_bin_docker(config):
     except PermissionError as err:
         exit_error(702, output_directory, err)
 
+    # Determine local IP address.
+
+    my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    my_socket.connect(("8.8.8.8", 80))
+    local_ip_addr = my_socket.getsockname()[0]
+    my_socket.close()
 
     # Create docker-environment-vars.sh
 
+    variables = {
+        "local_ip_addr": local_ip_addr,
+        "project_dir": project_dir,
+        "senzing_database_url": "",
+        "sql_connection": ""
+    }
+
     filename = "{0}/docker-environment-vars.sh".format(output_directory)
     with open(filename, 'w') as file:
-        logging.info(message_warning(157, filename))
-        file.write(file_docker_environment_vars.__doc__.format(project_dir))
+        logging.info(message_warning(165, filename))
+        file.write(file_docker_environment_vars.__doc__.format(**variables))
     os.chmod(filename, 0o755)
 
     # Write files from function docstrings.
@@ -738,12 +920,12 @@ def create_bin_docker(config):
     for filename, function in output_files.items():
         full_filename = "{0}/{1}".format(output_directory, filename)
         if not os.path.exists(full_filename):
-            logging.info(message_info(112, full_filename))
+            logging.info(message_info(165, full_filename))
             with open(full_filename, 'w') as file:
                 file.write(function.__doc__)
             os.chmod(full_filename, 0o755)
         else:
-            logging.info(message_info(171, full_filename))
+            logging.info(message_info(163, full_filename))
 
 # -----------------------------------------------------------------------------
 # do_* functions
