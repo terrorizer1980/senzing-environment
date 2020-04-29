@@ -498,7 +498,7 @@ PORT=9178
 
 echo "senzing-jupyter running on http://localhost:${PORT}"
 
-docker run \
+docker run \\
   --env SENZING_SQL_CONNECTION=${SENZING_SQL_CONNECTION} \\
   --interactive \\
   --name senzing-jupyter \\
