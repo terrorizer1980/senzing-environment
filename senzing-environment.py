@@ -641,6 +641,7 @@ export SENZING_VAR_DIR={project_dir}/var
 """
     return 0
 
+
 def file_docker_pull_latest():
     """#! /usr/bin/env bash
 
@@ -671,7 +672,7 @@ echo "senzing-api-server running on http://localhost:${PORT}"
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
   --interactive \\
-  --name senzing-jupyter \\
+  --name senzing-api-server \\
   --publish ${PORT}:${PORT} \\
   --rm \\
   --tty \\
@@ -699,13 +700,15 @@ DOCKER_IMAGE_VERSION=latest
 
 docker run \\
   --cap-add=ALL \\
+  --interactive \\
   --name senzing-debug \\
   --rm \\
+  --tty \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/senzing/senzing-debug:${DOCKER_IMAGE_VERSION}
+  senzing/senzing-debug:${DOCKER_IMAGE_VERSION}
 """
     return 0
 
@@ -930,6 +933,7 @@ docker run \\
   senzing/xterm:${DOCKER_IMAGE_VERSION}
 """
     return 0
+
 
 def file_portainer():
     """#!/usr/bin/env bash
@@ -1196,7 +1200,7 @@ def create_bin_docker(config):
         "senzing-jupyter.sh": file_senzing_jupyter,
         "senzing-mock-data-generator.sh": file_senzing_mock_data_generator,
         "senzing-rabbitmq.sh": file_senzing_rabbitmq,
-        "senzing-sqlite-web": file_senzing_sqlite_web,
+        "senzing-sqlite-web.sh": file_senzing_sqlite_web,
         "senzing-stream-loader.sh": file_senzing_stream_loader,
         "senzing-webapp.sh": file_senzing_webapp,
         "senzing-xterm.sh": file_senzing_xterm
