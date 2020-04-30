@@ -20,12 +20,11 @@ import stat
 import string
 import sys
 import time
-from importlib_metadata.docs.conf import project
 
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-04-29'
+__updated__ = '2020-04-30'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -184,6 +183,7 @@ message_dictionary = {
     "171": "  {0} = {1}",
     "172": "  {0} defaults to {1}",
     "173": "  {0} is not set",
+    "181": "{0} ip address found by method: {1}",
     "190": "---- File --------------------------------------------------------------------",
     "191": "---- Path on workstation: {0}",
     "192": "---- Path inside  docker: {0}",
@@ -621,14 +621,16 @@ def file_docker_environment_vars():
 export DATABASE_DATABASE={database_database}
 export POSTGRES_DIR={project_dir}/var/postgres
 export RABBITMQ_DIR={project_dir}/var/rabbitmq
-export SENZING_API_SERVER_URL="http://localhost:8250"
+export SENZING_API_SERVER_URL="http://{local_ip_addr}:8250"
 export SENZING_DATABASE_URL={senzing_database_url}
 export SENZING_DATA_DIR={project_dir}/data
 export SENZING_DATA_VERSION_DIR={project_dir}/data
+export SENZING_DOCKER_SOCKET=/var/run/docker.sock
 export SENZING_ETC_DIR={project_dir}/docker-etc
 export SENZING_G2_DIR={project_dir}
 export SENZING_INPUT_URL="https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json"
 export SENZING_LOCAL_IP_ADDR={local_ip_addr}
+export SENZING_PORTAINER_DIR={project_dir}/var/portainer
 export SENZING_PROJECT_DIR={project_dir}
 export SENZING_RABBITMQ_PASSWORD=bitnami
 export SENZING_RABBITMQ_QUEUE=senzing-rabbitmq-queue
@@ -639,13 +641,73 @@ export SENZING_VAR_DIR={project_dir}/var
 """
     return 0
 
+def file_docker_pull_latest():
+    """#! /usr/bin/env bash
+
+docker pull portainer/portainer:latest
+docker pull senzing/senzing-debug:latest
+docker pull senzing/entity-search-web-app:latest
+docker pull senzing/init-container:latest
+docker pull senzing/jupyter:latest
+docker pull senzing/mock-data-generator:latest
+docker pull senzing/senzing-api-server:latest
+docker pull senzing/stream-loader:latest
+docker pull senzing/xterm:latest
+"""
+    return 0
+
 
 def file_senzing_api_server():
-    pass
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+DOCKER_IMAGE_VERSION=latest
+PORT=8250
+
+echo "senzing-api-server running on http://localhost:${PORT}"
+
+docker run \\
+  --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+  --interactive \\
+  --name senzing-jupyter \\
+  --publish ${PORT}:${PORT} \\
+  --rm \\
+  --tty \\
+  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+  senzing/senzing-api-server:${DOCKER_IMAGE_VERSION} \\
+    -httpPort ${PORT} \\
+    -bindAddr all \\
+    -iniFile /etc/opt/senzing/G2Module.ini \\
+    -allowedOrigins "*" \\
+    -enableAdmin
+"""
+    return 0
 
 
 def file_senzing_debug():
-    pass
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+DOCKER_IMAGE_VERSION=latest
+
+docker run \\
+  --cap-add=ALL \\
+  --name senzing-debug \\
+  --rm \\
+  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+  senzing/senzing/senzing-debug:${DOCKER_IMAGE_VERSION}
+"""
+    return 0
 
 
 def file_senzing_init_container():
@@ -654,7 +716,7 @@ def file_senzing_init_container():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-IMAGE_VERSION=latest
+DOCKER_IMAGE_VERSION=latest
 
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
@@ -664,7 +726,7 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/init-container:${IMAGE_VERSION}
+  senzing/init-container:${DOCKER_IMAGE_VERSION}
 """
     return 0
 
@@ -675,7 +737,7 @@ def file_senzing_jupyter():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-IMAGE_VERSION=latest
+DOCKER_IMAGE_VERSION=latest
 PORT=9178
 
 echo "senzing-jupyter running on http://localhost:${PORT}"
@@ -692,7 +754,7 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/jupyter:${IMAGE_VERSION} start.sh jupyter notebook --NotebookApp.token=''
+  senzing/jupyter:${DOCKER_IMAGE_VERSION} start.sh jupyter notebook --NotebookApp.token=''
 """
     return 0
 
@@ -703,7 +765,7 @@ def file_senzing_mock_data_generator():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-IMAGE_VERSION=1.1.1
+DOCKER_IMAGE_VERSION=1.1.1
 
 docker run \\
   --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \\
@@ -718,7 +780,7 @@ docker run \\
   --name senzing-mock-data-generator \\
   --rm \\
   --tty \\
-  senzing/mock-data-generator:${IMAGE_VERSION}
+  senzing/mock-data-generator:${DOCKER_IMAGE_VERSION}
 """
     return 0
 
@@ -741,7 +803,7 @@ def file_senzing_rabbitmq():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-IMAGE_VERSION=3.8.2
+DOCKER_IMAGE_VERSION=3.8.2
 
 echo "senzing-rabbitmq running on http://localhost:15672"
 
@@ -758,7 +820,7 @@ docker run \\
   --rm \\
   --tty \\
   --volume ${RABBITMQ_DIR}:/bitnami \\
-  bitnami/rabbitmq:${IMAGE_VERSION}
+  bitnami/rabbitmq:${DOCKER_IMAGE_VERSION}
 """
     return 0
 
@@ -769,7 +831,7 @@ def file_senzing_sqlite_web():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-IMAGE_VERSION=latest
+DOCKER_IMAGE_VERSION=latest
 
 echo "senzing-sqlite-web running on http://localhost:9174"
 
@@ -781,7 +843,7 @@ docker run \\
   --rm \\
   --tty \\
   --volume ${SENZING_VAR_DIR}/sqlite:/data \\
-  coleifer/sqlite-web:${IMAGE_VERSION}
+  coleifer/sqlite-web:${DOCKER_IMAGE_VERSION}
 """
     return 0
 
@@ -792,7 +854,7 @@ def file_senzing_stream_loader():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-IMAGE_VERSION=latest
+DOCKER_IMAGE_VERSION=latest
 
 docker run \\
   --env LC_CTYPE="en_us.utf8" \\
@@ -812,7 +874,7 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/stream-loader:${IMAGE_VERSION}
+  senzing/stream-loader:${DOCKER_IMAGE_VERSION}
 """
 
 
@@ -822,7 +884,7 @@ def file_senzing_webapp():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-IMAGE_VERSION=latest
+DOCKER_IMAGE_VERSION=latest
 PORT=8251
 
 echo "senzing-webapp running on http://localhost:${PORT}"
@@ -831,7 +893,7 @@ docker run \\
   --env SENZING_API_SERVER_URL=${SENZING_API_SERVER_URL} \\
   --env SENZING_WEB_SERVER_PORT=${PORT} \\
   --interactive \\
-  --name senzing-jupyter \\
+  --name senzing-webapp \\
   --publish ${PORT}:${PORT} \\
   --rm \\
   --tty \\
@@ -839,7 +901,7 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/entity-search-web-app:${IMAGE_VERSION}
+  senzing/entity-search-web-app:${DOCKER_IMAGE_VERSION}
 """
     return 0
 
@@ -850,7 +912,7 @@ def file_senzing_xterm():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-IMAGE_VERSION=latest
+DOCKER_IMAGE_VERSION=latest
 PORT=8254
 
 echo "senzing-xterm running on http://localhost:${PORT}"
@@ -865,7 +927,29 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/xterm:${IMAGE_VERSION}
+  senzing/xterm:${DOCKER_IMAGE_VERSION}
+"""
+    return 0
+
+def file_portainer():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+DOCKER_IMAGE_VERSION=latest
+PORT=9170
+
+echo "portainer running on http://localhost:${PORT}"
+
+sudo docker run \\
+   --detach \\
+   --name portainer \\
+   --publish ${PORT}:9000 \\
+   --restart always \\
+   --volume ${SENZING_DOCKER_SOCKET}:/var/run/docker.sock \\
+   --volume ${SENZING_PORTAINER_DIR}:/data \\
+   portainer/portainer:${DOCKER_IMAGE_VERSION}
 """
     return 0
 
@@ -1016,7 +1100,10 @@ export SENZING_VAR_DIR={0}/var
 export POSTGRES_DIR={0}/var/postgres
 export RABBITMQ_DIR={0}/var/rabbitmq
 
-mkdir -p {0}/var/rabbitmq
+mkdir -p  {0}/var/postgres
+chmod 777 {0}/var/postgres
+
+mkdir -p  {0}/var/rabbitmq
 chmod 777 {0}/var/rabbitmq
     """.format(project_dir)
 
@@ -1101,6 +1188,9 @@ def create_bin_docker(config):
     # Map filenames to functions.
 
     output_files = {
+        "docker-pull-latest.sh": file_docker_pull_latest,
+        "senzing-api-server.sh": file_senzing_api_server,
+        "senzing-debug.sh": file_senzing_debug,
         "senzing-init-container.sh": file_senzing_init_container,
         "senzing-jupyter.sh": file_senzing_jupyter,
         "senzing-mock-data-generator.sh": file_senzing_mock_data_generator,
@@ -1131,10 +1221,15 @@ def create_bin_docker(config):
 
     # Calculate local_ip_addr.
 
-    my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    my_socket.connect(("8.8.8.8", 80))
-    local_ip_addr = my_socket.getsockname()[0]
-    my_socket.close()
+    local_ip_addr_method = "SENZING_LOCAL_IP_ADDR"
+    local_ip_addr = os.environ.get(local_ip_addr_method)
+    if not local_ip_addr:
+        my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        my_socket.connect(("8.8.8.8", 80))
+        local_ip_addr = my_socket.getsockname()[0]
+        my_socket.close()
+        local_ip_addr_method = "socket.connect"
+    logging.info(message_info(181, local_ip_addr, local_ip_addr_method))
 
     # Calculate sql_connection.
 
