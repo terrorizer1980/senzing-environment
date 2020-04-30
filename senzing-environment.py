@@ -618,26 +618,27 @@ def file_docker_environment_vars():
 # For more information about the environment variables, see
 # https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md
 
-export DATABASE_DATABASE={database_database}
-export POSTGRES_DIR={project_dir}/var/postgres
-export RABBITMQ_DIR={project_dir}/var/rabbitmq
-export SENZING_API_SERVER_URL="http://{local_ip_addr}:8250"
-export SENZING_DATABASE_URL={senzing_database_url}
-export SENZING_DATA_DIR={project_dir}/data
-export SENZING_DATA_VERSION_DIR={project_dir}/data
-export SENZING_DOCKER_SOCKET=/var/run/docker.sock
-export SENZING_ETC_DIR={project_dir}/docker-etc
-export SENZING_G2_DIR={project_dir}
-export SENZING_INPUT_URL="https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json"
-export SENZING_LOCAL_IP_ADDR={local_ip_addr}
-export SENZING_PORTAINER_DIR={project_dir}/var/portainer
+export SENZING_DOCKER_HOST_IP_ADDR={local_ip_addr}
 export SENZING_PROJECT_DIR={project_dir}
+
+export DATABASE_DATABASE={database_database}
+export POSTGRES_DIR=${{SENZING_PROJECT_DIR}}/var/postgres
+export RABBITMQ_DIR=${{SENZING_PROJECT_DIR}}/var/rabbitmq
+export SENZING_API_SERVER_URL="http://${{SENZING_DOCKER_HOST_IP_ADDR}}:8250"
+export SENZING_DATABASE_URL={senzing_database_url}
+export SENZING_DATA_DIR=${{SENZING_PROJECT_DIR}}/data
+export SENZING_DATA_VERSION_DIR=${{SENZING_PROJECT_DIR}}/data
+export SENZING_DOCKER_SOCKET=/var/run/docker.sock
+export SENZING_ETC_DIR=${{SENZING_PROJECT_DIR}}/docker-etc
+export SENZING_G2_DIR=${{SENZING_PROJECT_DIR}}
+export SENZING_INPUT_URL="https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json"
+export SENZING_PORTAINER_DIR=${{SENZING_PROJECT_DIR}}/var/portainer
 export SENZING_RABBITMQ_PASSWORD=bitnami
 export SENZING_RABBITMQ_QUEUE=senzing-rabbitmq-queue
 export SENZING_RABBITMQ_USERNAME=user
 export SENZING_RECORD_MAX=5000
 export SENZING_SQL_CONNECTION="{sql_connection}"
-export SENZING_VAR_DIR={project_dir}/var
+export SENZING_VAR_DIR=${{SENZING_PROJECT_DIR}}/var
 """
     return 0
 
@@ -772,7 +773,7 @@ DOCKER_IMAGE_VERSION=1.1.1
 
 docker run \\
   --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \\
-  --env SENZING_RABBITMQ_HOST=${SENZING_LOCAL_IP_ADDR} \\
+  --env SENZING_RABBITMQ_HOST=${SENZING_DOCKER_HOST_IP_ADDR} \\
   --env SENZING_RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
   --env SENZING_RABBITMQ_QUEUE=${SENZING_RABBITMQ_QUEUE} \\
   --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
@@ -864,7 +865,7 @@ docker run \\
   --env SENZING_DATA_SOURCE=TEST \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
   --env SENZING_ENTITY_TYPE=TEST \\
-  --env SENZING_RABBITMQ_HOST=${SENZING_LOCAL_IP_ADDR} \\
+  --env SENZING_RABBITMQ_HOST=${SENZING_DOCKER_HOST_IP_ADDR} \\
   --env SENZING_RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
   --env SENZING_RABBITMQ_QUEUE=${SENZING_RABBITMQ_QUEUE} \\
   --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
@@ -1226,7 +1227,7 @@ def create_bin_docker(config):
 
     # Calculate local_ip_addr.
 
-    local_ip_addr_method = "SENZING_LOCAL_IP_ADDR"
+    local_ip_addr_method = "SENZING_DOCKER_HOST_IP_ADDR"
     local_ip_addr = os.environ.get(local_ip_addr_method)
     if not local_ip_addr:
         my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
