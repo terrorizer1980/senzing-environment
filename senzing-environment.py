@@ -1105,7 +1105,8 @@ chmod 777 {0}/var/postgres
 
 mkdir -p  {0}/var/rabbitmq
 chmod 777 {0}/var/rabbitmq
-    """.format(project_dir)
+
+""".format(project_dir)
 
     logging.info(message_info(165, output_filename))
     with open(output_filename, "w") as text_file:
