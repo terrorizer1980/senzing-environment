@@ -506,11 +506,12 @@ database_connection_formats = {
     "sqlite3": "{scheme}://{username}:{password}@{path}",
 }
 
+
 def parse_database_connection(senzing_database_connection):
     result = {}
     scheme = senzing_database_connection[:senzing_database_connection.index(":")]
 
-    result = parse.parse(database_connection_formats.get(scheme,""), senzing_database_connection)
+    result = parse.parse(database_connection_formats.get(scheme, ""), senzing_database_connection)
     if not result:
         logging.error(message_error(695, "", senzing_database_connection))
     else:
@@ -519,12 +520,13 @@ def parse_database_connection(senzing_database_connection):
     assert type(result) == dict
     return result
 
+
 def get_g2_database_url_raw(parsed_database_url):
     ''' Given a canonical database URL, transform to the specific URL. '''
 
     result = ""
     scheme = parsed_database_url.get('scheme')
-    result = database_connection_formats.get(scheme,"").format(**parsed_database_url)
+    result = database_connection_formats.get(scheme, "").format(**parsed_database_url)
     if not result:
         logging.error(message_error(695, scheme, generic_database_url))
 
@@ -616,6 +618,7 @@ def file_docker_environment_vars():
 # For more information about the environment variables, see
 # https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md
 
+export DATABASE_DATABASE={database_database}
 export POSTGRES_DIR={project_dir}/var/postgres
 export RABBITMQ_DIR={project_dir}/var/rabbitmq
 export SENZING_API_SERVER_URL="http://localhost:8250"
@@ -760,8 +763,57 @@ docker run \\
     return 0
 
 
+def file_senzing_sqlite_web():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+IMAGE_VERSION=latest
+
+echo "senzing-sqlite-web running on http://localhost:9174"
+
+docker run \\
+  --env SQLITE_DATABASE=${DATABASE_DATABASE} \\
+  --interactive \\
+  --name senzing-sqlite-web \\
+  --publish 9174:8080 \\
+  --rm \\
+  --tty \\
+  --volume ${SENZING_VAR_DIR}/sqlite:/data \\
+  coleifer/sqlite-web:${IMAGE_VERSION}
+"""
+    return 0
+
+
 def file_senzing_stream_loader():
-    pass
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+IMAGE_VERSION=latest
+
+docker run \\
+  --env LC_CTYPE="en_us.utf8" \\
+  --env SENZING_DATA_SOURCE=TEST \\
+  --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+  --env SENZING_ENTITY_TYPE=TEST \\
+  --env SENZING_RABBITMQ_HOST=${SENZING_LOCAL_IP_ADDR} \\
+  --env SENZING_RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
+  --env SENZING_RABBITMQ_QUEUE=${SENZING_RABBITMQ_QUEUE} \\
+  --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
+  --env SENZING_SUBCOMMAND=rabbitmq \\
+  --interactive \\
+  --name senzing-stream-loader \\
+  --rm \\
+  --tty \\
+  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+  senzing/stream-loader:${IMAGE_VERSION}
+"""
 
 
 def file_senzing_webapp():
@@ -1053,6 +1105,8 @@ def create_bin_docker(config):
         "senzing-jupyter.sh": file_senzing_jupyter,
         "senzing-mock-data-generator.sh": file_senzing_mock_data_generator,
         "senzing-rabbitmq.sh": file_senzing_rabbitmq,
+        "senzing-sqlite-web": file_senzing_sqlite_web,
+        "senzing-stream-loader.sh": file_senzing_stream_loader,
         "senzing-webapp.sh": file_senzing_webapp,
         "senzing-xterm.sh": file_senzing_xterm
     }
@@ -1103,9 +1157,16 @@ def create_bin_docker(config):
     parsed_database_connection = parse_database_connection(sql_connection)
     senzing_database_url = get_g2_database_url(parsed_database_connection)
 
+    print(parsed_database_connection)
+
+    schema = parsed_database_connection.get("schema", "")
+    if parsed_database_connection.get("scheme", "") == "sqlite3":
+        schema = os.path.basename(parsed_database_connection.get("path", ""))
+
     # Create docker-environment-vars.sh
 
     variables = {
+        "database_database": schema,
         "local_ip_addr": local_ip_addr,
         "project_dir": project_dir,
         "senzing_database_url": senzing_database_url,
