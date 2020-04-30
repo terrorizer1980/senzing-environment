@@ -5,23 +5,27 @@
 # -----------------------------------------------------------------------------
 
 from glob import glob
+from urllib.parse import urlparse, urlunparse
 import argparse
 import configparser
 import json
 import linecache
 import logging
 import os
+import parse
 import shutil
 import signal
 import socket
 import stat
+import string
 import sys
 import time
+from importlib_metadata.docs.conf import project
 
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-04-28'
+__updated__ = '2020-04-29'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -31,6 +35,12 @@ log_format = '%(asctime)s %(message)s'
 KILOBYTES = 1024
 MEGABYTES = 1024 * KILOBYTES
 GIGABYTES = 1024 * MEGABYTES
+
+# Lists from https://www.ietf.org/rfc/rfc1738.txt
+
+xsafe_character_list = ['$', '-', '_', '.', '+', '!', '*', '(', ')', ',', '"' ] + list(string.ascii_letters)
+xunsafe_character_list = [ '"', '<', '>', '#', '%', '{', '}', '|', '\\', '^', '~', '[', ']', '`']
+xreserved_character_list = [ ';', ',', '/', '?', ':', '@', '=', '&']
 
 # The "configuration_locator" describes where configuration variables are in:
 # 1) Command line options, 2) Environment variables, 3) Configuration files, 4) Default values
@@ -389,6 +399,155 @@ def redact_configuration(config):
     return result
 
 # -----------------------------------------------------------------------------
+# Database URL parsing
+# -----------------------------------------------------------------------------
+
+
+def xtranslate(map, astring):
+    new_string = str(astring)
+    for key, value in map.items():
+        new_string = new_string.replace(key, value)
+    return new_string
+
+
+def xget_unsafe_characters(astring):
+    result = []
+    for unsafe_character in unsafe_character_list:
+        if unsafe_character in astring:
+            result.append(unsafe_character)
+    return result
+
+
+def xget_safe_characters(astring):
+    result = []
+    for safe_character in safe_character_list:
+        if safe_character not in astring:
+            result.append(safe_character)
+    return result
+
+
+def xparse_database_url(original_senzing_database_url):
+    ''' Given a canonical database URL, decompose into URL components. '''
+
+    result = {}
+
+    # Get the value of SENZING_DATABASE_URL environment variable.
+
+    senzing_database_url = original_senzing_database_url
+
+    # Create lists of safe and unsafe characters.
+
+    unsafe_characters = get_unsafe_characters(senzing_database_url)
+    safe_characters = get_safe_characters(senzing_database_url)
+
+    # Detect an error condition where there are not enough safe characters.
+
+    if len(unsafe_characters) > len(safe_characters):
+        logging.error(message_error(730, unsafe_characters, safe_characters))
+        return result
+
+    # Perform translation.
+    # This makes a map of safe character mapping to unsafe characters.
+    # "senzing_database_url" is modified to have only safe characters.
+
+    translation_map = {}
+    safe_characters_index = 0
+    for unsafe_character in unsafe_characters:
+        safe_character = safe_characters[safe_characters_index]
+        safe_characters_index += 1
+        translation_map[safe_character] = unsafe_character
+        senzing_database_url = senzing_database_url.replace(unsafe_character, safe_character)
+
+    # Parse "translated" URL.
+
+    parsed = urlparse(senzing_database_url)
+    schema = parsed.path.strip('/')
+
+    # Construct result.
+
+    result = {
+        'scheme': translate(translation_map, parsed.scheme),
+        'netloc': translate(translation_map, parsed.netloc),
+        'path': translate(translation_map, parsed.path),
+        'params': translate(translation_map, parsed.params),
+        'query': translate(translation_map, parsed.query),
+        'fragment': translate(translation_map, parsed.fragment),
+        'username': translate(translation_map, parsed.username),
+        'password': translate(translation_map, parsed.password),
+        'hostname': translate(translation_map, parsed.hostname),
+        'port': translate(translation_map, parsed.port),
+        'schema': translate(translation_map, schema),
+    }
+
+    # For safety, compare original URL with reconstructed URL.
+
+    url_parts = [
+        result.get('scheme'),
+        result.get('netloc'),
+        result.get('path'),
+        result.get('params'),
+        result.get('query'),
+        result.get('fragment'),
+    ]
+    test_senzing_database_url = urlunparse(url_parts)
+    if test_senzing_database_url != original_senzing_database_url:
+        logging.warning(message_warning(891, original_senzing_database_url, test_senzing_database_url))
+
+    # Return result.
+
+    return result
+
+
+database_connection_formats = {
+    "db2": "{scheme}://{username}:{password}@{schema}",
+    "mssql": "{scheme}://{username}:{password}@{schema}",
+    "mysql": "{scheme}://{username}:{password}@{hostname}:{port}/?schema={schema}",
+    "postgresql": "{scheme}://{username}:{password}@{hostname}:{port}:{schema}/",
+    "sqlite3": "{scheme}://{username}:{password}@{path}",
+}
+
+def parse_database_connection(senzing_database_connection):
+    result = {}
+    scheme = senzing_database_connection[:senzing_database_connection.index(":")]
+
+    result = parse.parse(database_connection_formats.get(scheme,""), senzing_database_connection)
+    if not result:
+        logging.error(message_error(695, "", senzing_database_connection))
+    else:
+        result = result.named
+
+    assert type(result) == dict
+    return result
+
+def get_g2_database_url_raw(parsed_database_url):
+    ''' Given a canonical database URL, transform to the specific URL. '''
+
+    result = ""
+    scheme = parsed_database_url.get('scheme')
+    result = database_connection_formats.get(scheme,"").format(**parsed_database_url)
+    if not result:
+        logging.error(message_error(695, scheme, generic_database_url))
+
+    assert type(result) == dict
+    return result
+
+
+def get_g2_database_url(parsed_database_connection):
+    ''' Given a parsed database URL, transform to the normalized URL. '''
+
+    result = ""
+    scheme = parsed_database_connection.get('scheme')
+
+    if scheme in ['mysql', 'postgresql', 'db2', 'mssql']:
+        result = "{scheme}://{username}:{password}@{hostname}:{port}/{schema}".format(**parsed_database_connection)
+    elif scheme in ['sqlite3']:
+        result = "{scheme}://{username}:{password}@{path}".format(**parsed_database_connection)
+    else:
+        logging.error(message_error(695, scheme, parsed_database_connection))
+
+    return result
+
+# -----------------------------------------------------------------------------
 # Utility functions
 # -----------------------------------------------------------------------------
 
@@ -454,10 +613,13 @@ def exit_silently():
 def file_docker_environment_vars():
     """#! /usr/bin/env bash
 
+# For more information about the environment variables, see
+# https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md
+
 export POSTGRES_DIR={project_dir}/var/postgres
 export RABBITMQ_DIR={project_dir}/var/rabbitmq
 export SENZING_API_SERVER_URL="http://localhost:8250"
-export SENZING_DATABASE_URL=[senzing_database_url]
+export SENZING_DATABASE_URL={senzing_database_url}
 export SENZING_DATA_DIR={project_dir}/data
 export SENZING_DATA_VERSION_DIR={project_dir}/data
 export SENZING_ETC_DIR={project_dir}/docker-etc
@@ -484,7 +646,24 @@ def file_senzing_debug():
 
 
 def file_senzing_init_container():
-    pass
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+IMAGE_VERSION=latest
+
+docker run \\
+  --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+  --name senzing-init-container \\
+  --rm \\
+  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+  senzing/init-container:${IMAGE_VERSION}
+"""
+    return 0
 
 
 def file_senzing_jupyter():
@@ -870,6 +1049,7 @@ def create_bin_docker(config):
     # Map filenames to functions.
 
     output_files = {
+        "senzing-init-container.sh": file_senzing_init_container,
         "senzing-jupyter.sh": file_senzing_jupyter,
         "senzing-mock-data-generator.sh": file_senzing_mock_data_generator,
         "senzing-rabbitmq.sh": file_senzing_rabbitmq,
@@ -877,14 +1057,16 @@ def create_bin_docker(config):
         "senzing-xterm.sh": file_senzing_xterm
     }
 
-    output_directory = "{0}/docker-bin".format(project_dir)
-    output_directory_old = "{0}.{1}".format(output_directory, int(time.time()))
+    # Specify output directory and backup directory.
 
-    # If directory exists, back it up.
+    output_directory = "{0}/docker-bin".format(project_dir)
+    backup_directory = "{0}.{1}".format(output_directory, int(time.time()))
+
+    # If output directory exists, back it up.
 
     if os.path.exists(output_directory):
-        logging.info(message_info(161, output_directory_old, output_directory))
-        shutil.move(output_directory, output_directory_old)
+        logging.info(message_info(161, backup_directory, output_directory))
+        shutil.move(output_directory, backup_directory)
 
     # Make .../docker-bin directory.
 
@@ -893,20 +1075,41 @@ def create_bin_docker(config):
     except PermissionError as err:
         exit_error(702, output_directory, err)
 
-    # Determine local IP address.
+    # Calculate local_ip_addr.
 
     my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     my_socket.connect(("8.8.8.8", 80))
     local_ip_addr = my_socket.getsockname()[0]
     my_socket.close()
 
+    # Calculate sql_connection.
+
+    # # FIXME:  Get path from setupEnv script
+    project_config_file = "{0}/docker-etc/G2Module.ini".format(project_dir)
+
+    # Read configuration file.
+
+    config_parser = configparser.ConfigParser()
+    config_parser.optionxform = str  # Maintain case of keys.
+    config_parser.read(project_config_file)
+    sql_connection = ""
+    try:
+        sql_connection = config_parser.get("SQL", "CONNECTION")
+    except:
+        pass
+
+    # Calculate senzing_database_url.
+
+    parsed_database_connection = parse_database_connection(sql_connection)
+    senzing_database_url = get_g2_database_url(parsed_database_connection)
+
     # Create docker-environment-vars.sh
 
     variables = {
         "local_ip_addr": local_ip_addr,
         "project_dir": project_dir,
-        "senzing_database_url": "",
-        "sql_connection": ""
+        "senzing_database_url": senzing_database_url,
+        "sql_connection": sql_connection
     }
 
     filename = "{0}/docker-environment-vars.sh".format(output_directory)
