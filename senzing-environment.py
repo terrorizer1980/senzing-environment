@@ -24,7 +24,7 @@ import time
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-04-30'
+__updated__ = '2020-05-01'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -1096,20 +1096,23 @@ def project_create_setupenv_docker(config):
     output_filename = "{0}/docker-setupEnv".format(project_dir)
 
     docstring = """#! /usr/bin/env bash
-export SENZING_DATA_DIR={0}/data
-export SENZING_DATA_VERSION_DIR={0}/data
-export SENZING_ETC_DIR={0}/docker-etc
-export SENZING_G2_DIR={0}
-export SENZING_VAR_DIR={0}/var
 
-export POSTGRES_DIR={0}/var/postgres
-export RABBITMQ_DIR={0}/var/rabbitmq
+export SENZING_PROJECT_DIR={project_dir}
 
-mkdir -p  {0}/var/postgres
-chmod 777 {0}/var/postgres
+export SENZING_DATA_DIR=${{SENZING_PROJECT_DIR}}/data
+export SENZING_DATA_VERSION_DIR=${{SENZING_PROJECT_DIR}}/data
+export SENZING_ETC_DIR={${{SENZING_PROJECT_DIR}}/docker-etc
+export SENZING_G2_DIR=${{SENZING_PROJECT_DIR}}
+export SENZING_VAR_DIR=${{SENZING_PROJECT_DIR}}/var
 
-mkdir -p  {0}/var/rabbitmq
-chmod 777 {0}/var/rabbitmq
+export POSTGRES_DIR=${{SENZING_PROJECT_DIR}}/var/postgres
+export RABBITMQ_DIR=${{SENZING_PROJECT_DIR}}/var/rabbitmq
+
+mkdir -p  ${{SENZING_PROJECT_DIR}}/var/postgres
+chmod 777 ${{SENZING_PROJECT_DIR}}/var/postgres
+
+mkdir -p  ${{SENZING_PROJECT_DIR}}/var/rabbitmq
+chmod 777 ${{SENZING_PROJECT_DIR}}/var/rabbitmq
 
 """.format(project_dir)
 
