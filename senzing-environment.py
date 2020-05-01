@@ -159,7 +159,7 @@ MESSAGE_DEBUG = 900
 message_dictionary = {
     "100": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}I",
     "101": "------------------------------------------------------------------------------",
-    "102": "Modifying {0}...",
+    "102": "{0} - Modifying...",
     "103": "   Changing {0}.{1} from {2} to {3}",
     "104": "   Keeping  {0}.{1} as {2}",
     "105": "   {0}.{1} doesn't exist",
@@ -1094,6 +1094,13 @@ def project_create_setupenv_docker(config):
     project_dir = config.get("project_dir")
 
     output_filename = "{0}/docker-setupEnv".format(project_dir)
+    backup_filename = "{0}.{1}".format(output_filename, int(time.time()))
+
+    # If output file exists, back it up.
+
+    if os.path.exists(output_filename):
+        logging.info(message_info(161, backup_filename, output_filename))
+        shutil.move(output_filename, backup_filename)
 
     docstring = """#! /usr/bin/env bash
 
@@ -1101,7 +1108,7 @@ export SENZING_PROJECT_DIR={project_dir}
 
 export SENZING_DATA_DIR=${{SENZING_PROJECT_DIR}}/data
 export SENZING_DATA_VERSION_DIR=${{SENZING_PROJECT_DIR}}/data
-export SENZING_ETC_DIR={${{SENZING_PROJECT_DIR}}/docker-etc
+export SENZING_ETC_DIR=${{SENZING_PROJECT_DIR}}/docker-etc
 export SENZING_G2_DIR=${{SENZING_PROJECT_DIR}}
 export SENZING_VAR_DIR=${{SENZING_PROJECT_DIR}}/var
 
@@ -1114,7 +1121,7 @@ chmod 777 ${{SENZING_PROJECT_DIR}}/var/postgres
 mkdir -p  ${{SENZING_PROJECT_DIR}}/var/rabbitmq
 chmod 777 ${{SENZING_PROJECT_DIR}}/var/rabbitmq
 
-""".format(project_dir)
+""".format(project_dir=project_dir)
 
     logging.info(message_info(165, output_filename))
     with open(output_filename, "w") as text_file:
@@ -1260,8 +1267,6 @@ def create_bin_docker(config):
 
     parsed_database_connection = parse_database_connection(sql_connection)
     senzing_database_url = get_g2_database_url(parsed_database_connection)
-
-    print(parsed_database_connection)
 
     schema = parsed_database_connection.get("schema", "")
     if parsed_database_connection.get("scheme", "") == "sqlite3":
