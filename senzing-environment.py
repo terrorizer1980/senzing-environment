@@ -164,12 +164,12 @@ message_dictionary = {
     "104": "   Keeping  {0}.{1} as {2}",
     "105": "   {0}.{1} doesn't exist",
     "106": "   Removed  {0}.{1}",
+    "119": "{0} - Modified. {1}",
     "151": "{0} - Changing permissions from {1:o} to {2:o}",
     "173": "{0} - Changing owner from {1} to {2}",
     "153": "{0} - Changing group from {1} to {2}",
     "154": "{0} - Creating file by copying {1}",
     "155": "{0} - Deleting",
-    "156": "{0} - Modified. {1}",
     "157": "{0} - Creating file",
     "158": "{0} - Creating symlink to {1}",
     "159": "{0} - Downloading from {1}",
@@ -1190,7 +1190,7 @@ def project_modify_G2Module_ini(config):
 
     # Write out contents.
 
-    logging.info(message_info(156, filename, ""))
+    logging.info(message_info(119, filename, ""))
     with open(filename, 'w') as output_file:
         config_parser.write(output_file)
 
