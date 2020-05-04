@@ -144,7 +144,7 @@ These are "one-time tasks" which may already have been completed.
 
 ### Create Senzing project
 
-If a Senzing project directory already exists, this step may be skipped.
+:thinking: If a Senzing project directory already exists, this step may be skipped.
 If a Senzing project directory is needed, perform the following step.
 
 1. Create the Senzing project.
@@ -168,29 +168,11 @@ If a Senzing project directory is needed, perform the following step.
    Example:
 
     ```console
-    export SENZING_DOCKER_HOST_IP_ADDR=10.1.1.102
+    export SENZING_DOCKER_HOST_IP_ADDR=10.1.1.100
     ```
 
-    1. To find the value for `SENZING_DOCKER_HOST_IP_ADDR` use Python interactively:
-       Example:
-
-        ```console
-        python3
-        ```
-
-       Copy and paste the following lines into the Python REPL (Read-Evaluate-Print Loop):
-
-        ```python
-        import socket
-
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.connect(("8.8.8.8", 80))
-        print("export SENZING_DOCKER_HOST_IP_ADDR={0}".format(sock.getsockname()[0]))
-        sock.close()
-        quit()
-        ```
-
-       Copy and paste the printed `export` statement into the host terminal.
+    1. To find the value for `SENZING_DOCKER_HOST_IP_ADDR` by using Python interactively, visit
+       [SENZING_DOCKER_HOST_IP_ADDR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_docker_host_ip_addr).
 
 ### Run Docker container
 
