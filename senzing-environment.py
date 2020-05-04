@@ -679,7 +679,7 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 DOCKER_IMAGE_VERSION=latest
 PORT=8250
 
-echo "senzing-api-server running on http://localhost:${PORT}"
+echo "${SENZING_PROJECT_NAME}-api-server running on http://localhost:${PORT}"
 
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
@@ -755,7 +755,7 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 DOCKER_IMAGE_VERSION=latest
 PORT=9178
 
-echo "senzing-jupyter running on http://localhost:${PORT}"
+echo "${SENZING_PROJECT_NAME}-jupyter running on http://localhost:${PORT}"
 
 docker run \\
   --env SENZING_SQL_CONNECTION=${SENZING_SQL_CONNECTION} \\
@@ -820,7 +820,7 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 DOCKER_IMAGE_VERSION=3.8.2
 
-echo "senzing-rabbitmq running on http://localhost:15672"
+echo "${SENZING_PROJECT_NAME}-rabbitmq running on http://localhost:15672"
 
 mkdir -p ${RABBITMQ_DIR}
 chmod 777 ${RABBITMQ_DIR}
@@ -848,7 +848,7 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 DOCKER_IMAGE_VERSION=latest
 
-echo "senzing-sqlite-web running on http://localhost:9174"
+echo "${SENZING_PROJECT_NAME}-sqlite-web running on http://localhost:9174"
 
 docker run \\
   --env SQLITE_DATABASE=${DATABASE_DATABASE} \\
@@ -902,7 +902,7 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 DOCKER_IMAGE_VERSION=latest
 PORT=8251
 
-echo "senzing-webapp running on http://localhost:${PORT}"
+echo "${SENZING_PROJECT_NAME}-webapp running on http://localhost:${PORT}"
 
 docker run \\
   --env SENZING_API_SERVER_URL=${SENZING_API_SERVER_URL} \\
@@ -930,7 +930,7 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 DOCKER_IMAGE_VERSION=latest
 PORT=8254
 
-echo "senzing-xterm running on http://localhost:${PORT}"
+echo "${SENZING_PROJECT_NAME}-xterm running on http://localhost:${PORT}"
 
 docker run \\
   --interactive \\
