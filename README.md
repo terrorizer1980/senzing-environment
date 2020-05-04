@@ -14,7 +14,7 @@ describing where we can improve.   Now on with the show...
 
 ## Overview
 
-The [senzing-environment.py](senzing-environment.py) program helps G2Project directories work with Senzing Docker formations.
+The [senzing-environment.py](senzing-environment.py) program helps Senzing project directories work with Senzing Docker formations.
 
 ### Contents
 
@@ -135,7 +135,7 @@ These are "one-time tasks" which may already have been completed.
 
 ### Docker volumes
 
-1. Specify the location of the project on the host system.
+1. Specify the location of the Senzing project on the host system.
    Example:
 
     ```console
@@ -144,10 +144,10 @@ These are "one-time tasks" which may already have been completed.
 
 ### Create Senzing project
 
-If a project directory already exists, this step may be skipped.
-If a project directory is needed, perform the following step.
+If a Senzing project directory already exists, this step may be skipped.
+If a Senzing project directory is needed, perform the following step.
 
-1. Create the project.
+1. Create the Senzing project.
    Example:
 
     ```console
@@ -156,7 +156,7 @@ If a project directory is needed, perform the following step.
 
 ### Environment variables for Docker
 
-1. Give the project a name.
+1. Give the Senzing project a name.
    The name is used as a prefix for docker containers.
    Example:
 
@@ -194,7 +194,7 @@ If a project directory is needed, perform the following step.
 
 ### Run Docker container
 
-1. Run Docker container to add Docker support to the project directory.
+1. Run Docker container to add Docker support to the Senzing project directory.
    Example:
 
     ```console
@@ -265,7 +265,7 @@ The following examples require initialization described in
     export SENZING_PROJECT_DIR=~/senzing-project
     ```
 
-1. :pencil2: Give the project a name.
+1. :pencil2: Give the Senzing project a name.
    The name is used as a prefix for docker containers.
    Example:
 
@@ -273,7 +273,7 @@ The following examples require initialization described in
     export SENZING_PROJECT_NAME=senzing
     ```
 
-1. Update Senzing project directory
+1. Add docker support to Senzing project directory
    Example:
 
     ```console
@@ -284,7 +284,7 @@ The following examples require initialization described in
 
 #### Senzing project work-around
 
-Currently G2Project directories contain symbolic links that do not work within docker containers.
+Currently Senzing project directories contain symbolic links that do not work within docker containers.
 The following instructions replace the symbolic links with actual directories.
 
 1. Backup existing directories.
@@ -295,7 +295,7 @@ The following instructions replace the symbolic links with actual directories.
     mv ${SENZING_PROJECT_DIR}/resources/schema ${SENZING_PROJECT_DIR}/resources/schema.$(date +%s)
     ```
 
-1. Copy new directories into G2Project.
+1. Copy new directories into Senzing project directory.
    Example:
 
     ```console
