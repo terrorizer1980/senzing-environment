@@ -680,6 +680,7 @@ DOCKER_IMAGE_VERSION=latest
 PORT=8250
 
 echo "${SENZING_PROJECT_NAME}-api-server running on http://localhost:${PORT}"
+echo "Swagger editor: http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api/master/senzing-rest-api.yaml"
 
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
@@ -754,6 +755,8 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 DOCKER_IMAGE_VERSION=latest
 PORT=9178
+
+chmod -R 777 ${SENZING_PROJECT_DIR}/var/sqlite/
 
 echo "${SENZING_PROJECT_NAME}-jupyter running on http://localhost:${PORT}"
 
