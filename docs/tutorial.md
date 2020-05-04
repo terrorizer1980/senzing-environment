@@ -3,21 +3,21 @@
 The following demonstrations show how to augment Senzing projects with `senzing-environment`
 to facilitate the use of Docker within a project.
 
-The first demonstration shows how to use `docker-compose` with a project.
-The second demonstration shows how to use independent docker containers within a project.
+The first demonstration shows how to use `docker-compose` with a Senzing project.
+The second demonstration shows how to use independent docker containers within a Senzing project.
 
 ## Demonstration 1
 
-### Create new G2Project with Docker support
+### Create new Senzing project with Docker support
 
-1. Specify the location of the project on the host system.
+1. Specify the location of the Senzing project on the host system.
    Example:
 
     ```console
     export SENZING_PROJECT_DIR=~/senzing-demo-project-1
     ```
 
-1. Give the project a name.
+1. Give the Senzing project a name.
    The name is used as a prefix for docker containers.
    Example:
 
@@ -25,14 +25,14 @@ The second demonstration shows how to use independent docker containers within a
     export SENZING_PROJECT_NAME=demo01
     ```
 
-1. Create the project.
+1. Create the Senzing project.
    Example:
 
     ```console
     /opt/senzing/g2/python/G2CreateProject.py ${SENZING_PROJECT_DIR}
     ```
 
-1. View the project.
+1. View the Senzing project.
    Example:
 
     ```console
@@ -67,7 +67,7 @@ The second demonstration shows how to use independent docker containers within a
 
        Copy and paste the printed `export` statement into the host terminal.
 
-1. Add Docker support to the project directory.
+1. Add Docker support to the Senzing project directory.
    Example:
 
     ```console
@@ -83,7 +83,7 @@ The second demonstration shows how to use independent docker containers within a
         --project-dir ${SENZING_PROJECT_DIR}
     ```
 
-1. View the project again.
+1. View the Senzing project again.
    Example:
 
     ```console
@@ -121,7 +121,7 @@ This Docker formation uses the docker-compose YAML file described in
 
    Something worthy of noting:  the `SENZING_ETC_DIR` references the `docker-etc` directory.
    `docker-etc` is similar to the `etc` directory, but the files have been modified
-   to reflect the paths of files being **inside** a docker container, not **outside** on the host system's project.
+   to reflect the paths of files being **inside** a docker container, not **outside** on the host system's Senzing project.
 
 1. Set environment variables using `source`.
    Example:
@@ -198,16 +198,16 @@ This Docker formation uses the docker-compose YAML file described in
 
 ## Demonstration 2
 
-### Create second G2Project with Docker support
+### Create second Senzing project with Docker support
 
-1. Specify the location of the project on the host system.
+1. Specify the location of the Senzing project on the host system.
    Example:
 
     ```console
     export SENZING_PROJECT_DIR=~/senzing-demo-project-2
     ```
 
-1. Give the project a name.
+1. Give the Senzing project a name.
    The name is used as a prefix for docker containers.
    Example:
 
@@ -215,7 +215,7 @@ This Docker formation uses the docker-compose YAML file described in
     export SENZING_PROJECT_NAME=demo02
     ```
 
-1. Create the project.
+1. Create the Senzing project.
    Example:
 
     ```console
@@ -250,7 +250,7 @@ This Docker formation uses the docker-compose YAML file described in
 
        Copy and paste the printed `export` statement into the host terminal.
 
-1. Add Docker support to the project directory.
+1. Add Docker support to the Senzing project directory.
    Example:
 
     ```console
