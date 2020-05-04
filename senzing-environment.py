@@ -24,7 +24,7 @@ import time
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-05-01'
+__updated__ = '2020-05-04'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -49,6 +49,11 @@ configuration_locator = {
         "default": False,
         "env": "SENZING_DEBUG",
         "cli": "debug"
+    },
+    "project_name": {
+        "default": "senzing",
+        "env": "SENZING_PROJECT_NAME",
+        "cli": "project-name"
     },
     "project_dir": {
         "default": "~/senzing",
@@ -91,6 +96,11 @@ def get_parser():
                     "action": "store_true",
                     "dest": "debug",
                     "help": "Enable debugging. (SENZING_DEBUG) Default: False"
+                },
+                "--project-name": {
+                    "dest": "project_name",
+                    "help": "A name for the project used as a prefix for artifacts. Default: senzing",
+                    "metavar": "SENZING_PROJECT_NAME"
                 },
                 "--project-dir": {
                     "dest": "project_dir",
@@ -632,6 +642,7 @@ export SENZING_DOCKER_SOCKET=/var/run/docker.sock
 export SENZING_ETC_DIR=${{SENZING_PROJECT_DIR}}/docker-etc
 export SENZING_G2_DIR=${{SENZING_PROJECT_DIR}}
 export SENZING_INPUT_URL="https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json"
+export SENZING_PROJECT_NAME={project_name}
 export SENZING_PORTAINER_DIR=${{SENZING_PROJECT_DIR}}/var/portainer
 export SENZING_RABBITMQ_PASSWORD=bitnami
 export SENZING_RABBITMQ_QUEUE=senzing-rabbitmq-queue
@@ -673,7 +684,7 @@ echo "senzing-api-server running on http://localhost:${PORT}"
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
   --interactive \\
-  --name senzing-api-server \\
+  --name ${SENZING_PROJECT_NAME}-api-server \\
   --publish ${PORT}:${PORT} \\
   --rm \\
   --tty \\
@@ -702,7 +713,7 @@ DOCKER_IMAGE_VERSION=latest
 docker run \\
   --cap-add=ALL \\
   --interactive \\
-  --name senzing-debug \\
+  --name ${SENZING_PROJECT_NAME}-debug \\
   --rm \\
   --tty \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
@@ -724,7 +735,7 @@ DOCKER_IMAGE_VERSION=latest
 
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-  --name senzing-init-container \\
+  --name ${SENZING_PROJECT_NAME}-init-container \\
   --rm \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
@@ -749,7 +760,7 @@ echo "senzing-jupyter running on http://localhost:${PORT}"
 docker run \\
   --env SENZING_SQL_CONNECTION=${SENZING_SQL_CONNECTION} \\
   --interactive \\
-  --name senzing-jupyter \\
+  --name ${SENZING_PROJECT_NAME}-jupyter \\
   --publish ${PORT}:8888 \\
   --rm \\
   --tty \\
@@ -781,7 +792,7 @@ docker run \\
   --env SENZING_RECORD_MONITOR=1000 \\
   --env SENZING_SUBCOMMAND=url-to-rabbitmq \\
   --interactive \\
-  --name senzing-mock-data-generator \\
+  --name ${SENZING_PROJECT_NAME}-mock-data-generator \\
   --rm \\
   --tty \\
   senzing/mock-data-generator:${DOCKER_IMAGE_VERSION}
@@ -818,7 +829,7 @@ docker run \\
   --env RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
   --env RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
   --interactive \\
-  --name senzing-rabbitmq \\
+  --name ${SENZING_PROJECT_NAME}-rabbitmq \\
   --publish 15672:15672 \\
   --publish 5672:5672 \\
   --rm \\
@@ -842,7 +853,7 @@ echo "senzing-sqlite-web running on http://localhost:9174"
 docker run \\
   --env SQLITE_DATABASE=${DATABASE_DATABASE} \\
   --interactive \\
-  --name senzing-sqlite-web \\
+  --name ${SENZING_PROJECT_NAME}-sqlite-web \\
   --publish 9174:8080 \\
   --rm \\
   --tty \\
@@ -871,7 +882,7 @@ docker run \\
   --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
   --env SENZING_SUBCOMMAND=rabbitmq \\
   --interactive \\
-  --name senzing-stream-loader \\
+  --name ${SENZING_PROJECT_NAME}-stream-loader \\
   --rm \\
   --tty \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
@@ -897,7 +908,7 @@ docker run \\
   --env SENZING_API_SERVER_URL=${SENZING_API_SERVER_URL} \\
   --env SENZING_WEB_SERVER_PORT=${PORT} \\
   --interactive \\
-  --name senzing-webapp \\
+  --name ${SENZING_PROJECT_NAME}-webapp \\
   --publish ${PORT}:${PORT} \\
   --rm \\
   --tty \\
@@ -923,7 +934,7 @@ echo "senzing-xterm running on http://localhost:${PORT}"
 
 docker run \\
   --interactive \\
-  --name senzing-xterm \\
+  --name ${SENZING_PROJECT_NAME}-xterm \\
   --publish ${PORT}:5000 \\
   --rm \\
   --tty \\
@@ -1200,6 +1211,7 @@ def create_bin_docker(config):
     # Pull configuration variables.
 
     project_dir = config.get("project_dir")
+    project_name = config.get("project_name")
 
     # Map filenames to functions.
 
@@ -1277,6 +1289,7 @@ def create_bin_docker(config):
     variables = {
         "database_database": schema,
         "local_ip_addr": local_ip_addr,
+        "project_name": project_name,
         "project_dir": project_dir,
         "senzing_database_url": senzing_database_url,
         "sql_connection": sql_connection
