@@ -18,16 +18,24 @@ The [senzing-environment.py](senzing-environment.py) program helps G2Project dir
 
 ### Contents
 
+1. [Related artifacts](#related-artifacts)
 1. [Expectations](#expectations)
 1. [Demonstrate using Command Line Interface](#demonstrate-using-command-line-interface)
     1. [Prerequisites for CLI](#prerequisites-for-cli)
     1. [Download](#download)
     1. [Run command](#run-command)
+1. [Demonstrate using Docker](#demonstrate-using-docker)
+    1. [Prerequisites for Docker](#prerequisites-for-docker)
+    1. [Docker volumes](#docker-volumes)
+    1. [Create Senzing project](#create-senzing-project)
+    1. [Environment variables for Docker](#environment-variables-for-docker)
+    1. [Run Docker container](#run-docker-container)
 1. [Develop](#develop)
     1. [Prerequisites for development](#prerequisites-for-development)
     1. [Clone repository](#clone-repository)
 1. [Examples](#examples)
     1. [Examples of CLI](#examples-of-cli)
+    1. [Examples of Docker](#examples-of-docker)
 1. [Advanced](#advanced)
     1. [Configuration](#configuration)
 1. [Errors](#errors)
@@ -40,6 +48,10 @@ The [senzing-environment.py](senzing-environment.py) program helps G2Project dir
    Perhaps it's an optional step.
 1. :pencil2: - A "pencil" icon means that the instructions may need modification before performing.
 1. :warning: - A "warning" icon means that something tricky is happening, so pay attention.
+
+## Related artifacts
+
+1. [DockerHub](https://hub.docker.com/r/senzing/senzing-environment)
 
 ## Expectations
 
@@ -111,6 +123,106 @@ These are "one-time tasks" which may already have been completed.
 
 1. For more examples of use, see [Examples of CLI](#examples-of-cli).
 
+## Demonstrate using Docker
+
+### Prerequisites for Docker
+
+:thinking: The following tasks need to be complete before proceeding.
+These are "one-time tasks" which may already have been completed.
+
+1. The following software programs need to be installed:
+    1. [docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md)
+
+### Docker volumes
+
+1. Specify the location of the project on the host system.
+   Example:
+
+    ```console
+    export SENZING_PROJECT_DIR=~/senzing-demo-project-1
+    ```
+
+### Create Senzing project
+
+If a project directory already exists, this step may be skipped.
+If a project directory is needed, perform the following step.
+
+1. Create the project.
+   Example:
+
+    ```console
+    /opt/senzing/g2/python/G2CreateProject.py ${SENZING_PROJECT_DIR}
+    ```
+
+### Environment variables for Docker
+
+1. Give the project a name.
+   The name is used as a prefix for docker containers.
+   Example:
+
+    ```console
+    export SENZING_PROJECT_NAME=demo02
+    ```
+
+1. :pencil2: Identify the IP address of the host system.
+   Example:
+
+    ```console
+    export SENZING_DOCKER_HOST_IP_ADDR=10.1.1.102
+    ```
+
+    1. To find the value for `SENZING_DOCKER_HOST_IP_ADDR` use Python interactively:
+       Example:
+
+        ```console
+        python3
+        ```
+
+       Copy and paste the following lines into the Python REPL (Read-Evaluate-Print Loop):
+
+        ```python
+        import socket
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.connect(("8.8.8.8", 80))
+        print("export SENZING_DOCKER_HOST_IP_ADDR={0}".format(sock.getsockname()[0]))
+        sock.close()
+        quit()
+        ```
+
+       Copy and paste the printed `export` statement into the host terminal.
+
+### Run Docker container
+
+1. Run Docker container to add Docker support to the project directory.
+   Example:
+
+    ```console
+    docker run \
+      --env SENZING_DOCKER_HOST_IP_ADDR=${SENZING_DOCKER_HOST_IP_ADDR} \
+      --interactive \
+      --rm \
+      --tty \
+      --user $(id -u):$(id -g) \
+      --volume ${SENZING_PROJECT_DIR}:${SENZING_PROJECT_DIR} \
+      senzing/senzing-environment add-docker-support \
+        --project-name ${SENZING_PROJECT_NAME} \
+        --project-dir ${SENZING_PROJECT_DIR}
+    ```
+
+1. Perform work-around for sym-link in sub-directories.
+   Example:
+
+    ```console
+    mv ${SENZING_PROJECT_DIR}/resources/config ${SENZING_PROJECT_DIR}/resources/config.$(date +%s)
+    mv ${SENZING_PROJECT_DIR}/resources/schema ${SENZING_PROJECT_DIR}/resources/schema.$(date +%s)
+
+    cp -r /opt/senzing/g2/resources/config/ ${SENZING_PROJECT_DIR}/resources/
+    cp -r /opt/senzing/g2/resources/schema/ ${SENZING_PROJECT_DIR}/resources/
+    ```
+
+1. For more examples of use, see [Examples of Docker](#examples-of-docker).
+
 ## Develop
 
 ### Prerequisites for development
@@ -153,11 +265,20 @@ The following examples require initialization described in
     export SENZING_PROJECT_DIR=~/senzing-project
     ```
 
+1. :pencil2: Give the project a name.
+   The name is used as a prefix for docker containers.
+   Example:
+
+    ```console
+    export SENZING_PROJECT_NAME=senzing
+    ```
+
 1. Update Senzing project directory
    Example:
 
     ```console
     senzing-environment.py add-docker-support \
+      --project-name ${SENZING_PROJECT_NAME} \
       --project-dir ${SENZING_PROJECT_DIR}
     ```
 
@@ -191,13 +312,28 @@ The following instructions replace the symbolic links with actual directories.
     source ${SENZING_PROJECT_DIR}/setupEnv-docker
     ```
 
+### Examples of Docker
+
+The following examples require initialization described in
+[Demonstrate using Docker](#demonstrate-using-docker).
+
+1. Visit [senzing-environment tutorial](docs/tutorial.md).
+
 ## Advanced
 
 ### Configuration
 
 Configuration values specified by environment variable or command line parameter.
 
+- **[GIT_ACCOUNT](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#git_account)**
+- **[GIT_REPOSITORY](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#git_repository)**
+- **[GIT_ACCOUNT_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#git_account_dir)**
+- **[GIT_REPOSITORY_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#git_repository_dir)**
 - **[SENZING_DEBUG](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_debug)**
+- **[SENZING_DOWNLOAD_FILE](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_download_file)**
+- **[SENZING_DOCKER_HOST_IP_ADDR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_docker_host_ip_addr)**
+- **[SENZING_PROJECT_DIR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_project_dir)**
+- **[SENZING_PROJECT_NAME](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_project_name)**
 
 ## Errors
 
