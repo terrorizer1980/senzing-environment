@@ -56,7 +56,7 @@ The [senzing-environment.py](senzing-environment.py) program helps G2Project dir
 ## Expectations
 
 - **Space:** This repository and demonstration require 2 MB free disk space.
-- **Time:** Budget 10 minutes to get the demonstration up-and-running, depending on CPU and network speeds.
+- **Time:** Budget 30 minutes to get the demonstration up-and-running, depending on CPU and network speeds.
 - **Background knowledge:** This repository assumes a working knowledge of:
   - [Docker](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/docker.md)
 
