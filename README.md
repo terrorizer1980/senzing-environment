@@ -291,7 +291,7 @@ The following instructions replace the symbolic links with actual directories.
    Example:
 
     ```console
-    source ${SENZING_PROJECT_DIR}/setupEnv-docker
+    source ${SENZING_PROJECT_DIR}/docker-setupEnv
     ```
 
 ### Examples of Docker
