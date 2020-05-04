@@ -14,7 +14,7 @@ describing where we can improve.   Now on with the show...
 
 ## Overview
 
-The [senzing-environment.py](senzing-environment.py) program helps G2Project directories work with Senzing Docker formations.
+The [senzing-environment.py](senzing-environment.py) program helps Senzing project directories work with Senzing Docker formations.
 
 ### Contents
 
@@ -135,7 +135,7 @@ These are "one-time tasks" which may already have been completed.
 
 ### Docker volumes
 
-1. Specify the location of the project on the host system.
+1. Specify the location of the Senzing project on the host system.
    Example:
 
     ```console
@@ -144,10 +144,10 @@ These are "one-time tasks" which may already have been completed.
 
 ### Create Senzing project
 
-If a project directory already exists, this step may be skipped.
-If a project directory is needed, perform the following step.
+:thinking: If a Senzing project directory already exists, this step may be skipped.
+If a Senzing project directory is needed, perform the following step.
 
-1. Create the project.
+1. Create the Senzing project.
    Example:
 
     ```console
@@ -156,7 +156,7 @@ If a project directory is needed, perform the following step.
 
 ### Environment variables for Docker
 
-1. Give the project a name.
+1. Give the Senzing project a name.
    The name is used as a prefix for docker containers.
    Example:
 
@@ -168,33 +168,15 @@ If a project directory is needed, perform the following step.
    Example:
 
     ```console
-    export SENZING_DOCKER_HOST_IP_ADDR=10.1.1.102
+    export SENZING_DOCKER_HOST_IP_ADDR=10.1.1.100
     ```
 
-    1. To find the value for `SENZING_DOCKER_HOST_IP_ADDR` use Python interactively:
-       Example:
-
-        ```console
-        python3
-        ```
-
-       Copy and paste the following lines into the Python REPL (Read-Evaluate-Print Loop):
-
-        ```python
-        import socket
-
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.connect(("8.8.8.8", 80))
-        print("export SENZING_DOCKER_HOST_IP_ADDR={0}".format(sock.getsockname()[0]))
-        sock.close()
-        quit()
-        ```
-
-       Copy and paste the printed `export` statement into the host terminal.
+    1. To find the value for `SENZING_DOCKER_HOST_IP_ADDR` by using Python interactively, visit
+       [SENZING_DOCKER_HOST_IP_ADDR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_docker_host_ip_addr).
 
 ### Run Docker container
 
-1. Run Docker container to add Docker support to the project directory.
+1. Run Docker container to add Docker support to the Senzing project directory.
    Example:
 
     ```console
@@ -265,7 +247,7 @@ The following examples require initialization described in
     export SENZING_PROJECT_DIR=~/senzing-project
     ```
 
-1. :pencil2: Give the project a name.
+1. :pencil2: Give the Senzing project a name.
    The name is used as a prefix for docker containers.
    Example:
 
@@ -273,7 +255,7 @@ The following examples require initialization described in
     export SENZING_PROJECT_NAME=senzing
     ```
 
-1. Update Senzing project directory
+1. Add docker support to Senzing project directory
    Example:
 
     ```console
@@ -284,7 +266,7 @@ The following examples require initialization described in
 
 #### Senzing project work-around
 
-Currently G2Project directories contain symbolic links that do not work within docker containers.
+Currently Senzing project directories contain symbolic links that do not work within docker containers.
 The following instructions replace the symbolic links with actual directories.
 
 1. Backup existing directories.
@@ -295,7 +277,7 @@ The following instructions replace the symbolic links with actual directories.
     mv ${SENZING_PROJECT_DIR}/resources/schema ${SENZING_PROJECT_DIR}/resources/schema.$(date +%s)
     ```
 
-1. Copy new directories into G2Project.
+1. Copy new directories into Senzing project directory.
    Example:
 
     ```console
@@ -309,7 +291,7 @@ The following instructions replace the symbolic links with actual directories.
    Example:
 
     ```console
-    source ${SENZING_PROJECT_DIR}/setupEnv-docker
+    source ${SENZING_PROJECT_DIR}/docker-setupEnv
     ```
 
 ### Examples of Docker
