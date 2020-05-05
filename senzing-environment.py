@@ -24,7 +24,7 @@ import time
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-05-04'
+__updated__ = '2020-05-05'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -941,6 +941,42 @@ docker run \\
     return 0
 
 
+def file_senzing_webapp_demo():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+DOCKER_INIT_CONTAINER_IMAGE_VERSION=latest
+DOCKER_WEBAPP_DEMO_IMAGE_VERSION=latest
+PORT=8251
+
+docker run \\
+  --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+  --name ${SENZING_PROJECT_NAME}-init-container \\
+  --rm \\
+  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+  senzing/init-container:${DOCKER_INIT_CONTAINER_IMAGE_VERSION}
+
+echo "${SENZING_PROJECT_NAME}-webapp-demo running on http://localhost:${PORT}"
+
+docker run \\
+  --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+  --name ${SENZING_PROJECT_NAME}-web-app-demo \\
+  --publish ${PORT}:80 \\
+  --rm \\
+  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+  senzing/web-app-demo:${DOCKER_WEBAPP_DEMO_IMAGE_VERSION}
+"""
+    return 0
+
+
 def file_senzing_xterm():
     """#!/usr/bin/env bash
 
@@ -1247,6 +1283,7 @@ def create_bin_docker(config):
         "senzing-sqlite-web.sh": file_senzing_sqlite_web,
         "senzing-stream-loader.sh": file_senzing_stream_loader,
         "senzing-webapp.sh": file_senzing_webapp,
+        "senzing-webapp-demo.sh": file_senzing_webapp_demo,
         "senzing-xterm.sh": file_senzing_xterm
     }
 
