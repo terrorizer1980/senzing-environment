@@ -8,13 +8,78 @@ The second demonstration shows how to use independent docker containers within a
 
 ## Demonstration 1
 
-### Create new Senzing project with Docker support
+### Create a Senzing project
 
 1. Specify the location of the Senzing project on the host system.
    Example:
 
     ```console
     export SENZING_PROJECT_DIR=~/senzing-demo-project-1
+    ```
+
+1. Create the Senzing project.
+   Example:
+
+    ```console
+    /opt/senzing/g2/python/G2CreateProject.py ${SENZING_PROJECT_DIR}
+    ```
+
+### Add Docker support
+
+1. Get a local copy of
+   [senzing-environment.py](https://raw.githubusercontent.com/Senzing/senzing-environment/master/senzing-environment.py).
+   Example:
+
+    1. :pencil2: Specify where to download file.
+       Example:
+
+        ```console
+        export SENZING_DOWNLOAD_FILE=~/senzing-environment.py
+        ```
+
+    1. Download file.
+       Example:
+
+        ```console
+        curl -X GET \
+          --output ${SENZING_DOWNLOAD_FILE} \
+          https://raw.githubusercontent.com/Senzing/senzing-environment/master/senzing-environment.py
+        ```
+
+    1. Make file executable.
+       Example:
+
+        ```console
+        chmod +x ${SENZING_DOWNLOAD_FILE}
+        ```
+
+1. Run the command.
+   Example:
+
+   ```console
+   ${SENZING_DOWNLOAD_FILE} add-docker-support --project-dir ${SENZING_PROJECT_DIR}
+   ```
+
+### Run demonstration
+
+1. Start
+   Example:
+
+    ```console
+    ${SENZING_PROJECT_DIR}/docker-bin/senzing-webapp-demo.sh
+    ```
+
+1. View  [Entity search webapp](http://localhost:8251/)
+
+## Demonstration 2
+
+### Create second Senzing project with Docker support
+
+1. Specify the location of the Senzing project on the host system.
+   Example:
+
+    ```console
+    export SENZING_PROJECT_DIR=~/senzing-demo-project-2
     ```
 
 1. Create the Senzing project.
@@ -196,15 +261,15 @@ This Docker formation uses the docker-compose YAML file described in
       docker-compose --file resources/postgresql/docker-compose-rabbitmq-postgresql.yaml down
     ```
 
-## Demonstration 2
+## Demonstration 3
 
-### Create second Senzing project with Docker support
+### Create third Senzing project with Docker support
 
 1. Specify the location of the Senzing project on the host system.
    Example:
 
     ```console
-    export SENZING_PROJECT_DIR=~/senzing-demo-project-2
+    export SENZING_PROJECT_DIR=~/senzing-demo-project-3
     ```
 
 1. Create the Senzing project.
@@ -284,7 +349,7 @@ This Docker formation uses the docker-compose YAML file described in
    Example:
 
     ```console
-    ~/senzing-demo-project-2/docker-bin/senzing-rabbitmq.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-rabbitmq.sh
     ```
 
 1. View [RabbitMQ](http://localhost:15672)
@@ -295,7 +360,7 @@ This Docker formation uses the docker-compose YAML file described in
    Example:
 
     ```console
-    ~/senzing-demo-project-2/docker-bin/senzing-mock-data-generator.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-mock-data-generator.sh
     ```
 
 ### Bring up Senzing init container
@@ -306,7 +371,7 @@ This Docker formation uses the docker-compose YAML file described in
    Example:
 
     ```console
-    ~/senzing-demo-project-2/docker-bin/senzing-init-container.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-init-container.sh
     ```
 
 ### Bring up Senzing stream-loader
@@ -315,7 +380,7 @@ This Docker formation uses the docker-compose YAML file described in
    Example:
 
     ```console
-    ~/senzing-demo-project-2/docker-bin/senzing-stream-loader.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-stream-loader.sh
     ```
 
 ### Bring up SQLite  web viewer
@@ -324,7 +389,7 @@ This Docker formation uses the docker-compose YAML file described in
    Example:
 
     ```console
-    ~/senzing-demo-project-2/docker-bin/senzing-sqlite-web.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-sqlite-web.sh
     ```
 
 1. View [SQLite Web](http://localhost:9174)
@@ -335,7 +400,7 @@ This Docker formation uses the docker-compose YAML file described in
    Example:
 
     ```console
-    ~/senzing-demo-project-2/docker-bin/senzing-api-server.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-api-server.sh
     ```
 
 1. View [Senzing API](http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api/master/senzing-rest-api.yaml)
@@ -346,7 +411,7 @@ This Docker formation uses the docker-compose YAML file described in
    Example:
 
     ```console
-    ~/senzing-demo-project-2/docker-bin/senzing-webapp.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-webapp.sh
     ```
 
 1. View  [Entity search webapp](http://localhost:8251/)
@@ -357,7 +422,7 @@ This Docker formation uses the docker-compose YAML file described in
    Example:
 
     ```console
-    ~/senzing-demo-project-2/docker-bin/senzing-jupyter.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-jupyter.sh
     ```
 
 1. View [Jupyter notebooks](http://localhost:9178/)
@@ -368,7 +433,7 @@ This Docker formation uses the docker-compose YAML file described in
    Example:
 
     ```console
-    ~/senzing-demo-project-2/docker-bin/senzing-xterm.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-xterm.sh
     ```
 
 1. View [X-Term](http://localhost:8254/)
@@ -379,7 +444,7 @@ This Docker formation uses the docker-compose YAML file described in
    Example:
 
     ```console
-    ~/senzing-demo-project-2/docker-bin/senzing-debug.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-debug.sh
     ```
 
 1. Enter the Senzing debug docker container.
