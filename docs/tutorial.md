@@ -10,6 +10,8 @@ The second demonstration shows how to use independent docker containers within a
 
 ### Create a Senzing project
 
+From [Quickstart Guide](https://senzing.zendesk.com/hc/en-us/articles/115002408867-Quickstart-Guide).
+
 1. Specify the location of the Senzing project on the host system.
    Example:
 
