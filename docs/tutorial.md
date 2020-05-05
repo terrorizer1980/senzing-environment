@@ -8,6 +8,8 @@ The second demonstration shows how to use independent docker containers within a
 
 ## Demonstration 1
 
+The following demonstration assumes that the `senzingapi` package (via yum or apt) has been installed on the workstation.
+
 ### Create a Senzing project
 
 From [Quickstart Guide](https://senzing.zendesk.com/hc/en-us/articles/115002408867-Quickstart-Guide).
