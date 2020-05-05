@@ -207,19 +207,19 @@ This Docker formation uses the docker-compose YAML file described in
     export SENZING_PROJECT_DIR=~/senzing-demo-project-2
     ```
 
+1. Create the Senzing project.
+   Example:
+
+    ```console
+    /opt/senzing/g2/python/G2CreateProject.py ${SENZING_PROJECT_DIR}
+    ```
+
 1. Give the Senzing project a name.
    The name is used as a prefix for docker containers.
    Example:
 
     ```console
     export SENZING_PROJECT_NAME=demo02
-    ```
-
-1. Create the Senzing project.
-   Example:
-
-    ```console
-    /opt/senzing/g2/python/G2CreateProject.py ${SENZING_PROJECT_DIR}
     ```
 
 1. :pencil2: Identify the IP address of the host system.
