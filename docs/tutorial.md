@@ -26,16 +26,27 @@ The second demonstration shows how to use independent docker containers within a
 
 ### Synergy with Senzing project
 
-From [Quickstart Guide ](https://senzing.zendesk.com/hc/en-us/articles/115002408867-Quickstart-Guide).
+From [Quickstart Guide](https://senzing.zendesk.com/hc/en-us/articles/115002408867-Quickstart-Guide).
 
-1. XXX
+1. Set environment variables
    Example:
 
     ```console
     cd ${SENZING_PROJECT_DIR}
     source setupEnv
+    ```
 
+1. Prime the database.
+   Example:
+
+    ```console
     python3 python/G2SetupConfig.py
+    ```
+
+1. Load example data.
+   Example:
+
+    ```console
     python3 python/G2Loader.py -P
     ```
 
@@ -85,6 +96,7 @@ From [Quickstart Guide ](https://senzing.zendesk.com/hc/en-us/articles/115002408
     ```
 
 1. View  [Entity search webapp](http://localhost:8251/)
+    1. [Entity #1](http://localhost:8251/entity/1)
 
 ## Demonstration 2
 
