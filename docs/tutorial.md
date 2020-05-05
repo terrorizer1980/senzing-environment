@@ -24,6 +24,21 @@ The second demonstration shows how to use independent docker containers within a
     /opt/senzing/g2/python/G2CreateProject.py ${SENZING_PROJECT_DIR}
     ```
 
+### Synergy with Senzing project
+
+From [Quickstart Guide ](https://senzing.zendesk.com/hc/en-us/articles/115002408867-Quickstart-Guide).
+
+1. XXX
+   Example:
+
+    ```console
+    cd ${SENZING_PROJECT_DIR}
+    source setupEnv
+
+    python3 python/G2SetupConfig.py
+    python3 python/G2Loader.py -P
+    ```
+
 ### Add Docker support
 
 1. Get a local copy of
@@ -62,7 +77,7 @@ The second demonstration shows how to use independent docker containers within a
 
 ### Run demonstration
 
-1. Start
+1. Start webapp demo.
    Example:
 
     ```console
