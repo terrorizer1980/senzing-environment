@@ -17,19 +17,19 @@ The second demonstration shows how to use independent docker containers within a
     export SENZING_PROJECT_DIR=~/senzing-demo-project-1
     ```
 
+1. Create the Senzing project.
+   Example:
+
+    ```console
+    /opt/senzing/g2/python/G2CreateProject.py ${SENZING_PROJECT_DIR}
+    ```
+
 1. Give the Senzing project a name.
    The name is used as a prefix for docker containers.
    Example:
 
     ```console
     export SENZING_PROJECT_NAME=demo01
-    ```
-
-1. Create the Senzing project.
-   Example:
-
-    ```console
-    /opt/senzing/g2/python/G2CreateProject.py ${SENZING_PROJECT_DIR}
     ```
 
 1. View the Senzing project.
@@ -43,7 +43,7 @@ The second demonstration shows how to use independent docker containers within a
    Example:
 
     ```console
-    export SENZING_DOCKER_HOST_IP_ADDR=10.1.1.102
+    export SENZING_DOCKER_HOST_IP_ADDR=10.1.1.100
     ```
 
     1. To find the value for `SENZING_DOCKER_HOST_IP_ADDR` use Python interactively:
@@ -226,7 +226,7 @@ This Docker formation uses the docker-compose YAML file described in
    Example:
 
     ```console
-    export SENZING_DOCKER_HOST_IP_ADDR=10.1.1.102
+    export SENZING_DOCKER_HOST_IP_ADDR=10.1.1.100
     ```
 
     1. To find the value for `SENZING_DOCKER_HOST_IP_ADDR` use Python interactively:
