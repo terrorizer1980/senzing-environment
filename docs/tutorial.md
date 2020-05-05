@@ -100,7 +100,7 @@ From [Quickstart Guide](https://senzing.zendesk.com/hc/en-us/articles/1150024088
     ```
 
 1. View  [Entity search webapp](http://localhost:8251/)
-    1. [Entity #1](http://localhost:8251/entity/1)
+    1. Search for "Robert Jones"
 
 ## Demonstration 2
 
