@@ -8,7 +8,11 @@ The second demonstration shows how to use independent docker containers within a
 
 ## Demonstration 1
 
+The following demonstration assumes that the `senzingapi` package has been installed via yum or apt on the workstation.
+
 ### Create a Senzing project
+
+From [Quickstart Guide](https://senzing.zendesk.com/hc/en-us/articles/115002408867-Quickstart-Guide).
 
 1. Specify the location of the Senzing project on the host system.
    Example:
@@ -22,6 +26,32 @@ The second demonstration shows how to use independent docker containers within a
 
     ```console
     /opt/senzing/g2/python/G2CreateProject.py ${SENZING_PROJECT_DIR}
+    ```
+
+### Synergy with Senzing project
+
+From [Quickstart Guide](https://senzing.zendesk.com/hc/en-us/articles/115002408867-Quickstart-Guide).
+
+1. Set environment variables
+   Example:
+
+    ```console
+    cd ${SENZING_PROJECT_DIR}
+    source setupEnv
+    ```
+
+1. Prime the database.
+   Example:
+
+    ```console
+    python3 python/G2SetupConfig.py
+    ```
+
+1. Load example data.
+   Example:
+
+    ```console
+    python3 python/G2Loader.py -P
     ```
 
 ### Add Docker support
@@ -62,7 +92,7 @@ The second demonstration shows how to use independent docker containers within a
 
 ### Run demonstration
 
-1. Start
+1. Start webapp demo.
    Example:
 
     ```console
@@ -70,6 +100,7 @@ The second demonstration shows how to use independent docker containers within a
     ```
 
 1. View  [Entity search webapp](http://localhost:8251/)
+    1. Search for "Robert Jones"
 
 ## Demonstration 2
 
