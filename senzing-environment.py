@@ -606,6 +606,14 @@ docker pull senzing/xterm:latest
     return 0
 
 
+def file_docker_pull_quickstart_latest():
+    """#! /usr/bin/env bash
+
+docker pull senzing/web-app-demo:latest
+"""
+    return 0
+
+
 def file_senzing_api_server():
     """#!/usr/bin/env bash
 
@@ -616,8 +624,8 @@ DOCKER_IMAGE_VERSION=latest
 PORT=8250
 
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_PROJECT_NAME}-api-server running on http://localhost:${PORT}"
-echo "Swagger editor: http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api/master/senzing-rest-api.yaml"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} Swagger editor: http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api/master/senzing-rest-api.yaml"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -697,7 +705,7 @@ PORT=9178
 chmod -R 777 ${SENZING_PROJECT_DIR}/var/sqlite/
 
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_PROJECT_NAME}-jupyter running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-jupyter running on http://localhost:${PORT}"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -765,7 +773,7 @@ DOCKER_IMAGE_VERSION=latest
 PORT=8251
 
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_PROJECT_NAME}-quickstart running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-quickstart running on http://localhost:${PORT}"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -781,6 +789,7 @@ docker run \\
 """
     return 0
 
+
 def file_senzing_rabbitmq():
     """#!/usr/bin/env bash
 
@@ -790,7 +799,7 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 DOCKER_IMAGE_VERSION=3.8.2
 
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_PROJECT_NAME}-rabbitmq running on http://localhost:15672"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-rabbitmq running on http://localhost:15672"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 mkdir -p ${RABBITMQ_DIR}
@@ -820,7 +829,7 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 DOCKER_IMAGE_VERSION=latest
 
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_PROJECT_NAME}-sqlite-web running on http://localhost:9174"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-sqlite-web running on http://localhost:9174"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -876,7 +885,7 @@ DOCKER_IMAGE_VERSION=latest
 PORT=8251
 
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_PROJECT_NAME}-webapp running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://localhost:${PORT}"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -917,7 +926,7 @@ docker run \\
   senzing/init-container:${DOCKER_INIT_CONTAINER_IMAGE_VERSION}
 
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_PROJECT_NAME}-webapp-demo running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp-demo running on http://localhost:${PORT}"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -944,7 +953,7 @@ DOCKER_IMAGE_VERSION=latest
 PORT=8254
 
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_PROJECT_NAME}-xterm running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-xterm running on http://localhost:${PORT}"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -972,7 +981,7 @@ DOCKER_IMAGE_VERSION=latest
 PORT=9170
 
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "portainer running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} portainer running on http://localhost:${PORT}"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 sudo docker run \\
@@ -1132,7 +1141,7 @@ def project_create_docker_bin_directory(project_dir):
         exit_error(702, output_directory, err)
 
 
-def project_create_docker_bin_files(project_dir, output_files):
+def project_create_docker_bin_files(project_dir, docker_bin_files):
 
     # Specify output directory and backup directory.
 
@@ -1140,7 +1149,7 @@ def project_create_docker_bin_files(project_dir, output_files):
 
     # Write files from function docstrings.
 
-    for filename, function in output_files.items():
+    for filename, function in docker_bin_files.items():
         full_filename = "{0}/{1}".format(output_directory, filename)
         if not os.path.exists(full_filename):
             logging.info(message_info(165, full_filename))
@@ -1328,7 +1337,7 @@ def do_add_docker_support(args):
 
     # Identify files to be created in <project>/docker-bin
 
-    output_files = {
+    docker_bin_files = {
         "docker-pull-latest.sh": file_docker_pull_latest,
         "senzing-api-server.sh": file_senzing_api_server,
         "senzing-debug.sh": file_senzing_debug,
@@ -1350,7 +1359,7 @@ def do_add_docker_support(args):
     project_create_setupenv_docker(config)
     project_create_docker_bin_directory(project_dir)
     project_create_docker_environment_vars(project_dir, project_name, docker_host_ip_addr)
-    project_create_docker_bin_files(project_dir, output_files)
+    project_create_docker_bin_files(project_dir, docker_bin_files)
 
     # Epilog.
 
@@ -1376,8 +1385,8 @@ def do_add_quickstart_support(args):
 
     # Identify files to be created in <project>/docker-bin
 
-    output_files = {
-        "docker-pull-latest.sh": file_docker_pull_latest,
+    docker_bin_files = {
+        "docker-pull-quickstart-latest.sh": file_docker_pull_quickstart_latest,
         "senzing-quickstart-demo.sh": file_senzing_quickstart_demo
     }
 
@@ -1387,7 +1396,7 @@ def do_add_quickstart_support(args):
     project_modify_G2Module_ini(project_dir)
     project_create_docker_bin_directory(project_dir)
     project_create_docker_environment_vars(project_dir, project_name, docker_host_ip_addr)
-    project_create_docker_bin_files(project_dir, output_files)
+    project_create_docker_bin_files(project_dir, docker_bin_files)
 
     # Epilog.
 
