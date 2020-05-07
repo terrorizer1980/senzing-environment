@@ -4,7 +4,6 @@
 # senzing-environment.py
 # -----------------------------------------------------------------------------
 
-from glob import glob
 from urllib.parse import urlparse, urlunparse
 import argparse
 import configparser
@@ -24,22 +23,10 @@ import time
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-05-05'
+__updated__ = '2020-05-06'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
-
-# Working with bytes.
-
-KILOBYTES = 1024
-MEGABYTES = 1024 * KILOBYTES
-GIGABYTES = 1024 * MEGABYTES
-
-# Lists from https://www.ietf.org/rfc/rfc1738.txt
-
-xsafe_character_list = ['$', '-', '_', '.', '+', '!', '*', '(', ')', ',', '"' ] + list(string.ascii_letters)
-xunsafe_character_list = [ '"', '<', '>', '#', '%', '{', '}', '|', '\\', '^', '~', '[', ']', '`']
-xreserved_character_list = [ ';', ',', '/', '?', ':', '@', '=', '&']
 
 # The "configuration_locator" describes where configuration variables are in:
 # 1) Command line options, 2) Environment variables, 3) Configuration files, 4) Default values
@@ -429,102 +416,6 @@ def redact_configuration(config):
 # Database URL parsing
 # -----------------------------------------------------------------------------
 
-
-def xtranslate(map, astring):
-    new_string = str(astring)
-    for key, value in map.items():
-        new_string = new_string.replace(key, value)
-    return new_string
-
-
-def xget_unsafe_characters(astring):
-    result = []
-    for unsafe_character in unsafe_character_list:
-        if unsafe_character in astring:
-            result.append(unsafe_character)
-    return result
-
-
-def xget_safe_characters(astring):
-    result = []
-    for safe_character in safe_character_list:
-        if safe_character not in astring:
-            result.append(safe_character)
-    return result
-
-
-def xparse_database_url(original_senzing_database_url):
-    ''' Given a canonical database URL, decompose into URL components. '''
-
-    result = {}
-
-    # Get the value of SENZING_DATABASE_URL environment variable.
-
-    senzing_database_url = original_senzing_database_url
-
-    # Create lists of safe and unsafe characters.
-
-    unsafe_characters = get_unsafe_characters(senzing_database_url)
-    safe_characters = get_safe_characters(senzing_database_url)
-
-    # Detect an error condition where there are not enough safe characters.
-
-    if len(unsafe_characters) > len(safe_characters):
-        logging.error(message_error(730, unsafe_characters, safe_characters))
-        return result
-
-    # Perform translation.
-    # This makes a map of safe character mapping to unsafe characters.
-    # "senzing_database_url" is modified to have only safe characters.
-
-    translation_map = {}
-    safe_characters_index = 0
-    for unsafe_character in unsafe_characters:
-        safe_character = safe_characters[safe_characters_index]
-        safe_characters_index += 1
-        translation_map[safe_character] = unsafe_character
-        senzing_database_url = senzing_database_url.replace(unsafe_character, safe_character)
-
-    # Parse "translated" URL.
-
-    parsed = urlparse(senzing_database_url)
-    schema = parsed.path.strip('/')
-
-    # Construct result.
-
-    result = {
-        'scheme': translate(translation_map, parsed.scheme),
-        'netloc': translate(translation_map, parsed.netloc),
-        'path': translate(translation_map, parsed.path),
-        'params': translate(translation_map, parsed.params),
-        'query': translate(translation_map, parsed.query),
-        'fragment': translate(translation_map, parsed.fragment),
-        'username': translate(translation_map, parsed.username),
-        'password': translate(translation_map, parsed.password),
-        'hostname': translate(translation_map, parsed.hostname),
-        'port': translate(translation_map, parsed.port),
-        'schema': translate(translation_map, schema),
-    }
-
-    # For safety, compare original URL with reconstructed URL.
-
-    url_parts = [
-        result.get('scheme'),
-        result.get('netloc'),
-        result.get('path'),
-        result.get('params'),
-        result.get('query'),
-        result.get('fragment'),
-    ]
-    test_senzing_database_url = urlunparse(url_parts)
-    if test_senzing_database_url != original_senzing_database_url:
-        logging.warning(message_warning(891, original_senzing_database_url, test_senzing_database_url))
-
-    # Return result.
-
-    return result
-
-
 database_connection_formats = {
     "db2": "{scheme}://{username}:{password}@{schema}",
     "mssql": "{scheme}://{username}:{password}@{schema}",
@@ -658,6 +549,7 @@ export SENZING_DATA_VERSION_DIR=${{SENZING_PROJECT_DIR}}/data
 export SENZING_DOCKER_SOCKET=/var/run/docker.sock
 export SENZING_ETC_DIR=${{SENZING_PROJECT_DIR}}/docker-etc
 export SENZING_G2_DIR=${{SENZING_PROJECT_DIR}}
+export SENZING_HORIZONTAL_RULE="=============================================================================="
 export SENZING_INPUT_URL="https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json"
 export SENZING_PORTAINER_DIR=${{SENZING_PROJECT_DIR}}/var/portainer
 export SENZING_PROJECT_NAME={project_name}
@@ -696,8 +588,10 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 DOCKER_IMAGE_VERSION=latest
 PORT=8250
 
+echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_PROJECT_NAME}-api-server running on http://localhost:${PORT}"
 echo "Swagger editor: http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api/master/senzing-rest-api.yaml"
+echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
@@ -775,7 +669,9 @@ PORT=9178
 
 chmod -R 777 ${SENZING_PROJECT_DIR}/var/sqlite/
 
+echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_PROJECT_NAME}-jupyter running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
   --env SENZING_SQL_CONNECTION=${SENZING_SQL_CONNECTION} \\
@@ -840,7 +736,9 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 DOCKER_IMAGE_VERSION=3.8.2
 
+echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_PROJECT_NAME}-rabbitmq running on http://localhost:15672"
+echo "${SENZING_HORIZONTAL_RULE}"
 
 mkdir -p ${RABBITMQ_DIR}
 chmod 777 ${RABBITMQ_DIR}
@@ -868,7 +766,9 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 DOCKER_IMAGE_VERSION=latest
 
+echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_PROJECT_NAME}-sqlite-web running on http://localhost:9174"
+echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
   --env SQLITE_DATABASE=${DATABASE_DATABASE} \\
@@ -922,7 +822,9 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 DOCKER_IMAGE_VERSION=latest
 PORT=8251
 
+echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_PROJECT_NAME}-webapp running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
   --env SENZING_API_SERVER_URL=${SENZING_API_SERVER_URL} \\
@@ -961,7 +863,9 @@ docker run \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
   senzing/init-container:${DOCKER_INIT_CONTAINER_IMAGE_VERSION}
 
+echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_PROJECT_NAME}-webapp-demo running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
@@ -986,7 +890,9 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 DOCKER_IMAGE_VERSION=latest
 PORT=8254
 
+echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_PROJECT_NAME}-xterm running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
   --interactive \\
@@ -1012,7 +918,9 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 DOCKER_IMAGE_VERSION=latest
 PORT=9170
 
+echo "${SENZING_HORIZONTAL_RULE}"
 echo "portainer running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE}"
 
 sudo docker run \\
    --detach \\
