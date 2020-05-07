@@ -666,8 +666,8 @@ docker run \\
   --name ${SENZING_PROJECT_NAME}-api-server \\
   --publish ${PORT}:${PORT} \\
   --rm \\
-  --user $(id -u):$(id -g) \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
@@ -778,8 +778,8 @@ docker run \\
   --interactive \\
   --name ${SENZING_PROJECT_NAME}-mock-data-generator \\
   --rm \\
-  --user $(id -u):$(id -g) \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   senzing/mock-data-generator:${DOCKER_IMAGE_VERSION}
 """
     return 0
@@ -849,6 +849,7 @@ docker run \\
   --publish 5672:5672 \\
   --rm \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   --volume ${RABBITMQ_DIR}:/bitnami \\
   bitnami/rabbitmq:${DOCKER_IMAGE_VERSION}
 """
@@ -874,6 +875,7 @@ docker run \\
   --publish 9174:8080 \\
   --rm \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_VAR_DIR}/sqlite:/data \\
   coleifer/sqlite-web:${DOCKER_IMAGE_VERSION}
 """
@@ -932,6 +934,7 @@ docker run \\
   --publish ${PORT}:${PORT} \\
   --rm \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
@@ -955,6 +958,7 @@ docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
   --name ${SENZING_PROJECT_NAME}-init-container \\
   --rm \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
@@ -970,6 +974,7 @@ docker run \\
   --name ${SENZING_PROJECT_NAME}-web-app-demo \\
   --publish ${PORT}:80 \\
   --rm \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
@@ -997,8 +1002,8 @@ docker run \\
   --name ${SENZING_PROJECT_NAME}-xterm \\
   --publish ${PORT}:5000 \\
   --rm \\
-  --user $(id -u):$(id -g) \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
