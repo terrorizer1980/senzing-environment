@@ -6,6 +6,14 @@ to facilitate the use of Docker within a project.
 The first demonstration shows how to use `docker-compose` with a Senzing project.
 The second demonstration shows how to use independent docker containers within a Senzing project.
 
+## Prerequisites for Tutorial
+
+:thinking: The following tasks need to be complete before proceeding.
+These are "one-time tasks" which may already have been completed.
+
+1. The following software programs need to be installed:
+    1. [docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md)
+
 ## Demonstration 1
 
 The following demonstration assumes that the `senzingapi` package has been installed via yum or apt on the workstation.
@@ -87,7 +95,7 @@ From [Quickstart Guide](https://senzing.zendesk.com/hc/en-us/articles/1150024088
    Example:
 
    ```console
-   ${SENZING_DOWNLOAD_FILE} add-docker-support --project-dir ${SENZING_PROJECT_DIR}
+   ${SENZING_DOWNLOAD_FILE} add-quickstart-support --project-dir ${SENZING_PROJECT_DIR}
    ```
 
 ### Run demonstration
@@ -96,7 +104,7 @@ From [Quickstart Guide](https://senzing.zendesk.com/hc/en-us/articles/1150024088
    Example:
 
     ```console
-    ${SENZING_PROJECT_DIR}/docker-bin/senzing-webapp-demo.sh
+    ${SENZING_PROJECT_DIR}/docker-bin/senzing-quickstart-demo.sh
     ```
 
 1. View  [Entity search webapp](http://localhost:8251/)
