@@ -20,10 +20,17 @@ import string
 import sys
 import time
 
+# Non-system packages
+
+try:
+    import parse
+except:
+    pass
+
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-05-07'
+__updated__ = '2020-05-08'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -614,6 +621,31 @@ docker pull senzing/web-app-demo:latest
     return 0
 
 
+def file_portainer():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+DOCKER_IMAGE_VERSION=latest
+PORT=9170
+
+echo "${SENZING_HORIZONTAL_RULE}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} portainer running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE}"
+
+sudo docker run \\
+   --detach \\
+   --name portainer \\
+   --publish ${PORT}:9000 \\
+   --restart always \\
+   --volume ${SENZING_DOCKER_SOCKET}:/var/run/docker.sock \\
+   --volume ${SENZING_PORTAINER_DIR}:/data \\
+   portainer/portainer:${DOCKER_IMAGE_VERSION}
+"""
+    return 0
+
+
 def file_senzing_api_server():
     """#!/usr/bin/env bash
 
@@ -635,6 +667,7 @@ docker run \\
   --publish ${PORT}:${PORT} \\
   --rm \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
@@ -684,6 +717,7 @@ docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
   --name ${SENZING_PROJECT_NAME}-init-container \\
   --rm \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
@@ -746,6 +780,7 @@ docker run \\
   --name ${SENZING_PROJECT_NAME}-mock-data-generator \\
   --rm \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   senzing/mock-data-generator:${DOCKER_IMAGE_VERSION}
 """
     return 0
@@ -781,6 +816,7 @@ docker run \\
   --name ${SENZING_PROJECT_NAME}-quickstart \\
   --publish ${PORT}:80 \\
   --rm \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
@@ -814,6 +850,7 @@ docker run \\
   --publish 5672:5672 \\
   --rm \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   --volume ${RABBITMQ_DIR}:/bitnami \\
   bitnami/rabbitmq:${DOCKER_IMAGE_VERSION}
 """
@@ -839,6 +876,7 @@ docker run \\
   --publish 9174:8080 \\
   --rm \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_VAR_DIR}/sqlite:/data \\
   coleifer/sqlite-web:${DOCKER_IMAGE_VERSION}
 """
@@ -866,6 +904,7 @@ docker run \\
   --interactive \\
   --name ${SENZING_PROJECT_NAME}-stream-loader \\
   --rm \\
+  --user $(id -u):$(id -g) \\
   --tty \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
@@ -896,6 +935,7 @@ docker run \\
   --publish ${PORT}:${PORT} \\
   --rm \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
@@ -919,6 +959,7 @@ docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
   --name ${SENZING_PROJECT_NAME}-init-container \\
   --rm \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
@@ -934,6 +975,7 @@ docker run \\
   --name ${SENZING_PROJECT_NAME}-web-app-demo \\
   --publish ${PORT}:80 \\
   --rm \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
@@ -962,36 +1004,12 @@ docker run \\
   --publish ${PORT}:5000 \\
   --rm \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
   senzing/xterm:${DOCKER_IMAGE_VERSION}
-"""
-    return 0
-
-
-def file_portainer():
-    """#!/usr/bin/env bash
-
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source ${SCRIPT_DIR}/docker-environment-vars.sh
-
-DOCKER_IMAGE_VERSION=latest
-PORT=9170
-
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} portainer running on http://localhost:${PORT}"
-echo "${SENZING_HORIZONTAL_RULE}"
-
-sudo docker run \\
-   --detach \\
-   --name portainer \\
-   --publish ${PORT}:9000 \\
-   --restart always \\
-   --volume ${SENZING_DOCKER_SOCKET}:/var/run/docker.sock \\
-   --volume ${SENZING_PORTAINER_DIR}:/data \\
-   portainer/portainer:${DOCKER_IMAGE_VERSION}
 """
     return 0
 
