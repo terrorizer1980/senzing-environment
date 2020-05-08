@@ -30,7 +30,7 @@ except:
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-05-07'
+__updated__ = '2020-05-08'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -717,6 +717,7 @@ docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
   --name ${SENZING_PROJECT_NAME}-init-container \\
   --rm \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
