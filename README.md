@@ -192,7 +192,7 @@ If a Senzing project directory is needed, perform the following step.
         --project-dir ${SENZING_PROJECT_DIR}
     ```
 
-1. Perform work-around for sym-link in sub-directories.
+1. Perform work-around for sym-link in sub-directories. (Senzing 1.x.x only)
    Example:
 
     ```console
@@ -264,7 +264,7 @@ The following examples require initialization described in
       --project-dir ${SENZING_PROJECT_DIR}
     ```
 
-#### Senzing project work-around
+#### Senzing project work-around (Senzing 1.x.x only)
 
 Currently Senzing project directories contain symbolic links that do not work within docker containers.
 The following instructions replace the symbolic links with actual directories.
