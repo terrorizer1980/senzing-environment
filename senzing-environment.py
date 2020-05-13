@@ -1651,6 +1651,7 @@ def do_add_quickstart_support_macos(args):
         "senzing-init-container.sh": file_senzing_init_container,
         "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
         "senzing-xterm.sh": file_senzing_xterm,
+        "senzing-sqlite-web.sh": file_senzing_sqlite_web,
         "senzing-yum.sh": file_senzing_yum
     }
 
