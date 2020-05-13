@@ -1174,13 +1174,12 @@ docker run \\
   --rm \\
   --tty \\
   --user $(id -u):$(id -g) \\
-  --volume ${SENZING_DATA_DIR}:/opt/senzing/data \\
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_PROJECT_DIR}:/opt/senzing \\
   senzing/yum:${DOCKER_IMAGE_VERSION}
 
 mv ${SENZING_DATA_DIR} ${SENZING_DATA_DIR}-backup
 mv ${SENZING_DATA_DIR}-backup/1.0.0 ${SENZING_DATA_DIR}
-rm ${SENZING_DATA_DIR}-backup
+rmdir ${SENZING_DATA_DIR}-backup
 """
     return 0
 
@@ -1647,6 +1646,7 @@ def do_add_quickstart_support_macos(args):
 
     docker_bin_files = {
         "docker-pull-quickstart-latest.sh": file_docker_pull_quickstart_latest,
+        "senzing-init-container.sh": file_senzing_init_container,
         "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
         "senzing-xterm.sh": file_senzing_xterm,
         "senzing-yum.sh": file_senzing_yum
