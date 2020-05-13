@@ -958,7 +958,7 @@ echo "${SENZING_HORIZONTAL_RULE}"
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
   --name ${SENZING_PROJECT_NAME}-quickstart \\
-  --publish ${PORT}:80 \\
+  --publish ${PORT}:8251 \\
   --rm \\
   --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
