@@ -725,7 +725,7 @@ export SENZING_DATA_DIR=${{SENZING_PROJECT_DIR}}/data
 export SENZING_DATA_VERSION_DIR=${{SENZING_PROJECT_DIR}}/data
 export SENZING_DOCKER_SOCKET=/var/run/docker.sock
 export SENZING_ETC_DIR=${{SENZING_PROJECT_DIR}}/docker-etc
-export SENZING_G2_DIR=${{SENZING_PROJECT_DIR}}
+export SENZING_G2_DIR=${{SENZING_PROJECT_DIR}}{senzing_project_dir_suffix}
 export SENZING_HORIZONTAL_RULE="=============================================================================="
 export SENZING_INPUT_URL="https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json"
 export SENZING_PORTAINER_DIR=${{SENZING_PROJECT_DIR}}/var/portainer
@@ -1117,7 +1117,7 @@ echo "${SENZING_HORIZONTAL_RULE}"
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
   --name ${SENZING_PROJECT_NAME}-web-app-demo \\
-  --publish ${PORT}:80 \\
+  --publish ${PORT}:8251 \\
   --rm \\
   --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
@@ -1139,7 +1139,8 @@ DOCKER_IMAGE_VERSION=latest
 PORT=8254
 
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "docker exec -it ${SENZING_PROJECT_NAME}-xterm /bin/bash"
+echo "${SENZING_HORIZONTAL_RULE:0:2} Container name: ${SENZING_PROJECT_NAME}-xterm"
+echo "${SENZING_HORIZONTAL_RULE:0:2} docker exec -it ${SENZING_PROJECT_NAME}-xterm /bin/bash"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-xterm running on http://localhost:${PORT}"
 echo "${SENZING_HORIZONTAL_RULE}"
 
@@ -1420,6 +1421,7 @@ def project_create_docker_environment_vars_macos(project_dir, project_name, dock
         "project_name": project_name,
         "project_dir": project_dir,
         "senzing_database_url": g2_database_url,
+        "senzing_project_dir_suffix": "/g2",
         "sql_connection": sql_connection
     }
 
