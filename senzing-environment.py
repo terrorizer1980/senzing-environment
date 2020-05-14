@@ -1214,17 +1214,19 @@ docker run \\
   --volume ${SENZING_PROJECT_DIR}:/opt/senzing \\
   senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM}
 
-# Directory manipulatation
+# Create symbolic links to timestamped directories.
 
 TIMESTAMP=$(date +%s)
 
-mv ${SENZING_G2_DIR} ${SENZING_G2_DIR}.${TIMESTAMP}
-ln -s ${SENZING_G2_DIR}.${TIMESTAMP} ${SENZING_G2_DIR}
+pushd ${SENZING_PROJECT_DIR}
+mv g2 g2.${TIMESTAMP}
+ln -s g2.${TIMESTAMP} g2
 
-mv ${SENZING_DATA_DIR} ${SENZING_DATA_DIR}-backup
-mv ${SENZING_DATA_DIR}-backup/1.0.0 ${SENZING_DATA_DIR}.${TIMESTAMP}
-rmdir ${SENZING_DATA_DIR}-backup
-ln -s ${SENZING_DATA_DIR}.${TIMESTAMP} ${SENZING_DATA_DIR}
+mv data data-backup
+mv data-backup/1.0.0 data.${TIMESTAMP}
+rmdir data-backup
+ln -s data.${TIMESTAMP} data
+popd
 """
     return 0
 
