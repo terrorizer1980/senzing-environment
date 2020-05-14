@@ -1133,9 +1133,8 @@ DOCKER_IMAGE_VERSION=latest
 PORT=8254
 
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} Container name: ${SENZING_PROJECT_NAME}-xterm"
-echo "${SENZING_HORIZONTAL_RULE:0:2} docker exec -it ${SENZING_PROJECT_NAME}-xterm /bin/bash"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-xterm running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} docker exec -it ${SENZING_PROJECT_NAME}-xterm /bin/bash"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
