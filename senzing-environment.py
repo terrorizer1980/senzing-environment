@@ -30,7 +30,7 @@ except:
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-05-13'
+__updated__ = '2020-05-14'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -125,7 +125,7 @@ def get_parser():
                 },
             },
         },
-        'add-quickstart-support': {
+        'add-docker-support-linux': {
             "help": 'Update a G2Project to support quickstart.',
             "arguments": {
                 "--debug": {
@@ -151,7 +151,7 @@ def get_parser():
                 },
             },
         },
-        'add-quickstart-support-macos': {
+        'add-docker-support-macos': {
             "help": 'Update a G2Project to support quickstart.',
             "arguments": {
                 "--debug": {
@@ -743,6 +743,7 @@ export SENZING_VAR_DIR=${{SENZING_PROJECT_DIR}}/var
 def file_docker_pull_latest():
     """#! /usr/bin/env bash
 
+docker pull coleifer/sqlite-web:latest
 docker pull portainer/portainer:latest
 docker pull senzing/senzing-debug:latest
 docker pull senzing/entity-search-web-app:latest
@@ -751,17 +752,9 @@ docker pull senzing/jupyter:latest
 docker pull senzing/mock-data-generator:latest
 docker pull senzing/senzing-api-server:latest
 docker pull senzing/stream-loader:latest
-docker pull senzing/xterm:latest
-"""
-    return 0
-
-
-def file_docker_pull_quickstart_latest():
-    """#! /usr/bin/env bash
-
-docker pull senzing/init-container:latest
 docker pull senzing/web-app-demo:latest
 docker pull senzing/xterm:latest
+docker pull senzing/yum:latest
 """
     return 0
 
@@ -1389,6 +1382,7 @@ def project_create_docker_environment_vars(project_dir, project_name, docker_hos
         "project_name": project_name,
         "project_dir": project_dir,
         "senzing_database_url": senzing_database_url,
+        "senzing_project_dir_suffix": "",
         "sql_connection": sql_connection
     }
 
@@ -1563,17 +1557,20 @@ def do_add_docker_support(args):
 
     docker_bin_files = {
         "docker-pull-latest.sh": file_docker_pull_latest,
+        "portainer.sh": file_portainer,
         "senzing-api-server.sh": file_senzing_api_server,
         "senzing-debug.sh": file_senzing_debug,
         "senzing-init-container.sh": file_senzing_init_container,
         "senzing-jupyter.sh": file_senzing_jupyter,
         "senzing-mock-data-generator.sh": file_senzing_mock_data_generator,
+        "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
         "senzing-rabbitmq.sh": file_senzing_rabbitmq,
         "senzing-sqlite-web.sh": file_senzing_sqlite_web,
         "senzing-stream-loader.sh": file_senzing_stream_loader,
         "senzing-webapp.sh": file_senzing_webapp,
         "senzing-webapp-demo.sh": file_senzing_webapp_demo,
-        "senzing-xterm.sh": file_senzing_xterm
+        "senzing-xterm.sh": file_senzing_xterm,
+        "senzing-yum.sh": file_senzing_yum
     }
 
     # Do work.
@@ -1590,7 +1587,7 @@ def do_add_docker_support(args):
     logging.info(exit_template(config))
 
 
-def do_add_quickstart_support(args):
+def do_add_docker_support_linux(args):
     ''' Do a task. '''
 
     # Get context from CLI, environment variables, and ini files.
@@ -1610,8 +1607,21 @@ def do_add_quickstart_support(args):
     # Identify files to be created in <project>/docker-bin
 
     docker_bin_files = {
-        "docker-pull-quickstart-latest.sh": file_docker_pull_quickstart_latest,
-        "senzing-quickstart-demo.sh": file_senzing_quickstart_demo
+        "docker-pull-latest.sh": file_docker_pull_latest,
+        "portainer.sh": file_portainer,
+        "senzing-api-server.sh": file_senzing_api_server,
+        "senzing-debug.sh": file_senzing_debug,
+        "senzing-init-container.sh": file_senzing_init_container,
+        "senzing-jupyter.sh": file_senzing_jupyter,
+        "senzing-mock-data-generator.sh": file_senzing_mock_data_generator,
+        "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
+        "senzing-rabbitmq.sh": file_senzing_rabbitmq,
+        "senzing-sqlite-web.sh": file_senzing_sqlite_web,
+        "senzing-stream-loader.sh": file_senzing_stream_loader,
+        "senzing-webapp.sh": file_senzing_webapp,
+        "senzing-webapp-demo.sh": file_senzing_webapp_demo,
+        "senzing-xterm.sh": file_senzing_xterm,
+        "senzing-yum.sh": file_senzing_yum
     }
 
     # Do work.
@@ -1627,7 +1637,7 @@ def do_add_quickstart_support(args):
     logging.info(exit_template(config))
 
 
-def do_add_quickstart_support_macos(args):
+def do_add_docker_support_macos(args):
     ''' Do a task. '''
 
     # Get context from CLI, environment variables, and ini files.
@@ -1648,10 +1658,19 @@ def do_add_quickstart_support_macos(args):
     # Identify files to be created in <project>/docker-bin
 
     docker_bin_files = {
-        "docker-pull-quickstart-latest.sh": file_docker_pull_quickstart_latest,
+        "docker-pull-latest.sh": file_docker_pull_latest,
+        "portainer.sh": file_portainer,
+        "senzing-api-server.sh": file_senzing_api_server,
+        "senzing-debug.sh": file_senzing_debug,
         "senzing-init-container.sh": file_senzing_init_container,
+        "senzing-jupyter.sh": file_senzing_jupyter,
+        "senzing-mock-data-generator.sh": file_senzing_mock_data_generator,
         "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
+        "senzing-rabbitmq.sh": file_senzing_rabbitmq,
         "senzing-sqlite-web.sh": file_senzing_sqlite_web,
+        "senzing-stream-loader.sh": file_senzing_stream_loader,
+        "senzing-webapp.sh": file_senzing_webapp,
+        "senzing-webapp-demo.sh": file_senzing_webapp_demo,
         "senzing-xterm.sh": file_senzing_xterm,
         "senzing-yum.sh": file_senzing_yum
     }
