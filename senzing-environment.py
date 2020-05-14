@@ -759,6 +759,7 @@ docker pull senzing/xterm:latest
 def file_docker_pull_quickstart_latest():
     """#! /usr/bin/env bash
 
+docker pull senzing/init-container:latest
 docker pull senzing/web-app-demo:latest
 docker pull senzing/xterm:latest
 """
@@ -1650,8 +1651,8 @@ def do_add_quickstart_support_macos(args):
         "docker-pull-quickstart-latest.sh": file_docker_pull_quickstart_latest,
         "senzing-init-container.sh": file_senzing_init_container,
         "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
-        "senzing-xterm.sh": file_senzing_xterm,
         "senzing-sqlite-web.sh": file_senzing_sqlite_web,
+        "senzing-xterm.sh": file_senzing_xterm,
         "senzing-yum.sh": file_senzing_yum
     }
 
