@@ -1064,8 +1064,8 @@ docker run \\
   --interactive \\
   --name ${SENZING_PROJECT_NAME}-stream-loader \\
   --rm \\
-  --user $(id -u):$(id -g) \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
