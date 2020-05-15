@@ -11,7 +11,7 @@ import json
 import linecache
 import logging
 import os
-import parse
+import re
 import shutil
 import signal
 import socket
@@ -19,13 +19,6 @@ import stat
 import string
 import sys
 import time
-
-# Non-system packages
-
-try:
-    import parse
-except:
-    pass
 
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
@@ -591,15 +584,42 @@ def parse_database_url(original_senzing_database_url):
     return result
 
 
+def parse_string(format_string, string_to_be_parsed):
+    """
+    Match string_to_be_parsed against the given format string, return dictionary of matches.
+    See https://stackoverflow.com/questions/10663093/use-python-format-string-in-reverse-for-parsing
+    """
+
+    # First split on any keyword arguments, note that the names of keyword arguments will be in the
+    # 1st, 3rd, ... positions in this list
+
+    tokens = re.split(r'\{(.*?)\}', format_string)
+    keywords = tokens[1::2]
+
+    # Now replace keyword arguments with named groups matching them. We also escape between keyword
+    # arguments so we support meta-characters there. Re-join tokens to form our regexp pattern
+
+    tokens[1::2] = map(u'(?P<{}>.*)'.format, keywords)
+    tokens[0::2] = map(re.escape, tokens[0::2])
+    pattern = ''.join(tokens)
+
+    # Use our pattern to match the given string, raise if it doesn't match
+
+    matches = re.match(pattern, string_to_be_parsed)
+    if not matches:
+        raise Exception("Format string did not match")
+
+    # Return a dict with all of our keywords and their values
+
+    return {x: matches.group(x) for x in keywords}
+
+
 def parse_database_connection(senzing_database_connection):
     result = {}
     scheme = senzing_database_connection[:senzing_database_connection.index(":")]
-
-    result = parse.parse(database_connection_formats.get(scheme, ""), senzing_database_connection)
+    result = parse_string(database_connection_formats.get(scheme, ""), senzing_database_connection)
     if not result:
         logging.error(message_error(695, "", senzing_database_connection))
-    else:
-        result = result.named
 
     assert type(result) == dict
     return result
@@ -608,24 +628,10 @@ def parse_database_connection(senzing_database_connection):
 def get_sql_connection(parsed_database_url):
     ''' Given a canonical database URL, transform to the specific URL. '''
 
-    result = ""
     scheme = parsed_database_url.get('scheme')
-
-    # Format database URL for a particular database.
-
-    if scheme in ['mysql']:
-        result = "{scheme}://{username}:{password}@{hostname}:{port}/?schema={schema}".format(**parsed_database_url)
-    elif scheme in ['postgresql']:
-        result = "{scheme}://{username}:{password}@{hostname}:{port}:{schema}/".format(**parsed_database_url)
-    elif scheme in ['db2']:
-        result = "{scheme}://{username}:{password}@{schema}".format(**parsed_database_url)
-    elif scheme in ['sqlite3']:
-        result = "{scheme}://{netloc}{path}".format(**parsed_database_url)
-    elif scheme in ['mssql']:
-        result = "{scheme}://{username}:{password}@{schema}".format(**parsed_database_url)
-    else:
-        logging.error(message_error(695, scheme, generic_database_url))
-
+    result = database_connection_formats.get(scheme, "").format(**parsed_database_url)
+    if not result:
+        logging.error(message_error(695, scheme, parsed_database_url))
     return result
 
 
@@ -723,6 +729,20 @@ export SENZING_API_SERVER_URL="http://${{SENZING_DOCKER_HOST_IP_ADDR}}:8250"
 export SENZING_DATABASE_URL={senzing_database_url}
 export SENZING_DATA_DIR=${{SENZING_PROJECT_DIR}}/data
 export SENZING_DATA_VERSION_DIR=${{SENZING_PROJECT_DIR}}/data
+export SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP=latest
+export SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER=latest
+export SENZING_DOCKER_IMAGE_VERSION_JUPYTER=latest
+export SENZING_DOCKER_IMAGE_VERSION_MOCK_DATA_GENERATOR=1.1.1
+export SENZING_DOCKER_IMAGE_VERSION_PORTAINER=latest
+export SENZING_DOCKER_IMAGE_VERSION_RABBITMQ=3.8.2
+export SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER=latest
+export SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG=latest
+export SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB=latest
+export SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER=latest
+export SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO=latest
+export SENZING_DOCKER_IMAGE_VERSION_XTERM=latest
+export SENZING_DOCKER_IMAGE_VERSION_YUM=latest
+export SENZING_DOCKER_REGISTRY_URL=docker.io
 export SENZING_DOCKER_SOCKET=/var/run/docker.sock
 export SENZING_ETC_DIR=${{SENZING_PROJECT_DIR}}/docker-etc
 export SENZING_G2_DIR=${{SENZING_PROJECT_DIR}}{senzing_project_dir_suffix}
@@ -743,18 +763,22 @@ export SENZING_VAR_DIR=${{SENZING_PROJECT_DIR}}/var
 def file_docker_pull_latest():
     """#! /usr/bin/env bash
 
-docker pull coleifer/sqlite-web:latest
-docker pull portainer/portainer:latest
-docker pull senzing/senzing-debug:latest
-docker pull senzing/entity-search-web-app:latest
-docker pull senzing/init-container:latest
-docker pull senzing/jupyter:latest
-docker pull senzing/mock-data-generator:latest
-docker pull senzing/senzing-api-server:latest
-docker pull senzing/stream-loader:latest
-docker pull senzing/web-app-demo:latest
-docker pull senzing/xterm:latest
-docker pull senzing/yum:latest
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/coleifer/sqlite-web:${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/mock-data-generator:${SENZING_DOCKER_IMAGE_VERSION_MOCK_DATA_GENERATOR}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM}
 """
     return 0
 
@@ -765,8 +789,9 @@ def file_portainer():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_IMAGE_VERSION=latest
 PORT=9170
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER}
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} portainer running on http://localhost:${PORT}"
@@ -779,7 +804,7 @@ docker run \\
    --restart always \\
    --volume ${SENZING_DOCKER_SOCKET}:/var/run/docker.sock \\
    --volume ${SENZING_PORTAINER_DIR}:/data \\
-   portainer/portainer:${DOCKER_IMAGE_VERSION}
+   portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER}
 """
     return 0
 
@@ -790,8 +815,9 @@ def file_senzing_api_server():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_IMAGE_VERSION=latest
 PORT=8250
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://localhost:${PORT}"
@@ -810,7 +836,7 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/senzing-api-server:${DOCKER_IMAGE_VERSION} \\
+  senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER} \\
     -httpPort ${PORT} \\
     -bindAddr all \\
     -iniFile /etc/opt/senzing/G2Module.ini \\
@@ -826,7 +852,7 @@ def file_senzing_debug():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_IMAGE_VERSION=latest
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
 
 docker run \\
   --cap-add=ALL \\
@@ -838,7 +864,7 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/senzing-debug:${DOCKER_IMAGE_VERSION}
+  senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
 """
     return 0
 
@@ -849,7 +875,7 @@ def file_senzing_init_container():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_IMAGE_VERSION=latest
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
 
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
@@ -860,7 +886,7 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/init-container:${DOCKER_IMAGE_VERSION}
+  senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
 """
     return 0
 
@@ -871,10 +897,11 @@ def file_senzing_jupyter():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_IMAGE_VERSION=latest
 PORT=9178
 
 chmod -R 777 ${SENZING_PROJECT_DIR}/var/sqlite/
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER}
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-jupyter running on http://localhost:${PORT}"
@@ -892,7 +919,7 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/jupyter:${DOCKER_IMAGE_VERSION} start.sh jupyter notebook --NotebookApp.token=''
+  senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER} start.sh jupyter notebook --NotebookApp.token=''
 """
     return 0
 
@@ -903,7 +930,7 @@ def file_senzing_mock_data_generator():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_IMAGE_VERSION=1.1.1
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/mock-data-generator:${SENZING_DOCKER_IMAGE_VERSION_MOCK_DATA_GENERATOR}
 
 docker run \\
   --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \\
@@ -919,7 +946,7 @@ docker run \\
   --rm \\
   --tty \\
   --user $(id -u):$(id -g) \\
-  senzing/mock-data-generator:${DOCKER_IMAGE_VERSION}
+  senzing/mock-data-generator:${SENZING_DOCKER_IMAGE_VERSION_MOCK_DATA_GENERATOR}
 """
     return 0
 
@@ -942,8 +969,9 @@ def file_senzing_quickstart_demo():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_IMAGE_VERSION=latest
 PORT=8251
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-quickstart running on http://localhost:${PORT}"
@@ -959,7 +987,7 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/web-app-demo:${DOCKER_IMAGE_VERSION}
+  senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
 """
     return 0
 
@@ -970,7 +998,7 @@ def file_senzing_rabbitmq():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_IMAGE_VERSION=3.8.2
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-rabbitmq running on http://localhost:15672"
@@ -990,7 +1018,7 @@ docker run \\
   --tty \\
   --user $(id -u):$(id -g) \\
   --volume ${RABBITMQ_DIR}:/bitnami \\
-  bitnami/rabbitmq:${DOCKER_IMAGE_VERSION}
+  bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}
 """
     return 0
 
@@ -1001,7 +1029,7 @@ def file_senzing_sqlite_web():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_IMAGE_VERSION=latest
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/coleifer/sqlite-web:${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-sqlite-web running on http://localhost:9174"
@@ -1016,7 +1044,7 @@ docker run \\
   --tty \\
   --user $(id -u):$(id -g) \\
   --volume ${SENZING_VAR_DIR}/sqlite:/data \\
-  coleifer/sqlite-web:${DOCKER_IMAGE_VERSION}
+  coleifer/sqlite-web:${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}
 """
     return 0
 
@@ -1027,7 +1055,7 @@ def file_senzing_stream_loader():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_IMAGE_VERSION=latest
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}
 
 docker run \\
   --env LC_CTYPE="en_us.utf8" \\
@@ -1042,13 +1070,13 @@ docker run \\
   --interactive \\
   --name ${SENZING_PROJECT_NAME}-stream-loader \\
   --rm \\
-  --user $(id -u):$(id -g) \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/stream-loader:${DOCKER_IMAGE_VERSION}
+  senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}
 """
 
 
@@ -1058,8 +1086,9 @@ def file_senzing_webapp():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_IMAGE_VERSION=latest
 PORT=8251
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://localhost:${PORT}"
@@ -1078,7 +1107,7 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/entity-search-web-app:${DOCKER_IMAGE_VERSION}
+  senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
 """
     return 0
 
@@ -1089,9 +1118,10 @@ def file_senzing_webapp_demo():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_INIT_CONTAINER_IMAGE_VERSION=latest
-DOCKER_WEBAPP_DEMO_IMAGE_VERSION=latest
 PORT=8251
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
 
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
@@ -1102,7 +1132,7 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/init-container:${DOCKER_INIT_CONTAINER_IMAGE_VERSION}
+  senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp-demo running on http://localhost:${PORT}"
@@ -1118,7 +1148,7 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/web-app-demo:${DOCKER_WEBAPP_DEMO_IMAGE_VERSION}
+  senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
 """
     return 0
 
@@ -1129,13 +1159,13 @@ def file_senzing_xterm():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_IMAGE_VERSION=latest
 PORT=8254
 
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM}
+
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} Container name: ${SENZING_PROJECT_NAME}-xterm"
-echo "${SENZING_HORIZONTAL_RULE:0:2} docker exec -it ${SENZING_PROJECT_NAME}-xterm /bin/bash"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-xterm running on http://localhost:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} docker exec -it ${SENZING_PROJECT_NAME}-xterm /bin/bash"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -1149,7 +1179,18 @@ docker run \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/xterm:${DOCKER_IMAGE_VERSION}
+  senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM}
+"""
+    return 0
+
+
+def file_senzing_xterm_shell():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+docker exec -it ${SENZING_PROJECT_NAME}-xterm  /bin/bash
 """
     return 0
 
@@ -1160,7 +1201,14 @@ def file_senzing_yum():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-DOCKER_IMAGE_VERSION=latest
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM}
+
+# Remove symbolic links.
+
+rm ${SENZING_G2_DIR}
+rm ${SENZING_DATA_DIR}
+
+# Download Senzing binaries.
 
 docker run \\
   --env SENZING_ACCEPT_EULA=${SENZING_ACCEPT_EULA} \\
@@ -1170,11 +1218,21 @@ docker run \\
   --tty \\
   --user $(id -u):$(id -g) \\
   --volume ${SENZING_PROJECT_DIR}:/opt/senzing \\
-  senzing/yum:${DOCKER_IMAGE_VERSION}
+  senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM}
 
-mv ${SENZING_DATA_DIR} ${SENZING_DATA_DIR}-backup
-mv ${SENZING_DATA_DIR}-backup/1.0.0 ${SENZING_DATA_DIR}
-rmdir ${SENZING_DATA_DIR}-backup
+# Create symbolic links to timestamped directories.
+
+TIMESTAMP=$(date +%s)
+
+pushd ${SENZING_PROJECT_DIR}
+mv g2 g2.${TIMESTAMP}
+ln -s g2.${TIMESTAMP} g2
+
+mv data data-backup
+mv data-backup/1.0.0 data.${TIMESTAMP}
+rmdir data-backup
+ln -s data.${TIMESTAMP} data
+popd
 """
     return 0
 
@@ -1570,6 +1628,7 @@ def do_add_docker_support(args):
         "senzing-webapp.sh": file_senzing_webapp,
         "senzing-webapp-demo.sh": file_senzing_webapp_demo,
         "senzing-xterm.sh": file_senzing_xterm,
+        "senzing-xterm-shell.sh": file_senzing_xterm_shell,
         "senzing-yum.sh": file_senzing_yum
     }
 
@@ -1621,6 +1680,7 @@ def do_add_docker_support_linux(args):
         "senzing-webapp.sh": file_senzing_webapp,
         "senzing-webapp-demo.sh": file_senzing_webapp_demo,
         "senzing-xterm.sh": file_senzing_xterm,
+        "senzing-xterm-shell.sh": file_senzing_xterm_shell,
         "senzing-yum.sh": file_senzing_yum
     }
 
@@ -1672,6 +1732,7 @@ def do_add_docker_support_macos(args):
         "senzing-webapp.sh": file_senzing_webapp,
         "senzing-webapp-demo.sh": file_senzing_webapp_demo,
         "senzing-xterm.sh": file_senzing_xterm,
+        "senzing-xterm-shell.sh": file_senzing_xterm_shell,
         "senzing-yum.sh": file_senzing_yum
     }
 
