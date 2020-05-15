@@ -383,6 +383,13 @@ Depending on the distribution of Linux, there are different ways of installing S
 
 ### Bring up Senzing init container
 
+1. Work-around for permission problem.
+   Example:
+
+    ```console
+    sudo chmod -R 777 ~/senzing-demo-project-3/var/postgres
+    ```
+
 1. Execute script to docker run `senzing/init-container`.
    `senzing/init-container` initialized configuration files (i.e. `.../etc` files)
    and initializes config in SQLite database.
@@ -390,13 +397,6 @@ Depending on the distribution of Linux, there are different ways of installing S
 
     ```console
     ~/senzing-demo-project-3/docker-bin/senzing-init-container.sh
-    ```
-
-1. Work-around for permission problem.
-   Example:
-
-    ```console
-    sudo chmod -R 777 ~/senzing-demo-project-3/var/postgres
     ```
 
 ### Bring up Senzing stream-loader
