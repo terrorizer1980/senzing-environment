@@ -113,8 +113,7 @@ def get_parser():
                 "--project-dir": {
                     "dest": "project_dir",
                     "help": "Specify location of G2Project Default: ~/senzing",
-                    "metavar": "SENZING_PROJECT_DIR",
-                    "required": True
+                    "metavar": "SENZING_PROJECT_DIR"
                 },
             },
         },
@@ -139,8 +138,7 @@ def get_parser():
                 "--project-dir": {
                     "dest": "project_dir",
                     "help": "Specify location of G2Project Default: ~/senzing",
-                    "metavar": "SENZING_PROJECT_DIR",
-                    "required": True
+                    "metavar": "SENZING_PROJECT_DIR"
                 },
             },
         },
@@ -793,6 +791,33 @@ docker run \\
     return 0
 
 
+def file_postgres():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+PORT=5432
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
+
+echo "${SENZING_HORIZONTAL_RULE}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-postgres listening on ${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE}"
+
+docker run \\
+  --env POSTGRES_DB=${DATABASE_DATABASE} \\
+  --env POSTGRES_PASSWORD=${DATABASE_PASSWORD} \\
+  --env POSTGRES_USERNAME=${DATABASE_USERNAME} \\
+  --name ${SENZING_PROJECT_NAME}-postgres \\
+  --publish ${PORT}:5432 \\
+  --rm \\
+  --volume ${POSTGRES_DIR}:/var/lib/postgresql/data \\
+  postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
+"""
+    return 0
+
+
 def file_senzing_api_server():
     """#!/usr/bin/env bash
 
@@ -865,7 +890,6 @@ docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
   --name ${SENZING_PROJECT_NAME}-init-container \\
   --rm \\
-  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
@@ -985,35 +1009,6 @@ docker run \\
     return 0
 
 
-def file_senzing_postgres():
-    """#!/usr/bin/env bash
-
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source ${SCRIPT_DIR}/docker-environment-vars.sh
-
-PORT=5432
-
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
-
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-postgres listening on ${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
-echo "${SENZING_HORIZONTAL_RULE}"
-
-docker run \\
-  --env POSTGRES_DB=${DATABASE_SCHEMA} \\
-  --env POSTGRES_PASSWORD=${DATABASE_PASSWORD} \\
-  --env POSTGRES_USERNAME=${DATABASE_USERNAME} \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-postgres \\
-  --publish ${PORT}:5432 \\
-  --rm \\
-  --tty \\
-  --volume ${POSTGRES_DIR}:/var/lib/postgresql/data \\
-  postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
-"""
-    return 0
-
-
 def file_senzing_postgresql_init():
     """#!/usr/bin/env bash
 
@@ -1089,7 +1084,6 @@ docker run \\
   --publish 5672:5672 \\
   --rm \\
   --tty \\
-  --user $(id -u):$(id -g) \\
   --volume ${RABBITMQ_DIR}:/bitnami \\
   bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}
 """
@@ -1701,6 +1695,7 @@ def do_add_docker_support_linux(args):
     docker_bin_files = {
         "docker-pull-latest.sh": file_docker_pull_latest,
         "portainer.sh": file_portainer,
+        "postgres.sh": file_postgres,
         "senzing-api-server.sh": file_senzing_api_server,
         "senzing-debug.sh": file_senzing_debug,
         "senzing-init-container.sh": file_senzing_init_container,
@@ -1756,6 +1751,7 @@ def do_add_docker_support_macos(args):
     docker_bin_files = {
         "docker-pull-latest.sh": file_docker_pull_latest,
         "portainer.sh": file_portainer,
+        "postgres.sh": file_postgres,
         "senzing-api-server.sh": file_senzing_api_server,
         "senzing-debug.sh": file_senzing_debug,
         "senzing-init-container.sh": file_senzing_init_container,
