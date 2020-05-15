@@ -11,7 +11,7 @@ import json
 import linecache
 import logging
 import os
-import parse
+import re
 import shutil
 import signal
 import socket
@@ -19,13 +19,6 @@ import stat
 import string
 import sys
 import time
-
-# Non-system packages
-
-try:
-    import parse
-except:
-    pass
 
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
@@ -591,15 +584,42 @@ def parse_database_url(original_senzing_database_url):
     return result
 
 
+def parse_string(format_string, string_to_be_parsed):
+    """
+    Match string_to_be_parsed against the given format string, return dictionary of matches.
+    See https://stackoverflow.com/questions/10663093/use-python-format-string-in-reverse-for-parsing
+    """
+
+    # First split on any keyword arguments, note that the names of keyword arguments will be in the
+    # 1st, 3rd, ... positions in this list
+
+    tokens = re.split(r'\{(.*?)\}', format_string)
+    keywords = tokens[1::2]
+
+    # Now replace keyword arguments with named groups matching them. We also escape between keyword
+    # arguments so we support meta-characters there. Re-join tokens to form our regexp pattern
+
+    tokens[1::2] = map(u'(?P<{}>.*)'.format, keywords)
+    tokens[0::2] = map(re.escape, tokens[0::2])
+    pattern = ''.join(tokens)
+
+    # Use our pattern to match the given string, raise if it doesn't match
+
+    matches = re.match(pattern, string_to_be_parsed)
+    if not matches:
+        raise Exception("Format string did not match")
+
+    # Return a dict with all of our keywords and their values
+
+    return {x: matches.group(x) for x in keywords}
+
+
 def parse_database_connection(senzing_database_connection):
     result = {}
     scheme = senzing_database_connection[:senzing_database_connection.index(":")]
-
-    result = parse.parse(database_connection_formats.get(scheme, ""), senzing_database_connection)
+    result = parse_string(database_connection_formats.get(scheme, ""), senzing_database_connection)
     if not result:
         logging.error(message_error(695, "", senzing_database_connection))
-    else:
-        result = result.named
 
     assert type(result) == dict
     return result
@@ -608,24 +628,10 @@ def parse_database_connection(senzing_database_connection):
 def get_sql_connection(parsed_database_url):
     ''' Given a canonical database URL, transform to the specific URL. '''
 
-    result = ""
     scheme = parsed_database_url.get('scheme')
-
-    # Format database URL for a particular database.
-
-    if scheme in ['mysql']:
-        result = "{scheme}://{username}:{password}@{hostname}:{port}/?schema={schema}".format(**parsed_database_url)
-    elif scheme in ['postgresql']:
-        result = "{scheme}://{username}:{password}@{hostname}:{port}:{schema}/".format(**parsed_database_url)
-    elif scheme in ['db2']:
-        result = "{scheme}://{username}:{password}@{schema}".format(**parsed_database_url)
-    elif scheme in ['sqlite3']:
-        result = "{scheme}://{netloc}{path}".format(**parsed_database_url)
-    elif scheme in ['mssql']:
-        result = "{scheme}://{username}:{password}@{schema}".format(**parsed_database_url)
-    else:
-        logging.error(message_error(695, scheme, generic_database_url))
-
+    result = database_connection_formats.get(scheme, "").format(**parsed_database_url)
+    if not result:
+        logging.error(message_error(695, scheme, parsed_database_url))
     return result
 
 
