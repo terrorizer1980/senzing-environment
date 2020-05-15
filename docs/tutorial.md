@@ -16,6 +16,7 @@ These are "one-time tasks" which may already have been completed.
 
 ## Demonstration 1
 
+Quick start demonstrations.
 See:
 
 1. [Quick Start for Linux](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/quickstart-linux.md)
@@ -214,6 +215,25 @@ This Docker formation uses the docker-compose YAML file described in
 ## Demonstration 3
 
 This demonstration creates a local PostgreSQL database and RabbitMQ queue.
+It shows how to bring up individual Docker containers.
+
+The demonstration works on the Linux operating system
+(e.g. not macOS, nor Windows).
+
+### Install Senzing
+
+:thinking: Installing Senzing on Linux is a "one-time task".
+If Senzing is already installed,
+proceed to [Create third Senzing project](#create-third-senzing-project).
+
+Depending on the distribution of Linux, there are different ways of installing Senzing.
+
+1. For installation on Red Hat, CentOS, openSuse and
+   [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#RPM-based).
+    1. Visit to [How to install Senzing API - CentOS](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzing-api.md#centos).
+1. For installation on Debian, Ubuntu and
+   [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian-based).
+    1. Visit to [How to install Senzing API - Ubuntu](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzing-api.md#ubuntu).
 
 ### Create third Senzing project
 
@@ -260,7 +280,7 @@ This demonstration creates a local PostgreSQL database and RabbitMQ queue.
        CONNECTION=postgresql://username:password@hostname:5432:G2/
     ```
 
-   When complete, the entire file might look something like this:
+   :thinking: When complete, the entire file might look something like this:
 
     ```ini
     [PIPELINE]
@@ -275,7 +295,7 @@ This demonstration creates a local PostgreSQL database and RabbitMQ queue.
 ### Create third Senzing project with Docker support
 
 1. Give the Senzing project a name.
-   The name is used as a prefix for docker containers.
+   The name is used as a prefix in docker container names.
    Example:
 
     ```console
@@ -314,6 +334,8 @@ This demonstration creates a local PostgreSQL database and RabbitMQ queue.
 :thinking: **Optional:** If a PostgreSQL is not already available,
 
 1. Bring up PostgreSQL database engine.
+   This will use the database information previously specified in
+   [Identify Senzing database](#identify-senzing-database).
    Example:
 
     ```console
@@ -370,7 +392,12 @@ This demonstration creates a local PostgreSQL database and RabbitMQ queue.
     ~/senzing-demo-project-3/docker-bin/senzing-init-container.sh
     ```
 
-FIXME: Permission problem
+1. Work-around for permission problem.
+   Example:
+
+    ```console
+    sudo chmod -R 777 ~/senzing-demo-project-3/var/postgres
+    ```
 
 ### Bring up Senzing stream-loader
 
