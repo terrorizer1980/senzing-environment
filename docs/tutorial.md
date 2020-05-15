@@ -16,99 +16,11 @@ These are "one-time tasks" which may already have been completed.
 
 ## Demonstration 1
 
-The following demonstration assumes that the `senzingapi` package has been installed via yum or apt on the workstation.
+Quick start demonstrations.
+See:
 
-### Create a Senzing project
-
-From [Quickstart Guide](https://senzing.zendesk.com/hc/en-us/articles/115002408867-Quickstart-Guide).
-
-1. Specify the location of the Senzing project on the host system.
-   Example:
-
-    ```console
-    export SENZING_PROJECT_DIR=~/senzing-demo-project-1
-    ```
-
-1. Create the Senzing project.
-   Example:
-
-    ```console
-    /opt/senzing/g2/python/G2CreateProject.py ${SENZING_PROJECT_DIR}
-    ```
-
-### Synergy with Senzing project
-
-From [Quickstart Guide](https://senzing.zendesk.com/hc/en-us/articles/115002408867-Quickstart-Guide).
-
-1. Set environment variables
-   Example:
-
-    ```console
-    cd ${SENZING_PROJECT_DIR}
-    source setupEnv
-    ```
-
-1. Prime the database.
-   Example:
-
-    ```console
-    python3 python/G2SetupConfig.py
-    ```
-
-1. Load example data.
-   Example:
-
-    ```console
-    python3 python/G2Loader.py -P
-    ```
-
-### Add Docker support
-
-1. Get a local copy of
-   [senzing-environment.py](https://raw.githubusercontent.com/Senzing/senzing-environment/master/senzing-environment.py).
-   Example:
-
-    1. :pencil2: Specify where to download file.
-       Example:
-
-        ```console
-        export SENZING_DOWNLOAD_FILE=~/senzing-environment.py
-        ```
-
-    1. Download file.
-       Example:
-
-        ```console
-        curl -X GET \
-          --output ${SENZING_DOWNLOAD_FILE} \
-          https://raw.githubusercontent.com/Senzing/senzing-environment/master/senzing-environment.py
-        ```
-
-    1. Make file executable.
-       Example:
-
-        ```console
-        chmod +x ${SENZING_DOWNLOAD_FILE}
-        ```
-
-1. Run the command.
-   Example:
-
-   ```console
-   ${SENZING_DOWNLOAD_FILE} add-quickstart-support --project-dir ${SENZING_PROJECT_DIR}
-   ```
-
-### Run demonstration
-
-1. Start webapp demo.
-   Example:
-
-    ```console
-    ${SENZING_PROJECT_DIR}/docker-bin/senzing-quickstart-demo.sh
-    ```
-
-1. View  [Entity search webapp](http://localhost:8251/)
-    1. Search for "Robert Jones"
+1. [Quick Start for Linux](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/quickstart-linux.md)
+1. [Quick Start for macOS](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/quickstart-macos.md)
 
 ## Demonstration 2
 
@@ -133,7 +45,7 @@ From [Quickstart Guide](https://senzing.zendesk.com/hc/en-us/articles/1150024088
    Example:
 
     ```console
-    export SENZING_PROJECT_NAME=demo01
+    export SENZING_PROJECT_NAME=demo02
     ```
 
 1. View the Senzing project.
@@ -182,7 +94,7 @@ From [Quickstart Guide](https://senzing.zendesk.com/hc/en-us/articles/1150024088
       --tty \
       --user $(id -u):$(id -g) \
       --volume ${SENZING_PROJECT_DIR}:${SENZING_PROJECT_DIR} \
-      senzing/senzing-environment add-docker-support \
+      senzing/senzing-environment add-docker-support-linux \
         --project-name ${SENZING_PROJECT_NAME} \
         --project-dir ${SENZING_PROJECT_DIR}
     ```
@@ -302,7 +214,28 @@ This Docker formation uses the docker-compose YAML file described in
 
 ## Demonstration 3
 
-### Create third Senzing project with Docker support
+This demonstration creates a local PostgreSQL database and RabbitMQ queue.
+It shows how to bring up individual Docker containers.
+
+The demonstration works on the Linux operating system
+(e.g. not macOS, nor Windows).
+
+### Install Senzing
+
+:thinking: Installing Senzing on Linux is a "one-time task".
+If Senzing is already installed,
+proceed to [Create third Senzing project](#create-third-senzing-project).
+
+Depending on the distribution of Linux, there are different ways of installing Senzing.
+
+1. For installation on Red Hat, CentOS, openSuse and
+   [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#RPM-based).
+    1. Visit to [How to install Senzing API - CentOS](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzing-api.md#centos).
+1. For installation on Debian, Ubuntu and
+   [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian-based).
+    1. Visit to [How to install Senzing API - Ubuntu](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzing-api.md#ubuntu).
+
+### Create third Senzing project
 
 1. Specify the location of the Senzing project on the host system.
    Example:
@@ -318,41 +251,56 @@ This Docker formation uses the docker-compose YAML file described in
     /opt/senzing/g2/python/G2CreateProject.py ${SENZING_PROJECT_DIR}
     ```
 
-1. Give the Senzing project a name.
-   The name is used as a prefix for docker containers.
-   Example:
+### Identify host IP address
 
-    ```console
-    export SENZING_PROJECT_NAME=demo02
-    ```
-
-1. :pencil2: Identify the IP address of the host system.
+1. :pencil2: Set the [SENZING_DOCKER_HOST_IP_ADDR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_docker_host_ip_addr) environment variable.
+   See [SENZING_DOCKER_HOST_IP_ADDR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_docker_host_ip_addr) for help.
    Example:
 
     ```console
     export SENZING_DOCKER_HOST_IP_ADDR=10.1.1.100
     ```
 
-    1. To find the value for `SENZING_DOCKER_HOST_IP_ADDR` use Python interactively:
-       Example:
+### Identify Senzing database
 
-        ```console
-        python3
-        ```
+1. Edit `${SENZING_PROJECT_DIR}/etc/G2Module.ini`
+   Example:
 
-       Copy and paste the following lines into the Python REPL (Read-Evaluate-Print Loop):
+    ```console
+    vi ${SENZING_PROJECT_DIR}/etc/G2Module.ini
+    ```
 
-        ```python
-        import socket
+1. :pencil2: Modify contents of `${SENZING_PROJECT_DIR}/etc/G2Module.ini`.
+   Change the SQL.CONNECTION value to point to the PostgreSQL instance
+   using the `username`, `password`, and `hostname` of the PostgreSQL instance.
+   Example:
 
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.connect(("8.8.8.8", 80))
-        print("export SENZING_DOCKER_HOST_IP_ADDR={0}".format(sock.getsockname()[0]))
-        sock.close()
-        quit()
-        ```
+    ```ini
+    [SQL]
+       CONNECTION=postgresql://username:password@hostname:5432:G2/
+    ```
 
-       Copy and paste the printed `export` statement into the host terminal.
+   :thinking: When complete, the entire file might look something like this:
+
+    ```ini
+    [PIPELINE]
+     SUPPORTPATH=/home/username/senzing-demo-project-1/data
+     CONFIGPATH=/home/username/senzing-demo-project-1/etc
+     RESOURCEPATH=/home/username/senzing-demo-project-1/resources
+
+    [SQL]
+     CONNECTION=postgresql://postgres:postgres@10.1.1.102:5432:G2/
+    ```
+
+### Create third Senzing project with Docker support
+
+1. Give the Senzing project a name.
+   The name is used as a prefix in docker container names.
+   Example:
+
+    ```console
+    export SENZING_PROJECT_NAME=demo03
+    ```
 
 1. Add Docker support to the Senzing project directory.
    Example:
@@ -360,14 +308,14 @@ This Docker formation uses the docker-compose YAML file described in
     ```console
     docker run \
       --env SENZING_DOCKER_HOST_IP_ADDR=${SENZING_DOCKER_HOST_IP_ADDR} \
+      --env SENZING_PROJECT_NAME=${SENZING_PROJECT_NAME} \
+      --env SENZING_PROJECT_DIR=${SENZING_PROJECT_DIR} \
       --interactive \
       --rm \
       --tty \
       --user $(id -u):$(id -g) \
       --volume ${SENZING_PROJECT_DIR}:${SENZING_PROJECT_DIR} \
-      senzing/senzing-environment add-docker-support \
-        --project-name ${SENZING_PROJECT_NAME} \
-        --project-dir ${SENZING_PROJECT_DIR}
+      senzing/senzing-environment add-docker-support-linux
     ```
 
 1. Perform work-around for sym-link in sub-directories.
@@ -379,6 +327,36 @@ This Docker formation uses the docker-compose YAML file described in
 
     cp -r /opt/senzing/g2/resources/config/ ${SENZING_PROJECT_DIR}/resources/
     cp -r /opt/senzing/g2/resources/schema/ ${SENZING_PROJECT_DIR}/resources/
+    ```
+
+### Bring up PostgreSQL database
+
+:thinking: **Optional:** If a PostgreSQL is not already available,
+
+1. Bring up PostgreSQL database engine.
+   This will use the database information previously specified in
+   [Identify Senzing database](#identify-senzing-database).
+   Example:
+
+    ```console
+    ~/senzing-demo-project-3/docker-bin/postgres.sh
+    ```
+
+1. Bring up phpPgAdmin.
+   Example:
+
+    ```console
+    ~/senzing-demo-project-3/docker-bin/senzing-phppgadmin.sh
+    ```
+
+1. View [phpPgAdmin](http://localhost:9171)
+
+1. Create Senzing schema in PostgreSQL.
+   This is a job that will run to completion and exit.
+   Example:
+
+    ```console
+    ~/senzing-demo-project-3/docker-bin/senzing-postgresql-init.sh
     ```
 
 ### Bring up RabbitMQ
@@ -396,6 +374,7 @@ This Docker formation uses the docker-compose YAML file described in
 ### Bring up mock-data-generator
 
 1. Execute script to docker run `senzing/mock-data-generator`.
+   This is a job that will run to completion and exit.
    Example:
 
     ```console
@@ -403,6 +382,13 @@ This Docker formation uses the docker-compose YAML file described in
     ```
 
 ### Bring up Senzing init container
+
+1. Work-around for permission problem.
+   Example:
+
+    ```console
+    sudo chmod -R 777 ~/senzing-demo-project-3/var/postgres
+    ```
 
 1. Execute script to docker run `senzing/init-container`.
    `senzing/init-container` initialized configuration files (i.e. `.../etc` files)
@@ -421,17 +407,6 @@ This Docker formation uses the docker-compose YAML file described in
     ```console
     ~/senzing-demo-project-3/docker-bin/senzing-stream-loader.sh
     ```
-
-### Bring up SQLite  web viewer
-
-1. Execute script to docker run `coleifer/sqlite-web`.
-   Example:
-
-    ```console
-    ~/senzing-demo-project-3/docker-bin/senzing-sqlite-web.sh
-    ```
-
-1. View [SQLite Web](http://localhost:9174)
 
 ### Bring up Senzing API Server
 
@@ -476,6 +451,13 @@ This Docker formation uses the docker-compose YAML file described in
     ```
 
 1. View [X-Term](http://localhost:8254/)
+
+1. "ssh" into x-term docker container.
+   Example:
+
+    ```console
+    ~/senzing-demo-project-3/docker-bin/senzing-xterm-shell.sh
+    ```
 
 ### Bring up Senzing debug
 
