@@ -714,6 +714,8 @@ export SENZING_DOCKER_IMAGE_VERSION_JUPYTER=latest
 export SENZING_DOCKER_IMAGE_VERSION_MOCK_DATA_GENERATOR=1.1.1
 export SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN=1.0.0
 export SENZING_DOCKER_IMAGE_VERSION_PORTAINER=latest
+export SENZING_DOCKER_IMAGE_VERSION_POSTGRES=11.6
+export SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT=1.0.0
 export SENZING_DOCKER_IMAGE_VERSION_RABBITMQ=3.8.2
 export SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER=latest
 export SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG=latest
@@ -748,6 +750,7 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/coleifer/sqlite-web:${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
@@ -971,21 +974,66 @@ docker run \\
   --env PHP_PG_ADMIN_USE_XHTML_STRICT=false \\
   --env PHP_PG_ADMIN_HELP_BASE=http://www.postgresql.org/docs/%s/interactive/ \\
   --env PHP_PG_ADMIN_AJAX_REFRESH=3 \\
+  --interactive \\
   --name ${SENZING_PROJECT_NAME}-phppgadmin \\
   --publish ${HTTP_PORT}:80 \\
   --publish ${HTTPS_PORT}:443 \\
   --rm \\
+  --tty \\
   senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}
 """
     return 0
 
 
 def file_senzing_postgres():
-    pass
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+PORT=5432
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
+
+echo "${SENZING_HORIZONTAL_RULE}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-postgres listening on ${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE}"
+
+docker run \\
+  --env POSTGRES_DB=${DATABASE_SCHEMA} \\
+  --env POSTGRES_PASSWORD=${DATABASE_PASSWORD} \\
+  --env POSTGRES_USERNAME=${DATABASE_USERNAME} \\
+  --interactive \\
+  --name ${SENZING_PROJECT_NAME}-postgres \\
+  --publish ${PORT}:5432 \\
+  --rm \\
+  --tty \\
+  --volume ${POSTGRES_DIR}:/var/lib/postgresql/data \\
+  postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
+"""
+    return 0
 
 
 def file_senzing_postgresql_init():
-    pass
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+PORT=8251
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/postgresql-client:${SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}
+
+docker run \\
+  --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+  --env SENZING_SQL_FILE="/opt/senzing/g2/resources/schema/g2core-schema-postgresql-create.sql" \\
+  --name ${SENZING_PROJECT_NAME}-postgresql-init \\
+  --rm \\
+  --user $(id -u):$(id -g) \\
+  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  senzing/postgresql-client:${SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}
+"""
+    return 0
 
 
 def file_senzing_quickstart_demo():
@@ -1659,6 +1707,7 @@ def do_add_docker_support_linux(args):
         "senzing-jupyter.sh": file_senzing_jupyter,
         "senzing-mock-data-generator.sh": file_senzing_mock_data_generator,
         "senzing-phppgadmin.sh": file_senzing_phppgadmin,
+        "senzing-postgresql-init.sh": file_senzing_postgresql_init,
         "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
         "senzing-rabbitmq.sh": file_senzing_rabbitmq,
         "senzing-sqlite-web.sh": file_senzing_sqlite_web,
@@ -1713,6 +1762,7 @@ def do_add_docker_support_macos(args):
         "senzing-jupyter.sh": file_senzing_jupyter,
         "senzing-mock-data-generator.sh": file_senzing_mock_data_generator,
         "senzing-phppgadmin.sh": file_senzing_phppgadmin,
+        "senzing-postgresql-init.sh": file_senzing_postgresql_init,
         "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
         "senzing-rabbitmq.sh": file_senzing_rabbitmq,
         "senzing-sqlite-web.sh": file_senzing_sqlite_web,
