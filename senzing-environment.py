@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.0.0"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-05-15'
+__updated__ = '2020-05-17'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -1545,11 +1545,11 @@ def project_create_docker_environment_vars_macos(project_dir, project_name, dock
 
     variables = {
         "database_database": schema,
-        "database_host": parsed_database_connection.get("host", ""),
-        "database_password": parsed_database_connection.get("password", ""),
-        "database_port": parsed_database_connection.get("port", ""),
-        "database_protocol": parsed_database_connection.get("protocol", ""),
-        "database_username": parsed_database_connection.get("username", ""),
+        "database_host": parsed_database_url.get("host", ""),
+        "database_password": parsed_database_url.get("password", ""),
+        "database_port": parsed_database_url.get("port", ""),
+        "database_protocol": parsed_database_url.get("protocol", ""),
+        "database_username": parsed_database_url.get("username", ""),
         "docker_host_ip_addr": docker_host_ip_addr,
         "project_name": project_name,
         "project_dir": project_dir,
