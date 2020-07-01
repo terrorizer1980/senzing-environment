@@ -709,7 +709,7 @@ export SENZING_DATA_VERSION_DIR=${{SENZING_PROJECT_DIR}}/data
 export SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP=latest
 export SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER=latest
 export SENZING_DOCKER_IMAGE_VERSION_JUPYTER=latest
-export SENZING_DOCKER_IMAGE_VERSION_MOCK_DATA_GENERATOR=1.1.1
+export SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER=1.1.1
 export SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN=1.0.0
 export SENZING_DOCKER_IMAGE_VERSION_PORTAINER=latest
 export SENZING_DOCKER_IMAGE_VERSION_POSTGRES=11.6
@@ -754,7 +754,7 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-debug:${SENZING_DOCKE
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER}
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/mock-data-generator:${SENZING_DOCKER_IMAGE_VERSION_MOCK_DATA_GENERATOR}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}
@@ -933,13 +933,13 @@ docker run \\
     return 0
 
 
-def file_senzing_mock_data_generator():
+def file_senzing_stream_producer():
     """#!/usr/bin/env bash
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/mock-data-generator:${SENZING_DOCKER_IMAGE_VERSION_MOCK_DATA_GENERATOR}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
 
 docker run \\
   --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \\
@@ -951,11 +951,11 @@ docker run \\
   --env SENZING_RECORD_MONITOR=1000 \\
   --env SENZING_SUBCOMMAND=url-to-rabbitmq \\
   --interactive \\
-  --name ${SENZING_PROJECT_NAME}-mock-data-generator \\
+  --name ${SENZING_PROJECT_NAME}-stream-producer \\
   --rm \\
   --tty \\
   --user $(id -u):$(id -g) \\
-  senzing/mock-data-generator:${SENZING_DOCKER_IMAGE_VERSION_MOCK_DATA_GENERATOR}
+  senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_stream-producer}
 """
     return 0
 
@@ -1701,7 +1701,7 @@ def do_add_docker_support_linux(args):
         "senzing-debug.sh": file_senzing_debug,
         "senzing-init-container.sh": file_senzing_init_container,
         "senzing-jupyter.sh": file_senzing_jupyter,
-        "senzing-mock-data-generator.sh": file_senzing_mock_data_generator,
+        "senzing-stream-producer.sh": file_senzing_stream-producer,
         "senzing-phppgadmin.sh": file_senzing_phppgadmin,
         "senzing-postgresql-init.sh": file_senzing_postgresql_init,
         "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
@@ -1757,7 +1757,7 @@ def do_add_docker_support_macos(args):
         "senzing-debug.sh": file_senzing_debug,
         "senzing-init-container.sh": file_senzing_init_container,
         "senzing-jupyter.sh": file_senzing_jupyter,
-        "senzing-mock-data-generator.sh": file_senzing_mock_data_generator,
+        "senzing-stream-producer.sh": file_senzing_stream-producer,
         "senzing-phppgadmin.sh": file_senzing_phppgadmin,
         "senzing-postgresql-init.sh": file_senzing_postgresql_init,
         "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
