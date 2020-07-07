@@ -180,14 +180,14 @@ If a Senzing project directory is needed, perform the following step.
    Example:
 
     ```console
-    docker run \
+    sudo docker run \
       --env SENZING_DOCKER_HOST_IP_ADDR=${SENZING_DOCKER_HOST_IP_ADDR} \
       --interactive \
       --rm \
       --tty \
       --user $(id -u):$(id -g) \
       --volume ${SENZING_PROJECT_DIR}:${SENZING_PROJECT_DIR} \
-      senzing/senzing-environment add-docker-support \
+      senzing/senzing-environment add-docker-support-linux \
         --project-name ${SENZING_PROJECT_NAME} \
         --project-dir ${SENZING_PROJECT_DIR}
     ```
