@@ -955,7 +955,7 @@ docker run \\
   --rm \\
   --tty \\
   --user $(id -u):$(id -g) \\
-  senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_stream-producer}
+  senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
 """
     return 0
 
