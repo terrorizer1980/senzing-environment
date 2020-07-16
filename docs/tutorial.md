@@ -183,7 +183,7 @@ This Docker formation uses the docker-compose YAML file described in
    data in different phases of the data flow:
     1. [RabbitMQ](http://localhost:15672) (username: user  password: bitnami)
     1. [PostgreSQL](http://localhost:9171) (username: postgres password: postgres)
-    1. [Senzing API](http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api/master/senzing-rest-api.yaml)
+    1. [Senzing API](http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml)
     1. [Entity search webapp](http://localhost:8251/)
     1. [Jupyter notebooks](http://localhost:9178/)
     1. [X-Term](http://localhost:8254/) for Senzing command line tools
@@ -417,7 +417,7 @@ Depending on the distribution of Linux, there are different ways of installing S
     ~/senzing-demo-project-3/docker-bin/senzing-api-server.sh
     ```
 
-1. View [Senzing API](http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api/master/senzing-rest-api.yaml)
+1. View [Senzing API](http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml)
 
 ### Bring up Senzing Entity Search WebApp
 
