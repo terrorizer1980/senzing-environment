@@ -1726,7 +1726,6 @@ def do_add_docker_support_linux(args):
         "senzing-debug.sh": file_senzing_debug,
         "senzing-init-container.sh": file_senzing_init_container,
         "senzing-jupyter.sh": file_senzing_jupyter,
-        "senzing-stream-producer.sh": file_senzing_stream - producer,
         "senzing-phppgadmin.sh": file_senzing_phppgadmin,
         "senzing-postgresql-init.sh": file_senzing_postgresql_init,
         "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
@@ -1734,10 +1733,10 @@ def do_add_docker_support_linux(args):
         "senzing-sqlite-web.sh": file_senzing_sqlite_web,
         "senzing-stream-loader.sh": file_senzing_stream_loader,
         "senzing-stream-producer.sh": file_senzing_stream_producer,
-        "senzing-webapp.sh": file_senzing_webapp,
         "senzing-webapp-demo.sh": file_senzing_webapp_demo,
-        "senzing-xterm.sh": file_senzing_xterm,
+        "senzing-webapp.sh": file_senzing_webapp,
         "senzing-xterm-shell.sh": file_senzing_xterm_shell,
+        "senzing-xterm.sh": file_senzing_xterm,
         "senzing-yum.sh": file_senzing_yum
     }
 
@@ -1784,18 +1783,17 @@ def do_add_docker_support_macos(args):
         "senzing-debug.sh": file_senzing_debug,
         "senzing-init-container.sh": file_senzing_init_container,
         "senzing-jupyter.sh": file_senzing_jupyter,
-        "senzing-stream-loader.sh": file_senzing_stream_loader,
-        "senzing-stream-producer.sh": file_senzing_stream_producer,
         "senzing-phppgadmin.sh": file_senzing_phppgadmin,
         "senzing-postgresql-init.sh": file_senzing_postgresql_init,
         "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
         "senzing-rabbitmq.sh": file_senzing_rabbitmq,
         "senzing-sqlite-web.sh": file_senzing_sqlite_web,
         "senzing-stream-loader.sh": file_senzing_stream_loader,
-        "senzing-webapp.sh": file_senzing_webapp,
+        "senzing-stream-producer.sh": file_senzing_stream_producer,
         "senzing-webapp-demo.sh": file_senzing_webapp_demo,
-        "senzing-xterm.sh": file_senzing_xterm,
+        "senzing-webapp.sh": file_senzing_webapp,
         "senzing-xterm-shell.sh": file_senzing_xterm_shell,
+        "senzing-xterm.sh": file_senzing_xterm,
         "senzing-yum.sh": file_senzing_yum
     }
 
