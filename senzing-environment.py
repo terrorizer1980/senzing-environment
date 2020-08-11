@@ -21,9 +21,9 @@ import sys
 import time
 
 __all__ = []
-__version__ = "1.0.3"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "1.0.4"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-07-23'
+__updated__ = '2020-08-10'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -68,6 +68,11 @@ configuration_locator = {
         "env": "SENZING_SLEEP_TIME_IN_SECONDS",
         "cli": "sleep-time-in-seconds"
     },
+    "sql_connection": {
+        "default": None,
+        "env": "SENZING_SQL_CONNECTION",
+        "cli": "sql-connection"
+    },
     "subcommand": {
         "default": None,
         "env": "SENZING_SUBCOMMAND",
@@ -78,6 +83,7 @@ configuration_locator = {
 
 keys_to_redact = [
     "password",
+    "sql_connection",
 ]
 
 report_warnings = []
@@ -95,6 +101,13 @@ def get_parser():
         'add-docker-support-linux': {
             "help": 'Update a G2Project to support quickstart.',
             "argument_aspects": ["support"],
+            "arguments": {
+                "--sql-connection": {
+                    "dest": "sql_connection",
+                    "help": "Override SQL > CONNECTION in G2Module.ini",
+                    "metavar": "SENZING_SQL_CONNECTION",
+                },
+            },
         },
         'add-docker-support-macos': {
             "help": 'Create a stand-aolne project.',
@@ -454,7 +467,7 @@ def redact_configuration(config):
 
 
 database_connection_formats = {
-    "db2": "{scheme}://{username}:{password}@{schema}",
+    "db2": "{scheme}://{username}:{password}@{hostname}:{port}/{schema}",
     "mssql": "{scheme}://{username}:{password}@{schema}",
     "mysql": "{scheme}://{username}:{password}@{hostname}:{port}/?schema={schema}",
     "postgresql": "{scheme}://{username}:{password}@{hostname}:{port}:{schema}/",
@@ -1493,7 +1506,7 @@ def project_create_docker_bin_files(project_dir, docker_bin_files):
             logging.info(message_info(163, full_filename))
 
 
-def project_create_docker_environment_vars(project_dir, project_name, docker_host_ip_addr):
+def project_create_docker_environment_vars(project_dir, project_name, docker_host_ip_addr, sql_connection):
 
     # Specify output directory and backup directory.
 
@@ -1506,14 +1519,14 @@ def project_create_docker_environment_vars(project_dir, project_name, docker_hos
 
     # Read configuration file.
 
-    config_parser = configparser.ConfigParser()
-    config_parser.optionxform = str  # Maintain case of keys.
-    config_parser.read(project_config_file)
-    sql_connection = ""
-    try:
-        sql_connection = config_parser.get("SQL", "CONNECTION")
-    except:
-        pass
+    if not sql_connection:
+        config_parser = configparser.ConfigParser()
+        config_parser.optionxform = str  # Maintain case of keys.
+        config_parser.read(project_config_file)
+        try:
+            sql_connection = config_parser.get("SQL", "CONNECTION")
+        except:
+            pass
 
     # Calculate senzing_database_url.
 
@@ -1523,8 +1536,6 @@ def project_create_docker_environment_vars(project_dir, project_name, docker_hos
     schema = parsed_database_connection.get("schema", "")
     if parsed_database_connection.get("scheme", "") == "sqlite3":
         schema = os.path.basename(parsed_database_connection.get("path", ""))
-
-    print(parsed_database_connection)
 
     # Create docker-environment-vars.sh
 
@@ -1714,6 +1725,7 @@ def do_add_docker_support_linux(args):
     project_dir = config.get("project_dir")
     project_name = config.get("project_name")
     docker_host_ip_addr = config.get("docker_host_ip_addr")
+    sql_connection = config.get("sql_connection")
 
     # Identify files to be created in <project>/docker-bin
 
@@ -1746,7 +1758,7 @@ def do_add_docker_support_linux(args):
     project_modify_G2Module_ini(project_dir)
     project_create_setupenv_docker(config)
     project_create_docker_bin_directory(project_dir)
-    project_create_docker_environment_vars(project_dir, project_name, docker_host_ip_addr)
+    project_create_docker_environment_vars(project_dir, project_name, docker_host_ip_addr, sql_connection)
     project_create_docker_bin_files(project_dir, docker_bin_files)
 
     # Epilog.
