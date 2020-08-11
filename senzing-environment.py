@@ -21,9 +21,9 @@ import sys
 import time
 
 __all__ = []
-__version__ = "1.0.4"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "1.0.5"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-08-10'
+__updated__ = '2020-08-11'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -720,6 +720,7 @@ export SENZING_API_SERVER_URL="http://${{SENZING_DOCKER_HOST_IP_ADDR}}:8250"
 export SENZING_DATABASE_URL={senzing_database_url}
 export SENZING_DATA_DIR=${{SENZING_PROJECT_DIR}}/data
 export SENZING_DATA_VERSION_DIR=${{SENZING_PROJECT_DIR}}/data
+export SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER=latest
 export SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP=latest
 export SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER=latest
 export SENZING_DOCKER_IMAGE_VERSION_JUPYTER=latest
@@ -743,6 +744,7 @@ export SENZING_ETC_DIR=${{SENZING_PROJECT_DIR}}/docker-etc
 export SENZING_G2_DIR=${{SENZING_PROJECT_DIR}}{senzing_project_dir_suffix}
 export SENZING_HORIZONTAL_RULE="=============================================================================="
 export SENZING_INPUT_URL="https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json"
+export SENZING_OPT_IBM_DIR=${{SENZING_PROJECT_DIR}}/docker-db2
 export SENZING_PORTAINER_DIR=${{SENZING_PROJECT_DIR}}/var/portainer
 export SENZING_PROJECT_NAME={project_name}
 export SENZING_RABBITMQ_PASSWORD=bitnami
@@ -763,17 +765,18 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/coleifer/sqlite-web:${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER}
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/db2-driver-installer:${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER}
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM}
@@ -860,6 +863,7 @@ docker run \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
   senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER} \\
     -httpPort ${PORT} \\
@@ -883,9 +887,11 @@ docker run \\
   --interactive \\
   --rm \\
   --tty \\
+  --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
   senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE} /bin/bash
 """
@@ -909,8 +915,33 @@ docker run \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
   senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
+"""
+    return 0
+
+
+def file_senzing_db2_driver_installer():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/db2-driver-installer:${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}
+
+mv ${SENZING_OPT_IBM_DIR} ${SENZING_OPT_IBM_DIR}.$(date +%s) || true
+mkdir -p ${SENZING_OPT_IBM_DIR}
+
+docker run \\
+  --name ${SENZING_PROJECT_NAME}-db2-driver-installer \\
+  --rm \\
+  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+  senzing/db2-driver-installer:${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}
+
+sudo -p "sudo access is required to change file ownershop.  Please enter your password:  " docker info >> /dev/null 2>&1
+
+sudo chown -R $(id -u):$(id -g) ${SENZING_OPT_IBM_DIR}
 """
     return 0
 
@@ -925,12 +956,15 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCK
 
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+  --env SENZING_GID=$(id -g) \\
+  --env SENZING_UID=$(id -u) \\
   --name ${SENZING_PROJECT_NAME}-init-container \\
   --rm \\
   --user 0 \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
   senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
 """
@@ -1092,6 +1126,7 @@ docker run \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
   senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
 """
@@ -1164,8 +1199,8 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-loader:${SENZING_DOCKE
 
 docker run \\
   --env LC_CTYPE="en_us.utf8" \\
-  --env SENZING_DATA_SOURCE=TEST \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+  --env SENZING_DATA_SOURCE=TEST \\
   --env SENZING_ENTITY_TYPE=TEST \\
   --env SENZING_RABBITMQ_HOST=${SENZING_DOCKER_HOST_IP_ADDR} \\
   --env SENZING_RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
@@ -1180,6 +1215,7 @@ docker run \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
   senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}
 """
@@ -1211,6 +1247,7 @@ docker run \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
   senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
 """
@@ -1230,12 +1267,15 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER
 
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+  --env SENZING_GID=$(id -g) \\
+  --env SENZING_UID=$(id -u) \\
   --name ${SENZING_PROJECT_NAME}-init-container \\
   --rm \\
-  --user $(id -u):$(id -g) \\
+  --user 0 \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
   senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
 
@@ -1252,6 +1292,7 @@ docker run \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
   senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
 """
@@ -1283,6 +1324,7 @@ docker run \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
   senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM}
 """
@@ -1735,6 +1777,7 @@ def do_add_docker_support_linux(args):
         "postgres.sh": file_postgres,
         "senzing-api-server.sh": file_senzing_api_server,
         "senzing-console.sh": file_senzing_console,
+        "senzing-db2-driver-installer.sh": file_senzing_db2_driver_installer,
         "senzing-debug.sh": file_senzing_debug,
         "senzing-init-container.sh": file_senzing_init_container,
         "senzing-jupyter.sh": file_senzing_jupyter,
@@ -1792,6 +1835,7 @@ def do_add_docker_support_macos(args):
         "postgres.sh": file_postgres,
         "senzing-api-server.sh": file_senzing_api_server,
         "senzing-console.sh": file_senzing_console,
+        "senzing-db2-driver-installer.sh": file_senzing_db2_driver_installer,
         "senzing-debug.sh": file_senzing_debug,
         "senzing-init-container.sh": file_senzing_init_container,
         "senzing-jupyter.sh": file_senzing_jupyter,
