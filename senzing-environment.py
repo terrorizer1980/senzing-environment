@@ -21,7 +21,7 @@ import sys
 import time
 
 __all__ = []
-__version__ = "1.0.3"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "1.0.4"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
 __updated__ = '2020-08-10'
 
@@ -100,6 +100,13 @@ def get_parser():
         'add-docker-support-linux': {
             "help": 'Update a G2Project to support quickstart.',
             "argument_aspects": ["support"],
+            "arguments": {
+                "--sql-connection": {
+                    "dest": "sql_connection",
+                    "help": "Override SQL > CONNECTION",
+                    "metavar": "SENZING_SQL_CONNECTION",
+                },
+            },
         },
         'add-docker-support-macos': {
             "help": 'Create a stand-aolne project.',
@@ -459,7 +466,7 @@ def redact_configuration(config):
 
 
 database_connection_formats = {
-    "db2": "{scheme}://{username}:{password}@{schema}",
+    "db2": "{scheme}://{username}:{password}@{hostname}:{port}/{schema}",
     "mssql": "{scheme}://{username}:{password}@{schema}",
     "mysql": "{scheme}://{username}:{password}@{hostname}:{port}/?schema={schema}",
     "postgresql": "{scheme}://{username}:{password}@{hostname}:{port}:{schema}/",
@@ -1519,6 +1526,9 @@ def project_create_docker_environment_vars(project_dir, project_name, docker_hos
             sql_connection = config_parser.get("SQL", "CONNECTION")
         except:
             pass
+
+    print(">>>>>> {0}".format(sql_connection))
+
 
     # Calculate senzing_database_url.
 
