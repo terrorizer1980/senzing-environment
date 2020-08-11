@@ -83,6 +83,7 @@ configuration_locator = {
 
 keys_to_redact = [
     "password",
+    "sql_connection",
 ]
 
 report_warnings = []
@@ -103,7 +104,7 @@ def get_parser():
             "arguments": {
                 "--sql-connection": {
                     "dest": "sql_connection",
-                    "help": "Override SQL > CONNECTION",
+                    "help": "Override SQL > CONNECTION in G2Module.ini",
                     "metavar": "SENZING_SQL_CONNECTION",
                 },
             },
@@ -1527,9 +1528,6 @@ def project_create_docker_environment_vars(project_dir, project_name, docker_hos
         except:
             pass
 
-    print(">>>>>> {0}".format(sql_connection))
-
-
     # Calculate senzing_database_url.
 
     parsed_database_connection = parse_database_connection(sql_connection)
@@ -1538,8 +1536,6 @@ def project_create_docker_environment_vars(project_dir, project_name, docker_hos
     schema = parsed_database_connection.get("schema", "")
     if parsed_database_connection.get("scheme", "") == "sqlite3":
         schema = os.path.basename(parsed_database_connection.get("path", ""))
-
-    print(parsed_database_connection)
 
     # Create docker-environment-vars.sh
 
