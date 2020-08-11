@@ -930,12 +930,18 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/db2-driver-installer:${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}
 
+mv ${SENZING_OPT_IBM_DIR} ${SENZING_OPT_IBM_DIR}.$(date +%s) || true
+mkdir -p ${SENZING_OPT_IBM_DIR}
+
 docker run \\
   --name ${SENZING_PROJECT_NAME}-db2-driver-installer \\
   --rm \\
-  --user $(id -u):$(id -g) \\
   --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   senzing/db2-driver-installer:${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}
+
+sudo -p "sudo access is required to change file ownershop.  Please enter your password:  " docker info >> /dev/null 2>&1
+
+sudo chown -R $(id -u):$(id -g) ${SENZING_OPT_IBM_DIR}
 """
     return 0
 
