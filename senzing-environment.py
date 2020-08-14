@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.0.5"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-08-11'
+__updated__ = '2020-08-14'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -1243,7 +1243,7 @@ docker run \\
   --publish ${PORT}:${PORT} \\
   --rm \\
   --tty \\
-  --user $(id -u):$(id -g) \\
+  --user 0 \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
   --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
