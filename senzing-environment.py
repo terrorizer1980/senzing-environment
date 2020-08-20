@@ -1262,7 +1262,8 @@ def file_senzing_webapp_demo():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-PORT=8251
+API_SERVER_PORT=8250
+WEBAPP_PORT=8251
 
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
@@ -1283,12 +1284,14 @@ docker run \\
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp-demo running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} Swagger editor: http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
   --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
   --name ${SENZING_PROJECT_NAME}-web-app-demo \\
-  --publish ${PORT}:8251 \\
+  --publish ${API_SERVER_PORT}:8250 \\
+  --publish ${WEBAPP_PORT}:8251 \\
   --rm \\
   --user $(id -u):$(id -g) \\
   --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
