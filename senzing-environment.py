@@ -1618,8 +1618,8 @@ def project_create_docker_environment_vars(project_dir, project_name, docker_hos
         "database_protocol": parsed_database_connection.get("scheme", ""),
         "database_username": parsed_database_connection.get("username", ""),
         "docker_host_ip_addr": docker_host_ip_addr,
-        "project_name": project_name,
         "project_dir": project_dir,
+        "project_name": project_name,
         "senzing_database_url": senzing_database_url,
         "senzing_project_dir_suffix": "",
         "sql_connection": sql_connection
@@ -1657,8 +1657,8 @@ def project_create_docker_environment_vars_macos(project_dir, project_name, dock
         "database_protocol": parsed_database_url.get("protocol", ""),
         "database_username": parsed_database_url.get("username", ""),
         "docker_host_ip_addr": docker_host_ip_addr,
-        "project_name": project_name,
         "project_dir": project_dir,
+        "project_name": project_name,
         "senzing_database_url": g2_database_url,
         "senzing_project_dir_suffix": "/g2",
         "sql_connection": sql_connection
