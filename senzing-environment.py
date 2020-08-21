@@ -21,7 +21,7 @@ import sys
 import time
 
 __all__ = []
-__version__ = "1.0.5"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "1.0.6"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
 __updated__ = '2020-08-21'
 
@@ -1004,33 +1004,6 @@ docker run \\
     return 0
 
 
-def file_senzing_stream_producer():
-    """#!/usr/bin/env bash
-
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source ${SCRIPT_DIR}/docker-environment-vars.sh
-
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
-
-docker run \\
-  --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \\
-  --env SENZING_RABBITMQ_HOST=${SENZING_DOCKER_HOST_IP_ADDR} \\
-  --env SENZING_RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
-  --env SENZING_RABBITMQ_QUEUE=${SENZING_RABBITMQ_QUEUE} \\
-  --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
-  --env SENZING_RECORD_MAX=${SENZING_RECORD_MAX} \\
-  --env SENZING_RECORD_MONITOR=1000 \\
-  --env SENZING_SUBCOMMAND=url-to-rabbitmq \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-stream-producer \\
-  --rm \\
-  --tty \\
-  --user $(id -u):$(id -g) \\
-  senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
-"""
-    return 0
-
-
 def file_senzing_phppgadmin():
     """#!/usr/bin/env bash
 
@@ -1219,6 +1192,33 @@ docker run \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
   senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}
 """
+
+
+def file_senzing_stream_producer():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
+
+docker run \\
+  --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \\
+  --env SENZING_RABBITMQ_HOST=${SENZING_DOCKER_HOST_IP_ADDR} \\
+  --env SENZING_RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
+  --env SENZING_RABBITMQ_QUEUE=${SENZING_RABBITMQ_QUEUE} \\
+  --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
+  --env SENZING_RECORD_MAX=${SENZING_RECORD_MAX} \\
+  --env SENZING_RECORD_MONITOR=1000 \\
+  --env SENZING_SUBCOMMAND=url-to-rabbitmq \\
+  --interactive \\
+  --name ${SENZING_PROJECT_NAME}-stream-producer \\
+  --rm \\
+  --tty \\
+  --user $(id -u):$(id -g) \\
+  senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
+"""
+    return 0
 
 
 def file_senzing_webapp():
