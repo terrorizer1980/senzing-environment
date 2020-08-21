@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.0.5"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-08-14'
+__updated__ = '2020-08-21'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -898,30 +898,6 @@ docker run \\
     return 0
 
 
-def file_senzing_debug():
-    """#!/usr/bin/env bash
-
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source ${SCRIPT_DIR}/docker-environment-vars.sh
-
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
-
-docker run \\
-  --cap-add=ALL \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-debug \\
-  --rm \\
-  --tty \\
-  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
-"""
-    return 0
-
-
 def file_senzing_db2_driver_installer():
     """#!/usr/bin/env bash
 
@@ -942,6 +918,30 @@ docker run \\
 sudo -p "sudo access is required to change file ownershop.  Please enter your password:  " docker info >> /dev/null 2>&1
 
 sudo chown -R $(id -u):$(id -g) ${SENZING_OPT_IBM_DIR}
+"""
+    return 0
+
+
+def file_senzing_debug():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
+
+docker run \\
+  --cap-add=ALL \\
+  --interactive \\
+  --name ${SENZING_PROJECT_NAME}-debug \\
+  --rm \\
+  --tty \\
+  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+  senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
 """
     return 0
 
@@ -1388,6 +1388,30 @@ popd
 """
     return 0
 
+
+def file_swagger_ui():
+    """#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+PORT=9180
+
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/swaggerapi/swagger-ui
+
+echo "${SENZING_HORIZONTAL_RULE}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-swagger-ui running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE}"
+
+docker run \
+  --env URL=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml \
+  --name ${SENZING_PROJECT_NAME}-swagger-ui \
+  --publish ${PORT}:8080 \
+  --rm \
+  swaggerapi/swagger-ui
+"""
+    return 0
+
 # -----------------------------------------------------------------------------
 # Utility functions
 # -----------------------------------------------------------------------------
@@ -1797,7 +1821,8 @@ def do_add_docker_support_linux(args):
         "senzing-webapp.sh": file_senzing_webapp,
         "senzing-xterm-shell.sh": file_senzing_xterm_shell,
         "senzing-xterm.sh": file_senzing_xterm,
-        "senzing-yum.sh": file_senzing_yum
+        "senzing-yum.sh": file_senzing_yum,
+        "swagger-ui.sh": file_swagger_ui
     }
 
     # Do work.
@@ -1855,7 +1880,8 @@ def do_add_docker_support_macos(args):
         "senzing-webapp.sh": file_senzing_webapp,
         "senzing-xterm-shell.sh": file_senzing_xterm_shell,
         "senzing-xterm.sh": file_senzing_xterm,
-        "senzing-yum.sh": file_senzing_yum
+        "senzing-yum.sh": file_senzing_yum,
+        "swagger-ui.sh": file_swagger_ui
     }
 
     # Do work.
