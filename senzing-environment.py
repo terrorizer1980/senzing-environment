@@ -1283,7 +1283,8 @@ docker run \\
   senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
 
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp-demo running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${WEBAPP_PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${API_SERVER_PORT}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} Swagger editor: http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml"
 echo "${SENZING_HORIZONTAL_RULE}"
 
