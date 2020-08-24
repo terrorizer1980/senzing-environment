@@ -824,6 +824,8 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/postgres:${SENZING_DOCKER_IMAGE_VERSI
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-postgres listening on ${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#postgres"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -988,6 +990,8 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/jupyter:${SENZING_DOCKER_IMAG
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-jupyter running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-jupyter"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -1020,6 +1024,8 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/phppgadmin:${SENZING_DOCKER_I
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-phppgadmin running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${HTTP_PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-phppgadmin"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -1091,6 +1097,8 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-quickstart running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-quickstart-demo"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -1119,6 +1127,8 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/bitnami/rabbitmq:${SENZING_DOCKER_IMA
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-rabbitmq running on http://${SENZING_DOCKER_HOST_IP_ADDR}:15672"
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-rabbitmq"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 mkdir -p ${RABBITMQ_DIR}
@@ -1149,6 +1159,8 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/coleifer/sqlite-web:${SENZING_DOCKER_
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-sqlite-web running on http://${SENZING_DOCKER_HOST_IP_ADDR}:9174"
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-sqlite-web"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -1236,6 +1248,8 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${SENZI
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -1288,7 +1302,8 @@ docker run \\
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${WEBAPP_PORT}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${API_SERVER_PORT}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} Swagger editor: http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml"
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp-demo"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -1321,6 +1336,8 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/xterm:${SENZING_DOCKER_IMAGE_
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-xterm running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} docker exec -it ${SENZING_PROJECT_NAME}-xterm /bin/bash"
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-xterm"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
@@ -1405,6 +1422,8 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/swaggerapi/swagger-ui
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-swagger-ui running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#swagger-ui"
 echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \

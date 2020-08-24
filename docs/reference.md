@@ -60,9 +60,11 @@
 ### senzing-api-server
 
 1. **Synopsis:**
+
    Brings up [Senzing API server](https://github.com/Senzing/senzing-api-server).
 
 1. **Invocation:**
+
    Example:
 
     ```console
@@ -76,16 +78,25 @@
     ```
 
    If running locally, the "heartbeat" can be seen at
-   [localhost:9170/heartbeat](http://localhost:9170/heartbeat).
+   [localhost:8250/heartbeat](http://localhost:8250/heartbeat).
 
 1. **swagger-ui:**
+
    The [Senzing REST API specification](https://github.com/Senzing/senzing-rest-api-specification)
    can be viewed with the online
    [Swagger UI](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml).
 
    However, there may be an issue when interacting with the Senzing API Server.
-   Another approach to viewing and interacting with the Senzing REST API is by using
+   Modern web browsers use
+   [CORS](https://www.w3.org/wiki/CORS)
+   and prevent
+   [mixed content](https://developers.google.com/web/fundamentals/security/prevent-mixed-content/what-is-mixed-content)
+   to protect users.
+   These preventative measures may interfere with using the "Swagger UI" to interact with the Senzing API server.
+
+   To avoid this issue, use
    [swagger-ui.sh](#swagger-ui).
+   It brings up a docker container that will allow `http://` support.
 
 ### senzing-console
 
@@ -113,8 +124,6 @@
 
 ### senzing-stream-producer
 
-### senzing-webapp-demo-01
-
 ### senzing-webapp-demo
 
 ### senzing-webapp
@@ -126,3 +135,24 @@
 ### senzing-yum
 
 ### swagger-ui
+
+1. **Synopsis:**
+
+   Brings up [Senzing UI](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/swagger-ui.md).
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/swagger-ui.sh
+     :
+    ==============================================================================
+    == swagger-ui running on http://nnn.nnn.nnn.nnn:9180
+    == For more information:
+    == http://senzing.github.io/senzing-environment/reference#swagger-ui
+    ==============================================================================
+    ```
+
+   If running locally, it can be seen at
+   [localhost:9180](http://localhost:9180).
