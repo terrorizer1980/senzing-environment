@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.0.6"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-08-27'
+__updated__ = '2020-09-01'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -920,7 +920,7 @@ docker run \\
   --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   senzing/db2-driver-installer:${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}
 
-sudo -p "sudo access is required to change file ownershop.  Please enter your password:  " docker info >> /dev/null 2>&1
+sudo -p "sudo access is required to change file ownership.  Please enter your password:  " docker info >> /dev/null 2>&1
 
 sudo chown -R $(id -u):$(id -g) ${SENZING_OPT_IBM_DIR}
 """
