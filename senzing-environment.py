@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.0.6"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-09-01'
+__updated__ = '2020-09-03'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -1069,8 +1069,6 @@ def file_senzing_postgresql_init():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-PORT=8251
-
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/postgresql-client:${SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}
 
 docker run \\
@@ -1225,7 +1223,7 @@ docker run \\
   --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
   --env SENZING_RECORD_MAX=${SENZING_RECORD_MAX} \\
   --env SENZING_RECORD_MONITOR=1000 \\
-  --env SENZING_SUBCOMMAND=url-to-rabbitmq \\
+  --env SENZING_SUBCOMMAND=json-to-rabbitmq \\
   --interactive \\
   --name ${SENZING_PROJECT_NAME}-stream-producer \\
   --rm \\

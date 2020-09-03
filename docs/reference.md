@@ -236,33 +236,223 @@
 
 ### senzing-phppgadmin
 
+1. **Synopsis:**
+
+   Brings up [phpPgAdmin](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/phppgadmin.md) service.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-phppgadmin.sh
+     :
+    ==============================================================================
+    == phppgadmin running on http://nnn.nnn.nnn.nnn:9171
+    == For more information:
+    == http://senzing.github.io/senzing-environment/reference#senzing-phppgadmin
+    ==============================================================================
+    ```
+
 ### senzing-postgresql-init
 
 ### senzing-quickstart-demo
 
+1. **Synopsis:**
+
+   Brings up [docker-web-app-demo](https://github.com/Senzing/docker-web-app-demo) service.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-quickstart-demo.sh
+     :
+    ==============================================================================
+    == quickstart running on http://nnn.nnn.nnn.nnn:8251
+    == For more information:
+    == http://senzing.github.io/senzing-environment/reference#senzing-quickstart-demo
+    ==============================================================================
+    ```
+
 ### senzing-rabbitmq
+
+1. **Synopsis:**
+
+   Brings up [bitnami/rabbitmq](https://hub.docker.com/r/bitnami/rabbitmq) service.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-rabbitmq.sh
+     :
+    ==============================================================================
+    == rabbitmq running on http://nnn.nnn.nnn.nnn:15672
+    == For more information:
+    == http://senzing.github.io/senzing-environment/reference#senzing-rabbitmq
+    ==============================================================================
+    ```
 
 ### senzing-sqlite-web
 
+1. **Synopsis:**
+
+   Brings up [coleifer/sqlite-web](https://hub.docker.com/r/coleifer/sqlite-web) service.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-sqlite-web.sh
+     :
+    ==============================================================================
+    == sqlite-web running on http://nnn.nnn.nnn.nnn:9174
+    == For more information:
+    == http://senzing.github.io/senzing-environment/reference#senzing-sqlite-web
+    ==============================================================================
+    ```
+
 ### senzing-stream-loader
+
+1. **Synopsis:**
+
+   Brings up [stream-loader](https://github.com/Senzing/stream-loader) service.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-stream-loader.sh
+     :
+    yyyy-mm-dd hh:mm:ss,nnn senzing-50010297I Enter {...}
+     :
+    ```
 
 ### senzing-stream-producer
 
+1. **Synopsis:**
+
+   Runs [stream-producer](https://github.com/Senzing/stream-producer) task.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-stream-producer.sh
+     :
+    yyyy-mm-dd hh:mm:ss,nnn senzing-501480297I Enter {...}
+     :
+    ```
+
 ### senzing-webapp-demo
+
+1. **Synopsis:**
+
+   Brings up
+   [senzing-api-server](https://github.com/Senzing/senzing-api-server) and
+   [entity-search-web-app](https://github.com/Senzing/entity-search-web-app)
+   services.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-webapp-demo.sh
+     :
+    ==============================================================================
+    == webapp running on http://nnn.nnn.nnn.nnn:8251
+    == api-server running on http://nnn.nnn.nnn.nnn:8250
+    == For more information:
+    == http://senzing.github.io/senzing-environment/reference#senzing-webapp-demo
+    ==============================================================================
+     :
+    ```
 
 ### senzing-webapp
 
+1. **Synopsis:**
+
+   Brings up [entity-search-web-app](https://github.com/Senzing/entity-search-web-app) service.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-webapp.sh
+     :
+    ==============================================================================
+    == webapp running on http://nnn.nnn.nnn.nnn:8251
+    == For more information:
+    == http://senzing.github.io/senzing-environment/reference#senzing-webapp
+    ==============================================================================
+     :
+    ```
+
 ### senzing-xterm-shell
+
+1. **Synopsis:**
+
+   Does a `docker exec` into an existing [senzing-xterm](#senzing-xterm).
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-xterm-shell.sh
+     :
+    ```
 
 ### senzing-xterm
 
+1. **Synopsis:**
+
+   Brings up [docker-xterm](https://github.com/Senzing/docker-xterm) service.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-xterm.sh
+     :
+    ==============================================================================
+    == xterm running on http://nnn.nnn.nnn.nnn:8254
+    == docker exec -it xterm /bin/bash
+    == For more information:
+    == http://senzing.github.io/senzing-environment/reference#senzing-xterm
+    ==============================================================================
+     :
+    ```
+
 ### senzing-yum
+
+1. **Synopsis:**
+
+   Runs [docker-yum](https://github.com/Senzing/docker-yum) task.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-yum.sh
+     :
+    ```
 
 ### swagger-ui
 
 1. **Synopsis:**
 
-   Brings up [Senzing UI](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/swagger-ui.md).
+   Brings up [Senzing UI](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/swagger-ui.md) service.
 
 1. **Invocation:**
 
