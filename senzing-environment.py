@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.0.6"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-09-03'
+__updated__ = '2020-09-30'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -1242,31 +1242,45 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 PORT=8251
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
+if [ "$1" == "up" ]
+then
 
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp"
-echo "${SENZING_HORIZONTAL_RULE}"
+    docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
 
-docker run \\
-  --env SENZING_API_SERVER_URL=${SENZING_API_SERVER_URL} \\
-  --env SENZING_WEB_SERVER_ADMIN_AUTH_MODE='JWT' \\
-  --env SENZING_WEB_SERVER_ADMIN_AUTH_PATH="http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}" \
-  --env SENZING_WEB_SERVER_PORT=${PORT} \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-webapp \\
-  --publish ${PORT}:${PORT} \\
-  --rm \\
-  --tty \\
-  --user 0 \\
-  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+    docker run \\
+      --detach \\
+      --env SENZING_API_SERVER_URL=${SENZING_API_SERVER_URL} \\
+      --env SENZING_WEB_SERVER_ADMIN_AUTH_MODE='JWT' \\
+      --env SENZING_WEB_SERVER_ADMIN_AUTH_PATH="http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}" \
+      --env SENZING_WEB_SERVER_PORT=${PORT} \\
+      --interactive \\
+      --name ${SENZING_PROJECT_NAME}-webapp \\
+      --publish ${PORT}:${PORT} \\
+      --rm \\
+      --tty \\
+      --user 0 \\
+      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+      --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+      senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
+
+elif [ "$1" == "down" ]
+then
+   docker kill ${SENZING_PROJECT_NAME}-webapp
+else
+   echo "usage: $0 [up | down]"
+   echo "For more information:"
+   echo "http://senzing.github.io/senzing-environment/reference#senzing-webapp"
+   exit
+fi
 """
     return 0
 
