@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.0.6"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-09-30'
+__updated__ = '2020-10-01'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -735,6 +735,7 @@ export SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG=latest
 export SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB=latest
 export SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER=latest
 export SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER=latest
+export SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI=latest
 export SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO=latest
 export SENZING_DOCKER_IMAGE_VERSION_XTERM=latest
 export SENZING_DOCKER_IMAGE_VERSION_YUM=latest
@@ -772,6 +773,7 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${SENZI
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/postgresql-client:${SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
@@ -780,6 +782,7 @@ docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-producer:${SENZING_DOC
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM}
 docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM}
+docker pull ${SENZING_DOCKER_REGISTRY_URL}/swaggerapi/swagger-ui:${SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}
 """
     return 0
 
@@ -792,22 +795,39 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 PORT=9170
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER}
+if [ "$1" == "up" ]
+then
 
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} portainer running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#portainer"
-echo "${SENZING_HORIZONTAL_RULE}"
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_PORTAINER}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER}
+    fi
 
-docker run \\
-  --detach \\
-  --name portainer \\
-  --publish ${PORT}:9000 \\
-  --restart always \\
-  --volume ${SENZING_DOCKER_SOCKET}:/var/run/docker.sock \\
-  --volume ${SENZING_PORTAINER_DIR}:/data \\
-  portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER}
+    docker run \\
+      --detach \\
+      --name ${SENZING_PROJECT_NAME}-portainer \\
+      --publish ${PORT}:9000 \\
+      --restart always \\
+      --rm \\
+      --volume ${SENZING_DOCKER_SOCKET}:/var/run/docker.sock \\
+      --volume ${SENZING_PORTAINER_DIR}:/data \\
+      portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-portainer running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#portainer"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-portainer >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-portainer >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#portainer"
+fi
 """
     return 0
 
@@ -820,23 +840,41 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 PORT=5432
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
+if [ "$1" == "up" ]
+then
 
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-postgres listening on ${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#postgres"
-echo "${SENZING_HORIZONTAL_RULE}"
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
+    fi
 
-docker run \\
-  --env POSTGRES_DB=${DATABASE_DATABASE} \\
-  --env POSTGRES_PASSWORD=${DATABASE_PASSWORD} \\
-  --env POSTGRES_USERNAME=${DATABASE_USERNAME} \\
-  --name ${SENZING_PROJECT_NAME}-postgres \\
-  --publish ${PORT}:5432 \\
-  --rm \\
-  --volume ${POSTGRES_DIR}:/var/lib/postgresql/data \\
-  postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
+    docker run \\
+      --detach \\
+      --env POSTGRES_DB=${DATABASE_DATABASE} \\
+      --env POSTGRES_PASSWORD=${DATABASE_PASSWORD} \\
+      --env POSTGRES_USERNAME=${DATABASE_USERNAME} \\
+      --name ${SENZING_PROJECT_NAME}-postgres \\
+      --publish ${PORT}:5432 \\
+      --restart always \\
+      --rm \\
+      --volume ${POSTGRES_DIR}:/var/lib/postgresql/data \\
+      postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-postgres listening on ${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#postgres"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-postgres >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-postgres >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#postgres"
+fi
 """
     return 0
 
@@ -849,33 +887,51 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 PORT=8250
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}
+if [ "$1" == "up" ]
+then
 
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-api-server"
-echo "${SENZING_HORIZONTAL_RULE}"
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}
+    fi
 
-docker run \\
-  --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-api-server \\
-  --publish ${PORT}:${PORT} \\
-  --rm \\
-  --tty \\
-  --user $(id -u):$(id -g) \\
-  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER} \\
-    -httpPort ${PORT} \\
-    -bindAddr all \\
-    -iniFile /etc/opt/senzing/G2Module.ini \\
-    -allowedOrigins "*" \\
-    -enableAdmin
+    docker run \\
+      --detach \\
+      --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+      --interactive \\
+      --name ${SENZING_PROJECT_NAME}-api-server \\
+      --publish ${PORT}:${PORT} \\
+      --restart always \\
+      --rm \\
+      --tty \\
+      --user $(id -u):$(id -g) \\
+      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+      --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+      senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER} \\
+        -httpPort ${PORT} \\
+        -bindAddr all \\
+        -iniFile /etc/opt/senzing/G2Module.ini \\
+        -allowedOrigins "*" \\
+        -enableAdmin
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-api-server"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-api-server >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-api-server >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#senzing-api-server"
+fi
 """
     return 0
 
@@ -886,7 +942,16 @@ def file_senzing_console():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}
+if [ "${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}" == "latest" ]
+then
+    docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}
+fi
+
+echo "${SENZING_HORIZONTAL_RULE}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} To exit ${SENZING_PROJECT_NAME}-console, type 'exit'"
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#console"
+echo "${SENZING_HORIZONTAL_RULE}"
 
 docker run \\
   --interactive \\
@@ -909,20 +974,35 @@ def file_senzing_db2_driver_installer():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/db2-driver-installer:${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}
+if [ "$1" == "up" ]
+then
 
-mv ${SENZING_OPT_IBM_DIR} ${SENZING_OPT_IBM_DIR}.$(date +%s) || true
-mkdir -p ${SENZING_OPT_IBM_DIR}
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/db2-driver-installer:${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}
+    fi
 
-docker run \\
-  --name ${SENZING_PROJECT_NAME}-db2-driver-installer \\
-  --rm \\
-  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-  senzing/db2-driver-installer:${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}
+    mv ${SENZING_OPT_IBM_DIR} ${SENZING_OPT_IBM_DIR}.$(date +%s) || true
+    mkdir -p ${SENZING_OPT_IBM_DIR}
 
-sudo -p "sudo access is required to change file ownership.  Please enter your password:  " docker info >> /dev/null 2>&1
+    docker run \\
+      --name ${SENZING_PROJECT_NAME}-db2-driver-installer \\
+      --rm \\
+      --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+      senzing/db2-driver-installer:${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}
 
-sudo chown -R $(id -u):$(id -g) ${SENZING_OPT_IBM_DIR}
+    sudo -p "sudo access is required to change file ownership.  Please enter your password:  " docker info >> /dev/null 2>&1
+    sudo chown -R $(id -u):$(id -g) ${SENZING_OPT_IBM_DIR}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-db2-driver-installer has completed."
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+else
+    echo "usage: $0 up"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#db2-driver-installer"
+fi
 """
     return 0
 
@@ -933,20 +1013,42 @@ def file_senzing_debug():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
+if [ "$1" == "up" ]
+then
 
-docker run \\
-  --cap-add=ALL \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-debug \\
-  --rm \\
-  --tty \\
-  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
+    fi
+
+    docker run \\
+      --cap-add=ALL \\
+      --detach \\
+      --interactive \\
+      --name ${SENZING_PROJECT_NAME}-debug \\
+      --restart always \\
+      --tty \\
+      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+      --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+      senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} To enter ${SENZING_PROJECT_NAME}-debug container, run:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} sudo docker exec -it ${SENZING_PROJECT_NAME}-debug /bin/bash"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-debug >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-debug >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#debug"
+fi
 """
     return 0
 
@@ -957,21 +1059,37 @@ def file_senzing_init_container():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
+if [ "$1" == "up" ]
+then
 
-docker run \\
-  --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-  --env SENZING_GID=$(id -g) \\
-  --env SENZING_UID=$(id -u) \\
-  --name ${SENZING_PROJECT_NAME}-init-container \\
-  --rm \\
-  --user 0 \\
-  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
+    fi
+
+    docker run \\
+      --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+      --env SENZING_GID=$(id -g) \\
+      --env SENZING_UID=$(id -u) \\
+      --name ${SENZING_PROJECT_NAME}-init-container \\
+      --rm \\
+      --user 0 \\
+      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+      --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+      senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-init-container has completed."
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+else
+    echo "usage: $0 up"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#init_container"
+fi
 """
     return 0
 
@@ -984,29 +1102,47 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 PORT=9178
 
-chmod -R 777 ${SENZING_PROJECT_DIR}/var/sqlite/
+if [ "$1" == "up" ]
+then
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER}
+    chmod -R 777 ${SENZING_PROJECT_DIR}/var/sqlite/
 
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-jupyter running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-jupyter"
-echo "${SENZING_HORIZONTAL_RULE}"
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_JUPYTER}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER}
+    fi
 
-docker run \\
-  --env SENZING_SQL_CONNECTION=${SENZING_SQL_CONNECTION} \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-jupyter \\
-  --publish ${PORT}:8888 \\
-  --rm \\
-  --tty \\
-  --volume ${SENZING_PROJECT_DIR}:/notebooks/shared \\
-  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER} start.sh jupyter notebook --NotebookApp.token=''
+    docker run \\
+      --detach \\
+      --env SENZING_SQL_CONNECTION=${SENZING_SQL_CONNECTION} \\
+      --interactive \\
+      --name ${SENZING_PROJECT_NAME}-jupyter \\
+      --publish ${PORT}:8888 \\
+      --restart always \\
+      --rm \\
+      --tty \\
+      --volume ${SENZING_PROJECT_DIR}:/notebooks/shared \\
+      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+      senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER} start.sh jupyter notebook --NotebookApp.token=''
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-jupyter running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-jupyter"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-jupyter >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-jupyter >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#senzing-jupyter"
+fi
 """
     return 0
 
@@ -1020,45 +1156,63 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 HTTP_PORT=9171
 HTTPS_PORT=9172
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}
+if [ "$1" == "up" ]
+then
 
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-phppgadmin running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${HTTP_PORT}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-phppgadmin"
-echo "${SENZING_HORIZONTAL_RULE}"
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}
+    fi
 
-docker run \\
-  --env PHP_PG_ADMIN_SERVER_DESC=PostgreSQL \\
-  --env PHP_PG_ADMIN_SERVER_HOST=${DATABASE_HOST} \\
-  --env PHP_PG_ADMIN_SERVER_PORT=${DATABASE_PORT} \\
-  --env PHP_PG_ADMIN_SERVER_SSL_MODE=allow \\
-  --env PHP_PG_ADMIN_SERVER_DEFAULT_DB=template1 \\
-  --env PHP_PG_ADMIN_SERVER_PG_DUMP_PATH=/usr/bin/pg_dump \\
-  --env PHP_PG_ADMIN_SERVER_PG_DUMPALL_PATH=/usr/bin/pg_dumpall \\
-  --env PHP_PG_ADMIN_DEFAULT_LANG=auto \\
-  --env PHP_PG_ADMIN_AUTO_COMPLETE="default on" \\
-  --env PHP_PG_ADMIN_EXTRA_LOGIN_SECURITY=false \\
-  --env PHP_PG_ADMIN_OWNED_ONLY=false \\
-  --env PHP_PG_ADMIN_SHOW_COMMENTS=true \\
-  --env PHP_PG_ADMIN_SHOW_ADVANCED=false \\
-  --env PHP_PG_ADMIN_SHOW_SYSTEM=false \\
-  --env PHP_PG_ADMIN_MIN_PASSWORD_LENGTH=1 \\
-  --env PHP_PG_ADMIN_LEFT_WIDTH=200 \\
-  --env PHP_PG_ADMIN_THEME=default \\
-  --env PHP_PG_ADMIN_SHOW_OIDS=false \\
-  --env PHP_PG_ADMIN_MAX_ROWS=30 \\
-  --env PHP_PG_ADMIN_MAX_CHARS=50 \\
-  --env PHP_PG_ADMIN_USE_XHTML_STRICT=false \\
-  --env PHP_PG_ADMIN_HELP_BASE=http://www.postgresql.org/docs/%s/interactive/ \\
-  --env PHP_PG_ADMIN_AJAX_REFRESH=3 \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-phppgadmin \\
-  --publish ${HTTP_PORT}:80 \\
-  --publish ${HTTPS_PORT}:443 \\
-  --rm \\
-  --tty \\
-  senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}
+    docker run \\
+      --detach \\
+      --env PHP_PG_ADMIN_SERVER_DESC=PostgreSQL \\
+      --env PHP_PG_ADMIN_SERVER_HOST=${DATABASE_HOST} \\
+      --env PHP_PG_ADMIN_SERVER_PORT=${DATABASE_PORT} \\
+      --env PHP_PG_ADMIN_SERVER_SSL_MODE=allow \\
+      --env PHP_PG_ADMIN_SERVER_DEFAULT_DB=template1 \\
+      --env PHP_PG_ADMIN_SERVER_PG_DUMP_PATH=/usr/bin/pg_dump \\
+      --env PHP_PG_ADMIN_SERVER_PG_DUMPALL_PATH=/usr/bin/pg_dumpall \\
+      --env PHP_PG_ADMIN_DEFAULT_LANG=auto \\
+      --env PHP_PG_ADMIN_AUTO_COMPLETE="default on" \\
+      --env PHP_PG_ADMIN_EXTRA_LOGIN_SECURITY=false \\
+      --env PHP_PG_ADMIN_OWNED_ONLY=false \\
+      --env PHP_PG_ADMIN_SHOW_COMMENTS=true \\
+      --env PHP_PG_ADMIN_SHOW_ADVANCED=false \\
+      --env PHP_PG_ADMIN_SHOW_SYSTEM=false \\
+      --env PHP_PG_ADMIN_MIN_PASSWORD_LENGTH=1 \\
+      --env PHP_PG_ADMIN_LEFT_WIDTH=200 \\
+      --env PHP_PG_ADMIN_THEME=default \\
+      --env PHP_PG_ADMIN_SHOW_OIDS=false \\
+      --env PHP_PG_ADMIN_MAX_ROWS=30 \\
+      --env PHP_PG_ADMIN_MAX_CHARS=50 \\
+      --env PHP_PG_ADMIN_USE_XHTML_STRICT=false \\
+      --env PHP_PG_ADMIN_HELP_BASE=http://www.postgresql.org/docs/%s/interactive/ \\
+      --env PHP_PG_ADMIN_AJAX_REFRESH=3 \\
+      --interactive \\
+      --name ${SENZING_PROJECT_NAME}-phppgadmin \\
+      --publish ${HTTP_PORT}:80 \\
+      --publish ${HTTPS_PORT}:443 \\
+      --restart always \\
+      --rm \\
+      --tty \\
+      senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-phppgadmin running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${HTTP_PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-phppgadmin"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-phppgadmin >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-phppgadmin >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#senzing-phppgadmin"
+fi
 """
     return 0
 
@@ -1069,16 +1223,32 @@ def file_senzing_postgresql_init():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/postgresql-client:${SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}
+if [ "$1" == "up" ]
+then
 
-docker run \\
-  --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-  --env SENZING_SQL_FILE="/opt/senzing/g2/resources/schema/g2core-schema-postgresql-create.sql" \\
-  --name ${SENZING_PROJECT_NAME}-postgresql-init \\
-  --rm \\
-  --user $(id -u):$(id -g) \\
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-  senzing/postgresql-client:${SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/postgresql-client:${SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}
+    fi
+
+    docker run \\
+      --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+      --env SENZING_SQL_FILE="/opt/senzing/g2/resources/schema/g2core-schema-postgresql-create.sql" \\
+      --name ${SENZING_PROJECT_NAME}-postgresql-init \\
+      --rm \\
+      --user $(id -u):$(id -g) \\
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+      senzing/postgresql-client:${SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-postgresql-init has completed."
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+else
+    echo "usage: $0 up"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#postgresql-init"
+fi
 """
     return 0
 
@@ -1091,26 +1261,44 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 PORT=8251
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
+if [ "$1" == "up" ]
+then
 
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-quickstart running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-quickstart-demo"
-echo "${SENZING_HORIZONTAL_RULE}"
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
+    fi
 
-docker run \\
-  --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-  --name ${SENZING_PROJECT_NAME}-quickstart \\
-  --publish ${PORT}:8251 \\
-  --rm \\
-  --user $(id -u):$(id -g) \\
-  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
+    docker run \\
+      --detach \\
+      --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+      --name ${SENZING_PROJECT_NAME}-quickstart \\
+      --publish ${PORT}:8251 \\
+      --restart always \\
+      --rm \\
+      --user $(id -u):$(id -g) \\
+      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+      --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+      senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-quickstart running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-quickstart-demo"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-quickstart >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-quickstart >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#senzing-quickstart-demo"
+fi
 """
     return 0
 
@@ -1121,28 +1309,46 @@ def file_senzing_rabbitmq():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}
+if [ "$1" == "up" ]
+then
 
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-rabbitmq running on http://${SENZING_DOCKER_HOST_IP_ADDR}:15672"
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-rabbitmq"
-echo "${SENZING_HORIZONTAL_RULE}"
+    mkdir -p ${RABBITMQ_DIR}
+    chmod 777 ${RABBITMQ_DIR}
 
-mkdir -p ${RABBITMQ_DIR}
-chmod 777 ${RABBITMQ_DIR}
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}
+    fi
 
-docker run \\
-  --env RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
-  --env RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-rabbitmq \\
-  --publish 15672:15672 \\
-  --publish 5672:5672 \\
-  --rm \\
-  --tty \\
-  --volume ${RABBITMQ_DIR}:/bitnami \\
-  bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}
+    docker run \\
+      --detach \\
+      --env RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
+      --env RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
+      --interactive \\
+      --name ${SENZING_PROJECT_NAME}-rabbitmq \\
+      --publish 15672:15672 \\
+      --publish 5672:5672 \\
+      --restart always \\
+      --rm \\
+      --tty \\
+      --volume ${RABBITMQ_DIR}:/bitnami \\
+      bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-rabbitmq running on http://${SENZING_DOCKER_HOST_IP_ADDR}:15672"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-rabbitmq"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-rabbitmq >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-rabbitmq >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#senzing-rabbitmq"
+fi
 """
     return 0
 
@@ -1153,24 +1359,42 @@ def file_senzing_sqlite_web():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/coleifer/sqlite-web:${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}
+if [ "$1" == "up" ]
+then
 
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-sqlite-web running on http://${SENZING_DOCKER_HOST_IP_ADDR}:9174"
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-sqlite-web"
-echo "${SENZING_HORIZONTAL_RULE}"
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/coleifer/sqlite-web:${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}
+    fi
 
-docker run \\
-  --env SQLITE_DATABASE=${DATABASE_DATABASE} \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-sqlite-web \\
-  --publish 9174:8080 \\
-  --rm \\
-  --tty \\
-  --user $(id -u):$(id -g) \\
-  --volume ${SENZING_VAR_DIR}/sqlite:/data \\
-  coleifer/sqlite-web:${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}
+    docker run \\
+      --detach \\
+      --env SQLITE_DATABASE=${DATABASE_DATABASE} \\
+      --interactive \\
+      --name ${SENZING_PROJECT_NAME}-sqlite-web \\
+      --publish 9174:8080 \\
+      --restart always \\
+      --rm \\
+      --tty \\
+      --user $(id -u):$(id -g) \\
+      --volume ${SENZING_VAR_DIR}/sqlite:/data \\
+      coleifer/sqlite-web:${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-sqlite-web running on http://${SENZING_DOCKER_HOST_IP_ADDR}:9174"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-sqlite-web"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-sqlite-web >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-sqlite-web >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#senzing-sqlite-web"
+fi
 """
     return 0
 
@@ -1181,29 +1405,51 @@ def file_senzing_stream_loader():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}
+if [ "$1" == "up" ]
+then
 
-docker run \\
-  --env LC_CTYPE="en_us.utf8" \\
-  --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-  --env SENZING_DATA_SOURCE=TEST \\
-  --env SENZING_ENTITY_TYPE=GENERIC \\
-  --env SENZING_RABBITMQ_HOST=${SENZING_DOCKER_HOST_IP_ADDR} \\
-  --env SENZING_RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
-  --env SENZING_RABBITMQ_QUEUE=${SENZING_RABBITMQ_QUEUE} \\
-  --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
-  --env SENZING_SUBCOMMAND=rabbitmq \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-stream-loader \\
-  --rm \\
-  --tty \\
-  --user $(id -u):$(id -g) \\
-  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}
+    fi
+
+    docker run \\
+      --detach \\
+      --env LC_CTYPE="en_us.utf8" \\
+      --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+      --env SENZING_DATA_SOURCE=TEST \\
+      --env SENZING_ENTITY_TYPE=GENERIC \\
+      --env SENZING_RABBITMQ_HOST=${SENZING_DOCKER_HOST_IP_ADDR} \\
+      --env SENZING_RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
+      --env SENZING_RABBITMQ_QUEUE=${SENZING_RABBITMQ_QUEUE} \\
+      --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
+      --env SENZING_SUBCOMMAND=rabbitmq \\
+      --interactive \\
+      --name ${SENZING_PROJECT_NAME}-stream-loader \\
+      --restart always \\
+      --rm \\
+      --tty \\
+      --user $(id -u):$(id -g) \\
+      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+      --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+      senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-stream-loader is running."
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-stream-loader >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-stream-loader >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#senzing-stream-loader"
+fi
 """
 
 
@@ -1213,23 +1459,46 @@ def file_senzing_stream_producer():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
+if [ "$1" == "up" ]
+then
 
-docker run \\
-  --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \\
-  --env SENZING_RABBITMQ_HOST=${SENZING_DOCKER_HOST_IP_ADDR} \\
-  --env SENZING_RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
-  --env SENZING_RABBITMQ_QUEUE=${SENZING_RABBITMQ_QUEUE} \\
-  --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
-  --env SENZING_RECORD_MAX=${SENZING_RECORD_MAX} \\
-  --env SENZING_RECORD_MONITOR=1000 \\
-  --env SENZING_SUBCOMMAND=json-to-rabbitmq \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-stream-producer \\
-  --rm \\
-  --tty \\
-  --user $(id -u):$(id -g) \\
-  senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
+    fi
+
+    docker run \\
+      --detach \\
+      --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \\
+      --env SENZING_RABBITMQ_HOST=${SENZING_DOCKER_HOST_IP_ADDR} \\
+      --env SENZING_RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
+      --env SENZING_RABBITMQ_QUEUE=${SENZING_RABBITMQ_QUEUE} \\
+      --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
+      --env SENZING_RECORD_MAX=${SENZING_RECORD_MAX} \\
+      --env SENZING_RECORD_MONITOR=1000 \\
+      --env SENZING_SUBCOMMAND=json-to-rabbitmq \\
+      --interactive \\
+      --name ${SENZING_PROJECT_NAME}-stream-producer \\
+      --rm \\
+      --tty \\
+      --user $(id -u):$(id -g) \\
+      senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-stream-producer is running."
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-stream-producer"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-stream-producer >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-stream-producer >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#senzing-stream-producer"
+fi
 """
     return 0
 
@@ -1245,13 +1514,10 @@ PORT=8251
 if [ "$1" == "up" ]
 then
 
-    docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
-
-    echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp"
-    echo "${SENZING_HORIZONTAL_RULE}"
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
+    fi
 
     docker run \\
       --detach \\
@@ -1262,6 +1528,7 @@ then
       --interactive \\
       --name ${SENZING_PROJECT_NAME}-webapp \\
       --publish ${PORT}:${PORT} \\
+      --restart always \\
       --rm \\
       --tty \\
       --user 0 \\
@@ -1272,14 +1539,20 @@ then
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
       senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}
 
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
 elif [ "$1" == "down" ]
 then
-   docker kill ${SENZING_PROJECT_NAME}-webapp
+    docker stop ${SENZING_PROJECT_NAME}-webapp >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-webapp >/dev/null 2>&1
 else
-   echo "usage: $0 [up | down]"
-   echo "For more information:"
-   echo "http://senzing.github.io/senzing-environment/reference#senzing-webapp"
-   exit
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#senzing-webapp"
 fi
 """
     return 0
@@ -1294,43 +1567,68 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 API_SERVER_PORT=8250
 WEBAPP_PORT=8251
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
+if [ "$1" == "up" ]
+then
 
-docker run \\
-  --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-  --env SENZING_GID=$(id -g) \\
-  --env SENZING_UID=$(id -u) \\
-  --name ${SENZING_PROJECT_NAME}-init-container \\
-  --rm \\
-  --user 0 \\
-  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
+    fi
 
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${WEBAPP_PORT}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${API_SERVER_PORT}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp-demo"
-echo "${SENZING_HORIZONTAL_RULE}"
+    docker run \\
+      --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+      --env SENZING_GID=$(id -g) \\
+      --env SENZING_UID=$(id -u) \\
+      --name ${SENZING_PROJECT_NAME}-init-container \\
+      --rm \\
+      --user 0 \\
+      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+      --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+      senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}
 
-docker run \\
-  --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-  --name ${SENZING_PROJECT_NAME}-web-app-demo \\
-  --publish ${API_SERVER_PORT}:8250 \\
-  --publish ${WEBAPP_PORT}:8251 \\
-  --rm \\
-  --user $(id -u):$(id -g) \\
-  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
+    fi
+
+    docker run \\
+      --detach \\
+      --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+      --name ${SENZING_PROJECT_NAME}-web-app-demo \\
+      --publish ${API_SERVER_PORT}:8250 \\
+      --publish ${WEBAPP_PORT}:8251 \\
+      --restart always \\
+      --rm \\
+      --user $(id -u):$(id -g) \\
+      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+      --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+      senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
+
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${WEBAPP_PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${API_SERVER_PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp-demo"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-init-container >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-init-container >/dev/null 2>&1
+    docker stop ${SENZING_PROJECT_NAME}-web-app-demo   >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-web-app-demo   >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#senzing-webapp-demo"
+fi
 """
     return 0
 
@@ -1343,28 +1641,47 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 PORT=8254
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM}
+if [ "$1" == "up" ]
+then
 
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-xterm running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} docker exec -it ${SENZING_PROJECT_NAME}-xterm /bin/bash"
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-xterm"
-echo "${SENZING_HORIZONTAL_RULE}"
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_XTERM}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM}
+    fi
 
-docker run \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-xterm \\
-  --publish ${PORT}:5000 \\
-  --rm \\
-  --tty \\
-  --user $(id -u):$(id -g) \\
-  --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-  --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-  --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-  --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-  --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM}
+    docker run \\
+      --detach \\
+      --interactive \\
+      --name ${SENZING_PROJECT_NAME}-xterm \\
+      --publish ${PORT}:5000 \\
+      --restart always \\
+      --rm \\
+      --tty \\
+      --user $(id -u):$(id -g) \\
+      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+      --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+      senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-xterm running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} To enter ${SENZING_PROJECT_NAME}-xterm container, run:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} docker exec -it ${SENZING_PROJECT_NAME}-xterm /bin/bash"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-xterm"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-xterm >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-xterm >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#senzing-xterm"
+fi
 """
     return 0
 
@@ -1386,38 +1703,54 @@ def file_senzing_yum():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM}
+if [ "$1" == "up" ]
+then
 
-# Remove symbolic links.
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_YUM}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM}
+    fi
 
-rm ${SENZING_G2_DIR}
-rm ${SENZING_DATA_DIR}
+    # Remove symbolic links.
 
-# Download Senzing binaries.
+    rm ${SENZING_G2_DIR}
+    rm ${SENZING_DATA_DIR}
 
-docker run \\
-  --env SENZING_ACCEPT_EULA=${SENZING_ACCEPT_EULA} \\
-  --interactive \\
-  --name ${SENZING_PROJECT_NAME}-yum \\
-  --rm \\
-  --tty \\
-  --user $(id -u):$(id -g) \\
-  --volume ${SENZING_PROJECT_DIR}:/opt/senzing \\
-  senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM}
+    # Download Senzing binaries.
 
-# Create symbolic links to timestamped directories.
+    docker run \\
+      --env SENZING_ACCEPT_EULA=${SENZING_ACCEPT_EULA} \\
+      --interactive \\
+      --name ${SENZING_PROJECT_NAME}-yum \\
+      --rm \\
+      --tty \\
+      --user $(id -u):$(id -g) \\
+      --volume ${SENZING_PROJECT_DIR}:/opt/senzing \\
+      senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM}
 
-TIMESTAMP=$(date +%s)
+    # Create symbolic links to timestamped directories.
 
-pushd ${SENZING_PROJECT_DIR}
-mv g2 g2.${TIMESTAMP}
-ln -s g2.${TIMESTAMP} g2
+    TIMESTAMP=$(date +%s)
 
-mv data data-backup
-mv data-backup/1.0.0 data.${TIMESTAMP}
-rmdir data-backup
-ln -s data.${TIMESTAMP} data
-popd
+    pushd ${SENZING_PROJECT_DIR}
+    mv g2 g2.${TIMESTAMP}
+    ln -s g2.${TIMESTAMP} g2
+
+    mv data data-backup
+    mv data-backup/1.0.0 data.${TIMESTAMP}
+    rmdir data-backup
+    ln -s data.${TIMESTAMP} data
+    popd
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-yum >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-yum >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#yum"
+fi
 """
     return 0
 
@@ -1430,20 +1763,38 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 PORT=9180
 
-docker pull ${SENZING_DOCKER_REGISTRY_URL}/swaggerapi/swagger-ui
+if [ "$1" == "up" ]
+then
 
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-swagger-ui running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#swagger-ui"
-echo "${SENZING_HORIZONTAL_RULE}"
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/swaggerapi/swagger-ui:${SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}
+    fi
 
-docker run \
-  --env URL=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml \
-  --name ${SENZING_PROJECT_NAME}-swagger-ui \
-  --publish ${PORT}:8080 \
-  --rm \
-  swaggerapi/swagger-ui
+    docker run \\
+      --detach \\
+      --env URL=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml \\
+      --name ${SENZING_PROJECT_NAME}-swagger-ui \\
+      --publish ${PORT}:8080 \\
+      --restart always \\
+      --rm \\
+      swaggerapi/swagger-ui:${SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-swagger-ui running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#swagger-ui"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "down" ]
+then
+    docker stop ${SENZING_PROJECT_NAME}-swagger-ui >/dev/null 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-swagger-ui >/dev/null 2>&1
+else
+    echo "usage: $0 [up | down]"
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#swagger-ui"
+fi
 """
     return 0
 
