@@ -800,7 +800,7 @@ then
 
     if [ "${SENZING_DOCKER_IMAGE_VERSION_PORTAINER}" == "latest" ]
     then
-        docker pull ${SENZING_DOCKER_REGISTRY_URL}/portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER}
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER} >> ${SENZING_PROJECT_DIR}/var/log/portainer.log 2>&1
     fi
 
     docker run \\
@@ -808,10 +808,9 @@ then
       --name ${SENZING_PROJECT_NAME}-portainer \\
       --publish ${PORT}:9000 \\
       --restart always \\
-      --rm \\
       --volume ${SENZING_DOCKER_SOCKET}:/var/run/docker.sock \\
       --volume ${SENZING_PORTAINER_DIR}:/data \\
-      portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER}
+      portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER} >> ${SENZING_PROJECT_DIR}/var/log/portainer.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-portainer running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
@@ -821,8 +820,8 @@ then
 
 elif [ "$1" == "down" ]
 then
-    docker stop ${SENZING_PROJECT_NAME}-portainer >/dev/null 2>&1
-    docker rm   ${SENZING_PROJECT_NAME}-portainer >/dev/null 2>&1
+    docker stop ${SENZING_PROJECT_NAME}-portainer >> ${SENZING_PROJECT_DIR}/var/log/portainer.log 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-portainer >> ${SENZING_PROJECT_DIR}/var/log/portainer.log 2>&1
 else
     echo "usage: $0 [up | down]"
     echo "For more information:"
@@ -845,7 +844,7 @@ then
 
     if [ "${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}" == "latest" ]
     then
-        docker pull ${SENZING_DOCKER_REGISTRY_URL}/postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES} >> ${SENZING_PROJECT_DIR}/var/log/postgres.log 2>&1
     fi
 
     docker run \\
@@ -856,9 +855,8 @@ then
       --name ${SENZING_PROJECT_NAME}-postgres \\
       --publish ${PORT}:5432 \\
       --restart always \\
-      --rm \\
       --volume ${POSTGRES_DIR}:/var/lib/postgresql/data \\
-      postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES}
+      postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES} >> ${SENZING_PROJECT_DIR}/var/log/postgres.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-postgres listening on ${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
@@ -868,8 +866,8 @@ then
 
 elif [ "$1" == "down" ]
 then
-    docker stop ${SENZING_PROJECT_NAME}-postgres >/dev/null 2>&1
-    docker rm   ${SENZING_PROJECT_NAME}-postgres >/dev/null 2>&1
+    docker stop ${SENZING_PROJECT_NAME}-postgres >> ${SENZING_PROJECT_DIR}/var/log/postgres.log 2>&1
+    docker rm   ${SENZING_PROJECT_NAME}-postgres >> ${SENZING_PROJECT_DIR}/var/log/postgres.log 2>&1
 else
     echo "usage: $0 [up | down]"
     echo "For more information:"
@@ -902,7 +900,6 @@ then
       --name ${SENZING_PROJECT_NAME}-api-server \\
       --publish ${PORT}:${PORT} \\
       --restart always \\
-      --rm \\
       --tty \\
       --user $(id -u):$(id -g) \\
       --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
@@ -1119,7 +1116,6 @@ then
       --name ${SENZING_PROJECT_NAME}-jupyter \\
       --publish ${PORT}:8888 \\
       --restart always \\
-      --rm \\
       --tty \\
       --volume ${SENZING_PROJECT_DIR}:/notebooks/shared \\
       --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
@@ -1194,7 +1190,6 @@ then
       --publish ${HTTP_PORT}:80 \\
       --publish ${HTTPS_PORT}:443 \\
       --restart always \\
-      --rm \\
       --tty \\
       senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}
 
@@ -1275,7 +1270,6 @@ then
       --name ${SENZING_PROJECT_NAME}-quickstart \\
       --publish ${PORT}:8251 \\
       --restart always \\
-      --rm \\
       --user $(id -u):$(id -g) \\
       --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
       --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
@@ -1329,7 +1323,6 @@ then
       --publish 15672:15672 \\
       --publish 5672:5672 \\
       --restart always \\
-      --rm \\
       --tty \\
       --volume ${RABBITMQ_DIR}:/bitnami \\
       bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}
@@ -1374,7 +1367,6 @@ then
       --name ${SENZING_PROJECT_NAME}-sqlite-web \\
       --publish 9174:8080 \\
       --restart always \\
-      --rm \\
       --tty \\
       --user $(id -u):$(id -g) \\
       --volume ${SENZING_VAR_DIR}/sqlite:/data \\
@@ -1427,7 +1419,6 @@ then
       --interactive \\
       --name ${SENZING_PROJECT_NAME}-stream-loader \\
       --restart always \\
-      --rm \\
       --tty \\
       --user $(id -u):$(id -g) \\
       --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
@@ -1529,7 +1520,6 @@ then
       --name ${SENZING_PROJECT_NAME}-webapp \\
       --publish ${PORT}:${PORT} \\
       --restart always \\
-      --rm \\
       --tty \\
       --user 0 \\
       --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
@@ -1601,7 +1591,6 @@ then
       --publish ${API_SERVER_PORT}:8250 \\
       --publish ${WEBAPP_PORT}:8251 \\
       --restart always \\
-      --rm \\
       --user $(id -u):$(id -g) \\
       --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
       --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
@@ -1655,7 +1644,6 @@ then
       --name ${SENZING_PROJECT_NAME}-xterm \\
       --publish ${PORT}:5000 \\
       --restart always \\
-      --rm \\
       --tty \\
       --user $(id -u):$(id -g) \\
       --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
@@ -1777,7 +1765,6 @@ then
       --name ${SENZING_PROJECT_NAME}-swagger-ui \\
       --publish ${PORT}:8080 \\
       --restart always \\
-      --rm \\
       swaggerapi/swagger-ui:${SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}
 
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2100,6 +2087,27 @@ chmod 777 ${{SENZING_PROJECT_DIR}}/var/rabbitmq
     os.chmod(output_filename, 0o755)
 
 
+def project_create_var_log_directory(project_dir):
+
+    # Specify output directory and backup directory.
+
+    output_directory = "{0}/var/log".format(project_dir)
+    backup_directory = "{0}.{1}".format(output_directory, int(time.time()))
+
+    # If output directory exists, back it up.
+
+    if os.path.exists(output_directory):
+        logging.info(message_info(161, backup_directory, output_directory))
+        shutil.move(output_directory, backup_directory)
+
+    # Make .../docker-bin directory.
+
+    try:
+        os.makedirs(output_directory, exist_ok=True)
+    except PermissionError as err:
+        exit_error(702, output_directory, err)
+
+
 def project_modify_G2Module_ini(project_dir):
 
     g2module_ini_for_docker = {
@@ -2217,6 +2225,7 @@ def do_add_docker_support_linux(args):
     project_modify_G2Module_ini(project_dir)
     project_create_setupenv_docker(config)
     project_create_docker_bin_directory(project_dir)
+    project_create_var_log_directory(project_dir)
     project_create_docker_environment_vars(project_dir, project_name, docker_host_ip_addr, sql_connection)
     project_create_docker_bin_files(project_dir, docker_bin_files)
 
@@ -2273,6 +2282,7 @@ def do_add_docker_support_macos(args):
     # Do work.
 
     project_create_docker_bin_directory(project_dir)
+    project_create_var_log_directory(project_dir)
     project_create_docker_environment_vars_macos(project_dir, project_name, docker_host_ip_addr, g2_database_url)
     project_create_docker_bin_files(project_dir, docker_bin_files)
 

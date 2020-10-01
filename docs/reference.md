@@ -48,7 +48,7 @@
    Example:
 
     ```console
-    $ ./docker-bin/portainer.sh
+    $ ./docker-bin/portainer.sh up
      :
     ==============================================================================
     == portainer running on http://nnn.nnn.nnn.nnn:9170
