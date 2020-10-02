@@ -264,27 +264,6 @@ The following examples require initialization described in
       --project-dir ${SENZING_PROJECT_DIR}
     ```
 
-#### Senzing project work-around (Senzing 1.x.x only)
-
-Currently Senzing project directories contain symbolic links that do not work within docker containers.
-The following instructions replace the symbolic links with actual directories.
-
-1. Backup existing directories.
-   Example:
-
-    ```console
-    mv ${SENZING_PROJECT_DIR}/resources/config ${SENZING_PROJECT_DIR}/resources/config.$(date +%s)
-    mv ${SENZING_PROJECT_DIR}/resources/schema ${SENZING_PROJECT_DIR}/resources/schema.$(date +%s)
-    ```
-
-1. Copy new directories into Senzing project directory.
-   Example:
-
-    ```console
-    cp -r /opt/senzing/g2/resources/config/ ${SENZING_PROJECT_DIR}/resources/
-    cp -r /opt/senzing/g2/resources/schema/ ${SENZING_PROJECT_DIR}/resources/
-    ```
-
 #### Set environment for docker
 
 1. Set environment.
