@@ -754,6 +754,15 @@ export SENZING_RABBITMQ_USERNAME=user
 export SENZING_RECORD_MAX=5000
 export SENZING_SQL_CONNECTION="{sql_connection}"
 export SENZING_VAR_DIR=${{SENZING_PROJECT_DIR}}/var
+
+export POSTGRES_HOST=${{SENZING_DOCKER_HOST_IP_ADDR}}
+export POSTGRES_PORT=5432
+export POSTGRES_DATABASE=G2
+
+if [ "${{DATABASE_DATABASE}}" != "G2C.db" ]
+then
+    export POSTGRES_DATABASE=${{DATABASE_DATABASE}}
+fi
 """
     return 0
 
@@ -859,7 +868,7 @@ then
 
     docker run \\
       --detach \\
-      --env POSTGRES_DB=${DATABASE_DATABASE} \\
+      --env POSTGRES_DB=${POSTGRES_DATABASE} \\
       --env POSTGRES_PASSWORD=${DATABASE_PASSWORD} \\
       --env POSTGRES_USERNAME=${DATABASE_USERNAME} \\
       --name ${SENZING_PROJECT_NAME}-postgres \\
@@ -871,6 +880,7 @@ then
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-postgres listening on ${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Username: ${DATABASE_USERNAME} Password: ${DATABASE_PASSWORD}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#postgres"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1047,6 +1057,7 @@ then
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-debug.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-debug is running."
     echo "${SENZING_HORIZONTAL_RULE:0:2} To enter ${SENZING_PROJECT_NAME}-debug container, run:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} sudo docker exec -it ${SENZING_PROJECT_NAME}-debug /bin/bash"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
@@ -1241,8 +1252,8 @@ then
     docker run \\
       --detach \\
       --env PHP_PG_ADMIN_SERVER_DESC=PostgreSQL \\
-      --env PHP_PG_ADMIN_SERVER_HOST=${DATABASE_HOST} \\
-      --env PHP_PG_ADMIN_SERVER_PORT=${DATABASE_PORT} \\
+      --env PHP_PG_ADMIN_SERVER_HOST=${POSTGRES_HOST} \\
+      --env PHP_PG_ADMIN_SERVER_PORT=${POSTGRES_PORT} \\
       --env PHP_PG_ADMIN_SERVER_SSL_MODE=allow \\
       --env PHP_PG_ADMIN_SERVER_DEFAULT_DB=template1 \\
       --env PHP_PG_ADMIN_SERVER_PG_DUMP_PATH=/usr/bin/pg_dump \\
@@ -1762,17 +1773,6 @@ else
     echo "For more information:"
     echo "http://senzing.github.io/senzing-environment/reference#senzing-xterm"
 fi
-"""
-    return 0
-
-
-def file_senzing_xterm_shell():
-    """#!/usr/bin/env bash
-
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source ${SCRIPT_DIR}/docker-environment-vars.sh
-
-docker exec -it ${SENZING_PROJECT_NAME}-xterm  /bin/bash
 """
     return 0
 
@@ -2308,7 +2308,6 @@ def do_add_docker_support_linux(args):
         "senzing-stream-producer.sh": file_senzing_stream_producer,
         "senzing-webapp-demo.sh": file_senzing_webapp_demo,
         "senzing-webapp.sh": file_senzing_webapp,
-        "senzing-xterm-shell.sh": file_senzing_xterm_shell,
         "senzing-xterm.sh": file_senzing_xterm,
         "senzing-yum.sh": file_senzing_yum,
         "swagger-ui.sh": file_swagger_ui
@@ -2369,7 +2368,6 @@ def do_add_docker_support_macos(args):
         "senzing-stream-producer.sh": file_senzing_stream_producer,
         "senzing-webapp-demo.sh": file_senzing_webapp_demo,
         "senzing-webapp.sh": file_senzing_webapp,
-        "senzing-xterm-shell.sh": file_senzing_xterm_shell,
         "senzing-xterm.sh": file_senzing_xterm,
         "senzing-yum.sh": file_senzing_yum,
         "swagger-ui.sh": file_swagger_ui

@@ -27,7 +27,7 @@
 
 1. **Synopsis:**
 
-   Pulls the latest version of all docker images from the docker repository to the local workstation.
+   Pulls docker images from the docker repository to the local workstation.
 
 1. **Invocation:**
 
@@ -41,7 +41,10 @@
 
 1. **Synopsis:**
 
-   Brings up [Portainer](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/portainer.md) service.
+   Brings up
+   [Portainer](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/portainer.md)
+   service.
+   Portainer helps visualize and manage Docker.
 
 1. **Invocation:**
 
@@ -49,7 +52,6 @@
 
     ```console
     $ ./docker-bin/portainer.sh up
-     :
     ==============================================================================
     == portainer running on http://nnn.nnn.nnn.nnn:9170
     == For more information:
@@ -64,15 +66,16 @@
 
 1. **Synopsis:**
 
-   Brings up [PostgreSQL](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/postgresql.md)
-   docker container, `postgres`, service.
+   Brings up
+   [PostgreSQL](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/postgresql.md)
+   service.
 
 1. **Invocation:**
 
    Example:
 
     ```console
-    $ ./postgres.sh
+    $ ./postgres.sh up
      :
     ==============================================================================
     == postgres listening on nnn.nnn.nnn.nnn:5432
@@ -92,10 +95,10 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-api-server.sh
+    $ ./docker-bin/senzing-api-server.sh up
      :
     ==============================================================================
-    == api-server running on http://nnn.nnn.nnn.nnn:9170
+    == api-server running on http://nnn.nnn.nnn.nnn:8250
     == For more information:
     == http://senzing.github.io/senzing-environment/reference#senzing-api-server
     ==============================================================================
@@ -135,8 +138,12 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-console.sh
-     :
+    $ ./docker-bin/senzing-console.sh up
+    ==============================================================================
+    == To exit console, type 'exit'
+    == For more information:
+    == http://senzing.github.io/senzing-environment/reference#senzing-console
+    ==============================================================================
     I have no name!@aaaaaaaaaaaa:/app$
     ```
 
@@ -153,12 +160,11 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-db2-driver-installer.sh
-     :
-    yyyy-mm-dd hh:mm:ss,nnn senzing-50080297I Enter {...}
-    yyyy-mm-dd hh:mm:ss,nnn senzing-50080150I /opt/IBM-template copied to /opt/IBM/.
-    yyyy-mm-dd hh:mm:ss,nnn senzing-50080298I Exit {...}
+    $ ./docker-bin/senzing-db2-driver-installer.sh up
     sudo access is required to change file ownership.  Please enter your password:
+    ==============================================================================
+    == db2-driver-installer has completed.
+    ==============================================================================
     ```
 
 ### senzing-debug
@@ -168,24 +174,52 @@
    Brings up [Senzing debug](https://github.com/Senzing/docker-senzing-debug) service.
    Functionally equivalent to [senzing-console](#senzing-console) plus
    `docker run ... --cap-add=ALL` parameter and runs as `root` user.
+   Unlike [senzing-console](#senzing-console),
+   [Senzing debug](https://github.com/Senzing/docker-senzing-debug) runs in the background
+   and `docker exec ...` is used to enter the container.
 
 1. **Invocation:**
 
    Example:
 
     ```console
-    $ ./docker-bin/senzing-debug.sh
-     :
-    /app/sleep-infinitely.sh is sleeping infinitely.
+    $ ./docker-bin/senzing-debug.sh up
+    ==============================================================================
+    == debug is running.
+    == To enter debug container, run:
+    == sudo docker exec -it debug /bin/bash
+    == For more information:
+    == http://senzing.github.io/senzing-environment/reference#senzing-debug
+    ==============================================================================
     ```
 
-   After invocation, use `docker-exec` to enter the container.
+   After invocation, use `docker exec` to enter the container.
    Example:
 
     ```console
     docker exec -it ${SENZING_PROJECT_NAME}-debug /bin/bash
     ```
+
 ### senzing-down
+
+1. **Synopsis:**
+
+   Brings down all containers launched from project folder.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-down.sh
+    ==============================================================================
+    == Bringing down all docker containers.
+    == For more information:
+    == http://senzing.github.io/senzing-environment/reference#senzing-down
+    ==
+    == Done.
+    ==============================================================================
+    ```
 
 ### senzing-environment
 
@@ -204,13 +238,10 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-init-container.sh
-     :
-    yyyy-mm-dd hh:mm:ss,nnn senzing-50070297I Enter {...}
-     :
-    yyyy-mm-dd hh:mm:ss,nnn senzing-50070171I Default config in SYS_CFG already exists having ID nnnnnnnnn
-    yyyy-mm-dd hh:mm:ss,nnn senzing-50070155I /etc/opt/senzing/g2config.json - Deleting
-    yyyy-mm-dd hh:mm:ss,nnn senzing-50070298I Exit {...}
+    $ ./docker-bin/senzing-init-container.sh up
+    ==============================================================================
+    == init-container has completed.
+    ==============================================================================
     ```
 
 ### senzing-jupyter
@@ -224,15 +255,12 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-jupyter.sh
-     :
+    $ ./docker-bin/senzing-jupyter.sh up
     ==============================================================================
     == jupyter running on http://nnn.nnn.nnn.nnn:9178
     == For more information:
     == http://senzing.github.io/senzing-environment/reference#senzing-jupyter
     ==============================================================================
-     :
-    Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
     ```
 
 ### senzing-phppgadmin
@@ -246,8 +274,7 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-phppgadmin.sh
-     :
+    $ ./docker-bin/senzing-phppgadmin.sh up
     ==============================================================================
     == phppgadmin running on http://nnn.nnn.nnn.nnn:9171
     == For more information:
@@ -256,6 +283,23 @@
     ```
 
 ### senzing-postgresql-init
+
+1. **Synopsis:**
+
+   Used with PostgreSQL database.
+   Brings up [postgresql-client](https://github.com/Senzing/postgresql-client) and
+   runs an SQL file to create tables in the PostgreSQL database.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-postgresql-init.sh up
+    ==============================================================================
+    == postgresql-init has completed.
+    ==============================================================================
+    ```
 
 ### senzing-quickstart-demo
 
@@ -268,8 +312,7 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-quickstart-demo.sh
-     :
+    $ ./docker-bin/senzing-quickstart-demo.sh up
     ==============================================================================
     == quickstart running on http://nnn.nnn.nnn.nnn:8251
     == For more information:
@@ -288,10 +331,10 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-rabbitmq.sh
-     :
+    $ ./docker-bin/senzing-rabbitmq.sh up
     ==============================================================================
     == rabbitmq running on http://nnn.nnn.nnn.nnn:15672
+    == Username: xxxxxxxx Password: xxxxxxxx
     == For more information:
     == http://senzing.github.io/senzing-environment/reference#senzing-rabbitmq
     ==============================================================================
@@ -308,7 +351,7 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-sqlite-web.sh
+    $ ./docker-bin/senzing-sqlite-web.sh up
      :
     ==============================================================================
     == sqlite-web running on http://nnn.nnn.nnn.nnn:9174
@@ -328,10 +371,12 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-stream-loader.sh
-     :
-    yyyy-mm-dd hh:mm:ss,nnn senzing-50010297I Enter {...}
-     :
+    $ ./docker-bin/senzing-stream-loader.sh up
+    ==============================================================================
+    == stream-loader is running.
+    For more information:
+    http://senzing.github.io/senzing-environment/reference#senzing-stream-loader
+    ==============================================================================
     ```
 
 ### senzing-stream-producer
@@ -345,10 +390,12 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-stream-producer.sh
-     :
-    yyyy-mm-dd hh:mm:ss,nnn senzing-501480297I Enter {...}
-     :
+    $ ./docker-bin/senzing-stream-producer.sh up
+    ==============================================================================
+    == stream-producer is running.
+    == For more information:
+    == http://senzing.github.io/senzing-environment/reference#senzing-stream-producer
+    ==============================================================================
     ```
 
 ### senzing-webapp-demo
@@ -365,15 +412,13 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-webapp-demo.sh
-     :
+    $ ./docker-bin/senzing-webapp-demo.sh up
     ==============================================================================
     == webapp running on http://nnn.nnn.nnn.nnn:8251
-    == api-server running on http://nnn.nnn.nnn.nnn:8250
+    == api-server running on http://nnn.nnn.nnn.nnn:8250/heartbeat
     == For more information:
     == http://senzing.github.io/senzing-environment/reference#senzing-webapp-demo
     ==============================================================================
-     :
     ```
 
 ### senzing-webapp
@@ -387,29 +432,12 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-webapp.sh
-     :
+    $ ./docker-bin/senzing-webapp.sh up
     ==============================================================================
     == webapp running on http://nnn.nnn.nnn.nnn:8251
     == For more information:
     == http://senzing.github.io/senzing-environment/reference#senzing-webapp
     ==============================================================================
-     :
-    ```
-
-### senzing-xterm-shell
-
-1. **Synopsis:**
-
-   Does a `docker exec` into an existing [senzing-xterm](#senzing-xterm).
-
-1. **Invocation:**
-
-   Example:
-
-    ```console
-    $ ./docker-bin/senzing-xterm-shell.sh
-     :
     ```
 
 ### senzing-xterm
@@ -423,15 +451,14 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-xterm.sh
-     :
+    $ ./docker-bin/senzing-xterm.sh up
     ==============================================================================
     == xterm running on http://nnn.nnn.nnn.nnn:8254
+    == To enter xterm container, run:
     == docker exec -it xterm /bin/bash
     == For more information:
     == http://senzing.github.io/senzing-environment/reference#senzing-xterm
     ==============================================================================
-     :
     ```
 
 ### senzing-yum
@@ -445,8 +472,8 @@
    Example:
 
     ```console
-    $ ./docker-bin/senzing-yum.sh
-     :
+    $ ./docker-bin/senzing-yum.sh up
+    :
     ```
 
 ### swagger-ui
@@ -460,7 +487,7 @@
    Example:
 
     ```console
-    $ ./docker-bin/swagger-ui.sh
+    $ ./docker-bin/swagger-ui.sh up
      :
     ==============================================================================
     == swagger-ui running on http://nnn.nnn.nnn.nnn:9180
