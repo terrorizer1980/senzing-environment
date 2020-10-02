@@ -963,8 +963,7 @@ docker run \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE} /bin/bash \\
-  >> ${SENZING_PROJECT_DIR}/var/log/senzing-console.log 2>&1
+  senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE} /bin/bash
 """
     return 0
 
@@ -1041,6 +1040,8 @@ then
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} To enter ${SENZING_PROJECT_NAME}-debug container, run:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} sudo docker exec -it ${SENZING_PROJECT_NAME}-debug /bin/bash"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-debug"
     echo "${SENZING_HORIZONTAL_RULE}"
 
 elif [ "$1" == "down" ]
@@ -1050,7 +1051,7 @@ then
 else
     echo "usage: $0 [up | down]"
     echo "For more information:"
-    echo "http://senzing.github.io/senzing-environment/reference#debug"
+    echo "http://senzing.github.io/senzing-environment/reference#senzing-debug"
 fi
 """
     return 0
@@ -1062,8 +1063,11 @@ def file_senzing_down():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-docker stop ${SENZING_PROJECT_NAME}-portainer            >> ${SENZING_PROJECT_DIR}/var/log/portainer.log 2>&1
-docker rm   ${SENZING_PROJECT_NAME}-portainer            >> ${SENZING_PROJECT_DIR}/var/log/portainer.log 2>&1
+echo "${SENZING_HORIZONTAL_RULE}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} Bringing down all ${SENZING_PROJECT_NAME} docker containers.:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-down"
+
 docker stop ${SENZING_PROJECT_NAME}-postgres             >> ${SENZING_PROJECT_DIR}/var/log/postgres.log 2>&1
 docker rm   ${SENZING_PROJECT_NAME}-postgres             >> ${SENZING_PROJECT_DIR}/var/log/postgres.log 2>&1
 docker stop ${SENZING_PROJECT_NAME}-api-server           >> ${SENZING_PROJECT_DIR}/var/log/senzing-api-server.log 2>&1
@@ -1103,6 +1107,12 @@ docker rm   ${SENZING_PROJECT_NAME}-yum                  >> ${SENZING_PROJECT_DI
 docker stop ${SENZING_PROJECT_NAME}-swagger-ui           >> ${SENZING_PROJECT_DIR}/var/log/swagger-ui.log 2>&1
 docker rm   ${SENZING_PROJECT_NAME}-swagger-ui           >> ${SENZING_PROJECT_DIR}/var/log/swagger-ui.log 2>&1
 
+docker stop ${SENZING_PROJECT_NAME}-portainer            >> ${SENZING_PROJECT_DIR}/var/log/portainer.log 2>&1
+docker rm   ${SENZING_PROJECT_NAME}-portainer            >> ${SENZING_PROJECT_DIR}/var/log/portainer.log 2>&1
+
+echo "${SENZING_HORIZONTAL_RULE:0:2}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} Done."
+echo "${SENZING_HORIZONTAL_RULE}"
 """
     return 0
 
@@ -1392,6 +1402,7 @@ then
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-rabbitmq running on http://${SENZING_DOCKER_HOST_IP_ADDR}:15672"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Username: ${SENZING_RABBITMQ_USERNAME} Password: ${SENZING_RABBITMQ_PASSWORD}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-rabbitmq"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1495,6 +1506,8 @@ then
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-stream-loader is running."
+    echo "For more information:"
+    echo "http://senzing.github.io/senzing-environment/reference#senzing-stream-loader"
     echo "${SENZING_HORIZONTAL_RULE}"
 
 elif [ "$1" == "down" ]
@@ -1671,7 +1684,7 @@ then
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${WEBAPP_PORT}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${API_SERVER_PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${API_SERVER_PORT}/heartbeat"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp-demo"
     echo "${SENZING_HORIZONTAL_RULE}"

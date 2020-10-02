@@ -185,6 +185,7 @@
     ```console
     docker exec -it ${SENZING_PROJECT_NAME}-debug /bin/bash
     ```
+### senzing-down
 
 ### senzing-environment
 
