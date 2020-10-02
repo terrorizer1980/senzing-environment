@@ -1064,7 +1064,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} Bringing down all ${SENZING_PROJECT_NAME} docker containers.:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} Bringing down all ${SENZING_PROJECT_NAME} docker containers."
 echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
 echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-down"
 
