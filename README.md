@@ -1,23 +1,49 @@
 # senzing-environment
 
-## Preamble
+## Synopsis
 
-At [Senzing](http://senzing.com),
-we strive to create GitHub documentation in a
-"[don't make me think](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/dont-make-me-think.md)" style.
-For the most part, instructions are copy and paste.
-Whenever thinking is needed, it's marked with a "thinking" icon :thinking:.
-Whenever customization is needed, it's marked with a "pencil" icon :pencil2:.
-If the instructions are not clear, please let us know by opening a new
-[Documentation issue](https://github.com/Senzing/senzing-environment/issues/new?template=documentation_request.md)
-describing where we can improve.   Now on with the show...
+The [senzing-environment.py](senzing-environment.py) program
+creates shell scripts in a `docker-bin/` directory
+that are used to start and stop Senzing Docker containers.
 
 ## Overview
 
-The [senzing-environment.py](senzing-environment.py) program helps Senzing project directories work with Senzing Docker formations.
+The [senzing-environment.py](senzing-environment.py) program creates a `docker-bin/` directory that looks like the following:
+
+```console
+docker-bin
+├── docker-environment-vars.sh
+├── docker-pull-latest.sh
+├── portainer.sh
+├── postgres.sh
+├── senzing-api-server.sh
+├── senzing-console.sh
+├── senzing-db2-driver-installer.sh
+├── senzing-debug.sh
+├── senzing-down.sh
+├── senzing-init-container.sh
+├── senzing-jupyter.sh
+├── senzing-phppgadmin.sh
+├── senzing-postgresql-init.sh
+├── senzing-quickstart-demo.sh
+├── senzing-rabbitmq.sh
+├── senzing-sqlite-web.sh
+├── senzing-stream-loader.sh
+├── senzing-stream-producer.sh
+├── senzing-webapp-demo.sh
+├── senzing-webapp.sh
+├── senzing-xterm.sh
+├── senzing-yum.sh
+└── swagger-ui.sh
+```
+
+The function of each file can be seen in the
+[Senzing environment reference](docs/reference.md).
 
 ### Contents
 
+1. [Preamble](#preamble)
+    1. [Legend](#legend)
 1. [Related artifacts](#related-artifacts)
 1. [Expectations](#expectations)
 1. [Demonstrate using Command Line Interface](#demonstrate-using-command-line-interface)
@@ -41,7 +67,19 @@ The [senzing-environment.py](senzing-environment.py) program helps Senzing proje
 1. [Errors](#errors)
 1. [References](#references)
 
-#### Legend
+## Preamble
+
+At [Senzing](http://senzing.com),
+we strive to create GitHub documentation in a
+"[don't make me think](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/dont-make-me-think.md)" style.
+For the most part, instructions are copy and paste.
+Whenever thinking is needed, it's marked with a "thinking" icon :thinking:.
+Whenever customization is needed, it's marked with a "pencil" icon :pencil2:.
+If the instructions are not clear, please let us know by opening a new
+[Documentation issue](https://github.com/Senzing/senzing-environment/issues/new?template=documentation_request.md)
+describing where we can improve.   Now on with the show...
+
+### Legend
 
 1. :thinking: - A "thinker" icon means that a little extra thinking may be required.
    Perhaps there are some choices to be made.
@@ -77,8 +115,6 @@ These are "one-time tasks" which may already have been completed.
 1. Install Python dependencies:
     1. See [requirements.txt](requirements.txt) for list
         1. [Installation hints](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-python-dependencies.md)
-1. The following software programs need to be installed:
-    1. [senzingapi](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-senzing-api.md)
 
 ### Download
 
@@ -190,17 +226,6 @@ If a Senzing project directory is needed, perform the following step.
       senzing/senzing-environment add-docker-support-linux \
         --project-name ${SENZING_PROJECT_NAME} \
         --project-dir ${SENZING_PROJECT_DIR}
-    ```
-
-1. Perform work-around for sym-link in sub-directories. (Senzing 1.x.x only)
-   Example:
-
-    ```console
-    mv ${SENZING_PROJECT_DIR}/resources/config ${SENZING_PROJECT_DIR}/resources/config.$(date +%s)
-    mv ${SENZING_PROJECT_DIR}/resources/schema ${SENZING_PROJECT_DIR}/resources/schema.$(date +%s)
-
-    cp -r /opt/senzing/g2/resources/config/ ${SENZING_PROJECT_DIR}/resources/
-    cp -r /opt/senzing/g2/resources/schema/ ${SENZING_PROJECT_DIR}/resources/
     ```
 
 1. For more examples of use, see [Examples of Docker](#examples-of-docker).

@@ -21,9 +21,9 @@ import sys
 import time
 
 __all__ = []
-__version__ = "1.0.6"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "1.1.1"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-10-02'
+__updated__ = '2020-10-15'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -1657,7 +1657,7 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 API_SERVER_PORT=8250
 WEBAPP_PORT=8251
 
-if [ "$1" == "up" ]
+if [ "$1" == "init" ]
 then
 
     if [ "${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}" == "latest" ]
@@ -1680,6 +1680,37 @@ then
       senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
+    if [ "${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}" == "latest" ]
+    then
+        docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
+    fi
+
+    docker run \\
+      --detach \\
+      --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+      --name ${SENZING_PROJECT_NAME}-web-app-demo \\
+      --publish ${API_SERVER_PORT}:8250 \\
+      --publish ${WEBAPP_PORT}:8251 \\
+      --restart always \\
+      --user $(id -u):$(id -g) \\
+      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+      --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+      senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
+      >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
+
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${WEBAPP_PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${API_SERVER_PORT}/heartbeat"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp-demo"
+    echo "${SENZING_HORIZONTAL_RULE}"
+
+elif [ "$1" == "up" ]
+then
     if [ "${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}" == "latest" ]
     then
         docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
