@@ -943,6 +943,7 @@ then
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Try http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}/heartbeat"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-api-server"
     echo "${SENZING_HORIZONTAL_RULE}"
