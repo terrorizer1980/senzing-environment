@@ -21,9 +21,9 @@ import sys
 import time
 
 __all__ = []
-__version__ = "1.1.1"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "1.1.2"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-10-15'
+__updated__ = '2020-10-16'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -716,7 +716,6 @@ export DATABASE_PROTOCOL={database_protocol}
 export DATABASE_USERNAME={database_username}
 export POSTGRES_DIR=${{SENZING_PROJECT_DIR}}/var/postgres
 export RABBITMQ_DIR=${{SENZING_PROJECT_DIR}}/var/rabbitmq
-export SENZING_API_SERVER_URL="http://${{SENZING_DOCKER_HOST_IP_ADDR}}:8250"
 export SENZING_DATABASE_URL={senzing_database_url}
 export SENZING_DATA_DIR=${{SENZING_PROJECT_DIR}}/data
 export SENZING_DATA_VERSION_DIR=${{SENZING_PROJECT_DIR}}/data
@@ -739,6 +738,18 @@ export SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI=latest
 export SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO=latest
 export SENZING_DOCKER_IMAGE_VERSION_XTERM=latest
 export SENZING_DOCKER_IMAGE_VERSION_YUM=latest
+export SENZING_DOCKER_PORT_JUPYTER=9178
+export SENZING_DOCKER_PORT_PHPPGADMIN_HTTP=9171
+export SENZING_DOCKER_PORT_PHPPGADMIN_HTTPS=9172
+export SENZING_DOCKER_PORT_PORTAINER=9170
+export SENZING_DOCKER_PORT_POSTGRES=5432
+export SENZING_DOCKER_PORT_RABBITMQ=5672
+export SENZING_DOCKER_PORT_RABBITMQ_UI=15672
+export SENZING_DOCKER_PORT_SENZING_API_SERVER=8250
+export SENZING_DOCKER_PORT_SENZING_SQLITE_WEB=9174
+export SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI=9180
+export SENZING_DOCKER_PORT_WEB_APP_DEMO=8251
+export SENZING_DOCKER_PORT_XTERM=8254
 export SENZING_DOCKER_REGISTRY_URL=docker.io
 export SENZING_DOCKER_SOCKET=/var/run/docker.sock
 export SENZING_ETC_DIR=${{SENZING_PROJECT_DIR}}/docker-etc
@@ -756,8 +767,8 @@ export SENZING_SQL_CONNECTION="{sql_connection}"
 export SENZING_VAR_DIR=${{SENZING_PROJECT_DIR}}/var
 
 export POSTGRES_HOST=${{SENZING_DOCKER_HOST_IP_ADDR}}
-export POSTGRES_PORT=5432
 export POSTGRES_DATABASE=G2
+export SENZING_API_SERVER_URL="http://${{SENZING_DOCKER_HOST_IP_ADDR}}:${{SENZING_DOCKER_PORT_SENZING_API_SERVER}}"
 
 if [ "${{DATABASE_DATABASE}}" != "G2C.db" ]
 then
@@ -811,8 +822,6 @@ def file_portainer():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-PORT=9170
-
 if [ "$1" == "up" ]
 then
 
@@ -824,7 +833,7 @@ then
     docker run \\
       --detach \\
       --name ${SENZING_PROJECT_NAME}-portainer \\
-      --publish ${PORT}:9000 \\
+      --publish ${SENZING_DOCKER_PORT_PORTAINER}:9000 \\
       --restart always \\
       --volume ${SENZING_DOCKER_SOCKET}:/var/run/docker.sock \\
       --volume ${SENZING_PORTAINER_DIR}:/data \\
@@ -832,7 +841,7 @@ then
       >> ${SENZING_PROJECT_DIR}/var/log/portainer.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-portainer running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-portainer running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_PORTAINER}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#portainer"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -856,8 +865,6 @@ def file_postgres():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-PORT=5432
-
 if [ "$1" == "up" ]
 then
 
@@ -872,14 +879,14 @@ then
       --env POSTGRES_PASSWORD=${DATABASE_PASSWORD} \\
       --env POSTGRES_USERNAME=${DATABASE_USERNAME} \\
       --name ${SENZING_PROJECT_NAME}-postgres \\
-      --publish ${PORT}:5432 \\
+      --publish ${SENZING_DOCKER_PORT_POSTGRES}:5432 \\
       --restart always \\
       --volume ${POSTGRES_DIR}:/var/lib/postgresql/data \\
       postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES} \\
       >> ${SENZING_PROJECT_DIR}/var/log/postgres.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-postgres listening on ${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-postgres listening on ${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_POSTGRES}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Username: ${DATABASE_USERNAME} Password: ${DATABASE_PASSWORD}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#postgres"
@@ -904,8 +911,6 @@ def file_senzing_api_server():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-PORT=8250
-
 if [ "$1" == "up" ]
 then
 
@@ -919,7 +924,7 @@ then
       --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
       --interactive \\
       --name ${SENZING_PROJECT_NAME}-api-server \\
-      --publish ${PORT}:${PORT} \\
+      --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:${SENZING_DOCKER_PORT_SENZING_API_SERVER} \\
       --restart always \\
       --tty \\
       --user $(id -u):$(id -g) \\
@@ -929,7 +934,7 @@ then
       --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
       senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER} \\
-        -httpPort ${PORT} \\
+        -httpPort ${SENZING_DOCKER_PORT_SENZING_API_SERVER} \\
         -bindAddr all \\
         -iniFile /etc/opt/senzing/G2Module.ini \\
         -allowedOrigins "*" \\
@@ -937,7 +942,8 @@ then
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-api-server.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Try http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}/heartbeat"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-api-server"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1185,8 +1191,6 @@ def file_senzing_jupyter():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-PORT=9178
-
 if [ "$1" == "up" ]
 then
 
@@ -1202,7 +1206,7 @@ then
       --env SENZING_SQL_CONNECTION=${SENZING_SQL_CONNECTION} \\
       --interactive \\
       --name ${SENZING_PROJECT_NAME}-jupyter \\
-      --publish ${PORT}:8888 \\
+      --publish ${SENZING_DOCKER_PORT_JUPYTER}:8888 \\
       --restart always \\
       --tty \\
       --volume ${SENZING_PROJECT_DIR}:/notebooks/shared \\
@@ -1214,7 +1218,7 @@ then
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-jupyter.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-jupyter running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-jupyter running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_JUPYTER}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-jupyter"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1238,9 +1242,6 @@ def file_senzing_phppgadmin():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-HTTP_PORT=9171
-HTTPS_PORT=9172
-
 if [ "$1" == "up" ]
 then
 
@@ -1253,7 +1254,7 @@ then
       --detach \\
       --env PHP_PG_ADMIN_SERVER_DESC=PostgreSQL \\
       --env PHP_PG_ADMIN_SERVER_HOST=${POSTGRES_HOST} \\
-      --env PHP_PG_ADMIN_SERVER_PORT=${POSTGRES_PORT} \\
+      --env PHP_PG_ADMIN_SERVER_PORT=${SENZING_DOCKER_PORT_POSTGRES} \\
       --env PHP_PG_ADMIN_SERVER_SSL_MODE=allow \\
       --env PHP_PG_ADMIN_SERVER_DEFAULT_DB=template1 \\
       --env PHP_PG_ADMIN_SERVER_PG_DUMP_PATH=/usr/bin/pg_dump \\
@@ -1276,15 +1277,15 @@ then
       --env PHP_PG_ADMIN_AJAX_REFRESH=3 \\
       --interactive \\
       --name ${SENZING_PROJECT_NAME}-phppgadmin \\
-      --publish ${HTTP_PORT}:80 \\
-      --publish ${HTTPS_PORT}:443 \\
+      --publish ${SENZING_DOCKER_PORT_PHPPGADMIN_HTTP}:80 \\
+      --publish ${SENZING_DOCKER_PORT_PHPPGADMIN_HTTPS}:443 \\
       --restart always \\
       --tty \\
       senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-phppgadmin.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-phppgadmin running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${HTTP_PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-phppgadmin running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_PHPPGADMIN_HTTP}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-phppgadmin"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1345,8 +1346,6 @@ def file_senzing_quickstart_demo():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-PORT=8251
-
 if [ "$1" == "up" ]
 then
 
@@ -1359,7 +1358,7 @@ then
       --detach \\
       --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
       --name ${SENZING_PROJECT_NAME}-quickstart \\
-      --publish ${PORT}:8251 \\
+      --publish ${SENZING_DOCKER_PORT_WEB_APP_DEMO}:8251 \\
       --restart always \\
       --user $(id -u):$(id -g) \\
       --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
@@ -1371,7 +1370,7 @@ then
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-quickstart-demo.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-quickstart running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-quickstart running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-quickstart-demo"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1412,8 +1411,8 @@ then
       --env RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
       --interactive \\
       --name ${SENZING_PROJECT_NAME}-rabbitmq \\
-      --publish 15672:15672 \\
-      --publish 5672:5672 \\
+      --publish ${SENZING_DOCKER_PORT_RABBITMQ_UI}:15672 \\
+      --publish ${SENZING_DOCKER_PORT_RABBITMQ}:5672 \\
       --restart always \\
       --tty \\
       --volume ${RABBITMQ_DIR}:/bitnami \\
@@ -1421,7 +1420,7 @@ then
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-rabbitmq.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-rabbitmq running on http://${SENZING_DOCKER_HOST_IP_ADDR}:15672"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-rabbitmq running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_RABBITMQ_UI}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Username: ${SENZING_RABBITMQ_USERNAME} Password: ${SENZING_RABBITMQ_PASSWORD}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-rabbitmq"
@@ -1459,7 +1458,7 @@ then
       --env SQLITE_DATABASE=${DATABASE_DATABASE} \\
       --interactive \\
       --name ${SENZING_PROJECT_NAME}-sqlite-web \\
-      --publish 9174:8080 \\
+      --publish ${SENZING_DOCKER_PORT_SENZING_SQLITE_WEB}:8080 \\
       --restart always \\
       --tty \\
       --user $(id -u):$(id -g) \\
@@ -1468,7 +1467,7 @@ then
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-sqlite-web.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-sqlite-web running on http://${SENZING_DOCKER_HOST_IP_ADDR}:9174"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-sqlite-web running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_SQLITE_WEB}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-sqlite-web"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1508,6 +1507,7 @@ then
       --env SENZING_ENTITY_TYPE=GENERIC \\
       --env SENZING_RABBITMQ_HOST=${SENZING_DOCKER_HOST_IP_ADDR} \\
       --env SENZING_RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
+      --env SENZING_RABBITMQ_PORT=${SENZING_DOCKER_PORT_RABBITMQ} \\
       --env SENZING_RABBITMQ_QUEUE=${SENZING_RABBITMQ_QUEUE} \\
       --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
       --env SENZING_SUBCOMMAND=rabbitmq \\
@@ -1526,8 +1526,8 @@ then
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-stream-loader is running."
-    echo "For more information:"
-    echo "http://senzing.github.io/senzing-environment/reference#senzing-stream-loader"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-stream-loader"
     echo "${SENZING_HORIZONTAL_RULE}"
 
 elif [ "$1" == "down" ]
@@ -1561,6 +1561,7 @@ then
       --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \\
       --env SENZING_RABBITMQ_HOST=${SENZING_DOCKER_HOST_IP_ADDR} \\
       --env SENZING_RABBITMQ_PASSWORD=${SENZING_RABBITMQ_PASSWORD} \\
+      --env SENZING_RABBITMQ_PORT=${SENZING_DOCKER_PORT_RABBITMQ} \\
       --env SENZING_RABBITMQ_QUEUE=${SENZING_RABBITMQ_QUEUE} \\
       --env SENZING_RABBITMQ_USERNAME=${SENZING_RABBITMQ_USERNAME} \\
       --env SENZING_RECORD_MAX=${SENZING_RECORD_MAX} \\
@@ -1599,8 +1600,6 @@ def file_senzing_webapp():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-PORT=8251
-
 if [ "$1" == "up" ]
 then
 
@@ -1613,11 +1612,11 @@ then
       --detach \\
       --env SENZING_API_SERVER_URL=${SENZING_API_SERVER_URL} \\
       --env SENZING_WEB_SERVER_ADMIN_AUTH_MODE='JWT' \\
-      --env SENZING_WEB_SERVER_ADMIN_AUTH_PATH="http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}" \
-      --env SENZING_WEB_SERVER_PORT=${PORT} \\
+      --env SENZING_WEB_SERVER_ADMIN_AUTH_PATH="http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}" \
+      --env SENZING_WEB_SERVER_PORT=${SENZING_DOCKER_PORT_WEB_APP_DEMO} \\
       --interactive \\
       --name ${SENZING_PROJECT_NAME}-webapp \\
-      --publish ${PORT}:${PORT} \\
+      --publish ${SENZING_DOCKER_PORT_WEB_APP_DEMO}:${SENZING_DOCKER_PORT_WEB_APP_DEMO} \\
       --restart always \\
       --tty \\
       --user 0 \\
@@ -1630,7 +1629,7 @@ then
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1653,9 +1652,6 @@ def file_senzing_webapp_demo():
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
-
-API_SERVER_PORT=8250
-WEBAPP_PORT=8251
 
 if [ "$1" == "init" ]
 then
@@ -1689,8 +1685,8 @@ then
       --detach \\
       --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
       --name ${SENZING_PROJECT_NAME}-web-app-demo \\
-      --publish ${API_SERVER_PORT}:8250 \\
-      --publish ${WEBAPP_PORT}:8251 \\
+      --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:8250 \\
+      --publish ${SENZING_DOCKER_PORT_WEB_APP_DEMO}:8251 \\
       --restart always \\
       --user $(id -u):$(id -g) \\
       --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
@@ -1703,8 +1699,8 @@ then
 
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${WEBAPP_PORT}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${API_SERVER_PORT}/heartbeat"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}/heartbeat"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp-demo"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1720,8 +1716,8 @@ then
       --detach \\
       --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
       --name ${SENZING_PROJECT_NAME}-web-app-demo \\
-      --publish ${API_SERVER_PORT}:8250 \\
-      --publish ${WEBAPP_PORT}:8251 \\
+      --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:8250 \\
+      --publish ${SENZING_DOCKER_PORT_WEB_APP_DEMO}:8251 \\
       --restart always \\
       --user $(id -u):$(id -g) \\
       --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
@@ -1734,8 +1730,8 @@ then
 
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${WEBAPP_PORT}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${API_SERVER_PORT}/heartbeat"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}/heartbeat"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp-demo"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1761,8 +1757,6 @@ def file_senzing_xterm():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-PORT=8254
-
 if [ "$1" == "up" ]
 then
 
@@ -1775,7 +1769,7 @@ then
       --detach \\
       --interactive \\
       --name ${SENZING_PROJECT_NAME}-xterm \\
-      --publish ${PORT}:5000 \\
+      --publish ${SENZING_DOCKER_PORT_XTERM}:5000 \\
       --restart always \\
       --tty \\
       --user $(id -u):$(id -g) \\
@@ -1788,7 +1782,7 @@ then
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-xterm.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-xterm running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-xterm running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_XTERM}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} To enter ${SENZING_PROJECT_NAME}-xterm container, run:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} docker exec -it ${SENZING_PROJECT_NAME}-xterm /bin/bash"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
@@ -1873,8 +1867,6 @@ def file_swagger_ui():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-PORT=9180
-
 if [ "$1" == "up" ]
 then
 
@@ -1887,13 +1879,13 @@ then
       --detach \\
       --env URL=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml \\
       --name ${SENZING_PROJECT_NAME}-swagger-ui \\
-      --publish ${PORT}:8080 \\
+      --publish ${SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI}:8080 \\
       --restart always \\
       swaggerapi/swagger-ui:${SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI} \\
       >> ${SENZING_PROJECT_DIR}/var/log/swagger-ui.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-swagger-ui running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-swagger-ui running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#swagger-ui"
     echo "${SENZING_HORIZONTAL_RULE}"
