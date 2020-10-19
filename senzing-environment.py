@@ -21,7 +21,7 @@ import sys
 import time
 
 __all__ = []
-__version__ = "1.1.2"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "1.1.3"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
 __updated__ = '2020-10-19'
 
@@ -837,8 +837,8 @@ then
       --restart always \\
       --volume ${SENZING_DOCKER_SOCKET}:/var/run/docker.sock \\
       --volume ${SENZING_PORTAINER_DIR}:/data \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_PORTAINER}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_PORTAINER] \\
       portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER} \\
       >> ${SENZING_PROJECT_DIR}/var/log/portainer.log 2>&1
 
@@ -884,8 +884,8 @@ then
       --publish ${SENZING_DOCKER_PORT_POSTGRES}:5432 \\
       --restart always \\
       --volume ${POSTGRES_DIR}:/var/lib/postgresql/data \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_POSTGRES}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_POSTGRES] \\
       postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES} \\
       >> ${SENZING_PROJECT_DIR}/var/log/postgres.log 2>&1
 
@@ -937,8 +937,8 @@ then
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
       --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_SENZING_API_SERVER}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_SENZING_API_SERVER] \\
       senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER} \\
         -httpPort ${SENZING_DOCKER_PORT_SENZING_API_SERVER} \\
         -bindAddr all \\
@@ -994,8 +994,8 @@ docker run \\
   --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
   --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
   --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-  ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-  ${{SENZING_DOCKER_RUN_PARAMETERS_CONSOLE}} \\
+  ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+  ${SENZING_DOCKER_RUN_PARAMETERS_CONSOLE] \\
   senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE} /bin/bash
 """
     return 0
@@ -1022,8 +1022,8 @@ then
       --name ${SENZING_PROJECT_NAME}-db2-driver-installer \\
       --rm \\
       --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_DB2_DRIVER_INSTALLER}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_DB2_DRIVER_INSTALLER] \\
       senzing/db2-driver-installer:${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-db2-driver-installer.log 2>&1
 
@@ -1069,8 +1069,8 @@ then
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
       --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_DEBUG}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_DEBUG] \\
       senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-debug.log 2>&1
 
@@ -1181,8 +1181,8 @@ then
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
       --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER] \\
       senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-init-container.log 2>&1
 
@@ -1228,8 +1228,8 @@ then
       --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_JUPYTER}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_JUPYTER] \\
       senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER} start.sh jupyter notebook --NotebookApp.token='' \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-jupyter.log 2>&1
 
@@ -1297,8 +1297,8 @@ then
       --publish ${SENZING_DOCKER_PORT_PHPPGADMIN_HTTPS}:443 \\
       --restart always \\
       --tty \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_PHPPGADMIN}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_PHPPGADMIN] \\
       senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-phppgadmin.log 2>&1
 
@@ -1342,8 +1342,8 @@ then
       --rm \\
       --user $(id -u):$(id -g) \\
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_POSTGRESQL_CLIENT}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_POSTGRESQL_CLIENT] \\
       senzing/postgresql-client:${SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-postgresql-init.log 2>&1
 
@@ -1386,8 +1386,8 @@ then
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
       --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO] \\
       senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-quickstart-demo.log 2>&1
 
@@ -1438,8 +1438,8 @@ then
       --restart always \\
       --tty \\
       --volume ${RABBITMQ_DIR}:/bitnami \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_RABBITMQ}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_RABBITMQ] \\
       bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-rabbitmq.log 2>&1
 
@@ -1487,8 +1487,8 @@ then
       --tty \\
       --user $(id -u):$(id -g) \\
       --volume ${SENZING_VAR_DIR}/sqlite:/data \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_SQLITE_WEB}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_SQLITE_WEB] \\
       coleifer/sqlite-web:${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-sqlite-web.log 2>&1
 
@@ -1547,8 +1547,8 @@ then
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
       --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_STREAM_LOADER}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_STREAM_LOADER] \\
       senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-stream-loader.log 2>&1
 
@@ -1600,8 +1600,8 @@ then
       --rm \\
       --tty \\
       --user $(id -u):$(id -g) \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_STREAM_PRODUCER}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_STREAM_PRODUCER] \\
       senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-stream-producer.log 2>&1
 
@@ -1655,8 +1655,8 @@ then
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
       --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_ENTITY_SEARCH_WEB_APP}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_ENTITY_SEARCH_WEB_APP] \\
       senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp.log 2>&1
 
@@ -1705,8 +1705,8 @@ then
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
       --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER] \\
       senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -1728,8 +1728,8 @@ then
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
       --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO] \\
       senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -1760,8 +1760,8 @@ then
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
       --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO] \\
       senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -1815,8 +1815,8 @@ then
       --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
       --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
       --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_XTERM}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_XTERM] \\
       senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-xterm.log 2>&1
 
@@ -1870,8 +1870,8 @@ then
       --tty \\
       --user $(id -u):$(id -g) \\
       --volume ${SENZING_PROJECT_DIR}:/opt/senzing \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_YUM}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_YUM] \\
       senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM} \\
       >> ${SENZING_PROJECT_DIR}/var/log/senzing-yum.log 2>&1
 
@@ -1922,8 +1922,8 @@ then
       --name ${SENZING_PROJECT_NAME}-swagger-ui \\
       --publish ${SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI}:8080 \\
       --restart always \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_GLOBAL}} \\
-      ${{SENZING_DOCKER_RUN_PARAMETERS_SWAGGERAPI_SWAGGER_UI}} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+      ${SENZING_DOCKER_RUN_PARAMETERS_SWAGGERAPI_SWAGGER_UI] \\
       swaggerapi/swagger-ui:${SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI} \\
       >> ${SENZING_PROJECT_DIR}/var/log/swagger-ui.log 2>&1
 
