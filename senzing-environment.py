@@ -968,6 +968,9 @@ function up {
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_SENZING_API_SERVER} \\
+        ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
+        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER} \\
             -httpPort ${SENZING_DOCKER_PORT_SENZING_API_SERVER} \\
             -bindAddr all \\
@@ -1043,6 +1046,9 @@ ${SENZING_SUDO} docker run \\
     --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
     ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
     ${SENZING_DOCKER_RUN_PARAMETERS_CONSOLE} \\
+    ${SENZING_NETWORK_PARAMETER} \\
+    ${SENZING_OPT_IBM_DIR_PARAMETER} \\
+    ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
     senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE} /bin/bash
 """
     return 0
@@ -1134,6 +1140,10 @@ function up {
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_DEBUG} \\
+        ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
+        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
+        ${SENZING_RUNAS_USER_PARAMETER} \\
         senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-debug.log 2>&1
 
@@ -1260,6 +1270,9 @@ function up {
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \\
+        ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
+        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-init-container.log 2>&1
 
@@ -1327,6 +1340,9 @@ function up {
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_JUPYTER} \\
+        ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
+        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER} start.sh jupyter notebook --NotebookApp.token='' \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-jupyter.log 2>&1
 
@@ -1411,6 +1427,9 @@ function up {
         --tty \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_PHPPGADMIN} \\
+        ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
+        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-phppgadmin.log 2>&1
 
@@ -1471,6 +1490,7 @@ function up {
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_POSTGRESQL_CLIENT} \\
+        ${SENZING_NETWORK_PARAMETER} \\
         senzing/postgresql-client:${SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-postgresql-init.log 2>&1
 
@@ -1535,6 +1555,9 @@ function up {
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
+        ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
+        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-quickstart-demo.log 2>&1
 
@@ -1602,6 +1625,7 @@ function up {
         --volume ${RABBITMQ_DIR}:/bitnami \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_RABBITMQ} \\
+        ${SENZING_NETWORK_PARAMETER} \\
         bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-rabbitmq.log 2>&1
 
@@ -1666,6 +1690,7 @@ function up {
         --volume ${SENZING_VAR_DIR}/sqlite:/data \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_SQLITE_WEB} \\
+        ${SENZING_NETWORK_PARAMETER} \\
         coleifer/sqlite-web:${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-sqlite-web.log 2>&1
 
@@ -1741,6 +1766,9 @@ function up {
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_STREAM_LOADER} \\
+        ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
+        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-stream-loader.log 2>&1
 
@@ -1809,6 +1837,7 @@ function up {
         --user $(id -u):$(id -g) \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_STREAM_PRODUCER} \\
+        ${SENZING_NETWORK_PARAMETER} \\
         senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-stream-producer.log 2>&1
 
@@ -1879,6 +1908,7 @@ function up {
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_ENTITY_SEARCH_WEB_APP} \\
+        ${SENZING_NETWORK_PARAMETER} \\
         senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp.log 2>&1
 
@@ -1944,6 +1974,9 @@ function init {
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \\
+        ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
+        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -1967,6 +2000,9 @@ function init {
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
+        ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
+        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -1999,6 +2035,9 @@ function up {
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
+        ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
+        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -2071,6 +2110,7 @@ function up {
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_XTERM} \\
+        ${SENZING_NETWORK_PARAMETER} \\
         senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-xterm.log 2>&1
 
@@ -2141,6 +2181,7 @@ function up {
         --volume ${SENZING_PROJECT_DIR}:/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_YUM} \\
+        ${SENZING_NETWORK_PARAMETER} \\
         senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-yum.log 2>&1
 
@@ -2208,6 +2249,7 @@ function up {
         --restart always \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_SWAGGERAPI_SWAGGER_UI} \\
+        ${SENZING_NETWORK_PARAMETER} \\
         swaggerapi/swagger-ui:${SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI} \\
         >> ${SENZING_PROJECT_DIR}/var/log/swagger-ui.log 2>&1
 
