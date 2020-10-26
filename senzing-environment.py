@@ -1096,14 +1096,14 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 if [ "$1" == "up" ]; then
-  up
+    up
 elif [ "$1" == "down" ]; then
-  down
+    down
 elif [ "$1" == "restart" ]; then
-  down
-  up
+    down
+    up
 else
-  usage
+    usage
 fi
 """
     return 0
@@ -1313,22 +1313,22 @@ function up {
     fi
 
     ${SENZING_SUDO} docker run \\
-      --detach \\
-      --env SENZING_SQL_CONNECTION=${SENZING_SQL_CONNECTION} \\
-      --interactive \\
-      --name ${SENZING_PROJECT_NAME}-jupyter \\
-      --publish ${SENZING_DOCKER_PORT_JUPYTER}:8888 \\
-      --restart always \\
-      --tty \\
-      --volume ${SENZING_PROJECT_DIR}:/notebooks/shared \\
-      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
-      ${SENZING_DOCKER_RUN_PARAMETERS_JUPYTER} \\
-      senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER} start.sh jupyter notebook --NotebookApp.token='' \\
-      >> ${SENZING_PROJECT_DIR}/var/log/senzing-jupyter.log 2>&1
+        --detach \\
+        --env SENZING_SQL_CONNECTION=${SENZING_SQL_CONNECTION} \\
+        --interactive \\
+        --name ${SENZING_PROJECT_NAME}-jupyter \\
+        --publish ${SENZING_DOCKER_PORT_JUPYTER}:8888 \\
+        --restart always \\
+        --tty \\
+        --volume ${SENZING_PROJECT_DIR}:/notebooks/shared \\
+        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+        ${SENZING_DOCKER_RUN_PARAMETERS_JUPYTER} \\
+        senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER} start.sh jupyter notebook --NotebookApp.token='' \\
+        >> ${SENZING_PROJECT_DIR}/var/log/senzing-jupyter.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-jupyter running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_JUPYTER}"
@@ -1756,7 +1756,7 @@ function down {
 }
 
 function usage {
-    echo "usage: $0 [up | down]"
+    echo "usage: $0 [up | down | restart]"
     echo "For more information:"
     echo "http://senzing.github.io/senzing-environment/reference#senzing-stream-loader"
 }
@@ -1984,23 +1984,22 @@ function up {
     fi
 
     ${SENZING_SUDO} docker run \\
-      --detach \\
-      --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-      --name ${SENZING_PROJECT_NAME}-web-app-demo \\
-      --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:8250 \\
-      --publish ${SENZING_DOCKER_PORT_WEB_APP_DEMO}:8251 \\
-      --restart always \\
-      --user $(id -u):$(id -g) \\
-      --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-      --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-      --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-      --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-      --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-      ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
-      ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
-      senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
-      >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
-
+        --detach \\
+        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+        --name ${SENZING_PROJECT_NAME}-web-app-demo \\
+        --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:8250 \\
+        --publish ${SENZING_DOCKER_PORT_WEB_APP_DEMO}:8251 \\
+        --restart always \\
+        --user $(id -u):$(id -g) \\
+        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+        ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
+        senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
+        >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}"
@@ -2176,14 +2175,14 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 if [ "$1" == "up" ]; then
-  up
+    up
 elif [ "$1" == "down" ]; then
-  down
+    down
 elif [ "$1" == "restart" ]; then
-  down
-  up
+    down
+    up
 else
-  usage
+    usage
 fi
 """
     return 0
