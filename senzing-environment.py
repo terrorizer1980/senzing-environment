@@ -1524,6 +1524,7 @@ function up {
         --detach \\
         --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
         --name ${SENZING_PROJECT_NAME}-quickstart \\
+        --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:8250 \\
         --publish ${SENZING_DOCKER_PORT_WEB_APP_DEMO}:8251 \\
         --restart always \\
         --user $(id -u):$(id -g) \\
