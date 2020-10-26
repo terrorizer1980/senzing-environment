@@ -838,6 +838,7 @@ function up {
         --volume ${SENZING_PORTAINER_DIR}:/data \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_PORTAINER} \\
+        ${SENZING_NETWORK_PARAMETER} \\
         portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/portainer.log 2>&1
 
@@ -900,6 +901,7 @@ function up {
         --volume ${POSTGRES_DIR}:/var/lib/postgresql/data \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_POSTGRES} \\
+        ${SENZING_NETWORK_PARAMETER} \\
         postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES} \\
         >> ${SENZING_PROJECT_DIR}/var/log/postgres.log 2>&1
 
@@ -965,12 +967,11 @@ function up {
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
         --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_SENZING_API_SERVER} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
-        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER} \\
             -httpPort ${SENZING_DOCKER_PORT_SENZING_API_SERVER} \\
             -bindAddr all \\
@@ -1043,12 +1044,11 @@ ${SENZING_SUDO} docker run \\
     --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
     --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
     --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+    --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
     --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
     ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
     ${SENZING_DOCKER_RUN_PARAMETERS_CONSOLE} \\
     ${SENZING_NETWORK_PARAMETER} \\
-    ${SENZING_OPT_IBM_DIR_PARAMETER} \\
-    ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
     senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE} /bin/bash
 """
     return 0
@@ -1074,6 +1074,7 @@ function up {
         --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_DB2_DRIVER_INSTALLER} \\
+        ${SENZING_NETWORK_PARAMETER} \\
         senzing/db2-driver-installer:${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-db2-driver-installer.log 2>&1
 
@@ -1137,12 +1138,11 @@ function up {
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
         --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_DEBUG} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
-        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         ${SENZING_RUNAS_USER_PARAMETER} \\
         senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-debug.log 2>&1
@@ -1267,12 +1267,11 @@ function up {
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
         --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
-        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-init-container.log 2>&1
 
@@ -1333,16 +1332,16 @@ function up {
         --publish ${SENZING_DOCKER_PORT_JUPYTER}:8888 \\
         --restart always \\
         --tty \\
-        --volume ${SENZING_PROJECT_DIR}:/notebooks/shared \\
         --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
+        --volume ${SENZING_PROJECT_DIR}:/notebooks/shared \\
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_JUPYTER} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
-        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER} start.sh jupyter notebook --NotebookApp.token='' \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-jupyter.log 2>&1
 
@@ -1396,40 +1395,38 @@ function up {
 
     ${SENZING_SUDO} docker run \\
         --detach \\
+        --env PHP_PG_ADMIN_AJAX_REFRESH=3 \\
+        --env PHP_PG_ADMIN_AUTO_COMPLETE="default on" \\
+        --env PHP_PG_ADMIN_DEFAULT_LANG=auto \\
+        --env PHP_PG_ADMIN_EXTRA_LOGIN_SECURITY=false \\
+        --env PHP_PG_ADMIN_HELP_BASE=http://www.postgresql.org/docs/%s/interactive/ \\
+        --env PHP_PG_ADMIN_LEFT_WIDTH=200 \\
+        --env PHP_PG_ADMIN_MAX_CHARS=50 \\
+        --env PHP_PG_ADMIN_MAX_ROWS=30 \\
+        --env PHP_PG_ADMIN_MIN_PASSWORD_LENGTH=1 \\
+        --env PHP_PG_ADMIN_OWNED_ONLY=false \\
+        --env PHP_PG_ADMIN_SERVER_DEFAULT_DB=template1 \\
         --env PHP_PG_ADMIN_SERVER_DESC=PostgreSQL \\
         --env PHP_PG_ADMIN_SERVER_HOST=${POSTGRES_HOST} \\
+        --env PHP_PG_ADMIN_SERVER_PG_DUMPALL_PATH=/usr/bin/pg_dumpall \\
+        --env PHP_PG_ADMIN_SERVER_PG_DUMP_PATH=/usr/bin/pg_dump \\
         --env PHP_PG_ADMIN_SERVER_PORT=${SENZING_DOCKER_PORT_POSTGRES} \\
         --env PHP_PG_ADMIN_SERVER_SSL_MODE=allow \\
-        --env PHP_PG_ADMIN_SERVER_DEFAULT_DB=template1 \\
-        --env PHP_PG_ADMIN_SERVER_PG_DUMP_PATH=/usr/bin/pg_dump \\
-        --env PHP_PG_ADMIN_SERVER_PG_DUMPALL_PATH=/usr/bin/pg_dumpall \\
-        --env PHP_PG_ADMIN_DEFAULT_LANG=auto \\
-        --env PHP_PG_ADMIN_AUTO_COMPLETE="default on" \\
-        --env PHP_PG_ADMIN_EXTRA_LOGIN_SECURITY=false \\
-        --env PHP_PG_ADMIN_OWNED_ONLY=false \\
-        --env PHP_PG_ADMIN_SHOW_COMMENTS=true \\
         --env PHP_PG_ADMIN_SHOW_ADVANCED=false \\
-        --env PHP_PG_ADMIN_SHOW_SYSTEM=false \\
-        --env PHP_PG_ADMIN_MIN_PASSWORD_LENGTH=1 \\
-        --env PHP_PG_ADMIN_LEFT_WIDTH=200 \\
-        --env PHP_PG_ADMIN_THEME=default \\
+        --env PHP_PG_ADMIN_SHOW_COMMENTS=true \\
         --env PHP_PG_ADMIN_SHOW_OIDS=false \\
-        --env PHP_PG_ADMIN_MAX_ROWS=30 \\
-        --env PHP_PG_ADMIN_MAX_CHARS=50 \\
+        --env PHP_PG_ADMIN_SHOW_SYSTEM=false \\
+        --env PHP_PG_ADMIN_THEME=default \\
         --env PHP_PG_ADMIN_USE_XHTML_STRICT=false \\
-        --env PHP_PG_ADMIN_HELP_BASE=http://www.postgresql.org/docs/%s/interactive/ \\
-        --env PHP_PG_ADMIN_AJAX_REFRESH=3 \\
         --interactive \\
         --name ${SENZING_PROJECT_NAME}-phppgadmin \\
-        --publish ${SENZING_DOCKER_PORT_PHPPGADMIN_HTTP}:80 \\
         --publish ${SENZING_DOCKER_PORT_PHPPGADMIN_HTTPS}:443 \\
+        --publish ${SENZING_DOCKER_PORT_PHPPGADMIN_HTTP}:80 \\
         --restart always \\
         --tty \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_PHPPGADMIN} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
-        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-phppgadmin.log 2>&1
 
@@ -1552,12 +1549,11 @@ function up {
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
         --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
-        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-quickstart-demo.log 2>&1
 
@@ -1763,12 +1759,11 @@ function up {
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
         --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_STREAM_LOADER} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
-        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-stream-loader.log 2>&1
 
@@ -1905,6 +1900,7 @@ function up {
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
         --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_ENTITY_SEARCH_WEB_APP} \\
@@ -1971,12 +1967,11 @@ function init {
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
         --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
-        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -1997,12 +1992,11 @@ function init {
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
         --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
-        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -2032,12 +2026,11 @@ function up {
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
         --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_OPT_IBM_DIR_PARAMETER} \\
-        ${SENZING_OPT_MICROSOFT_DIR_PARAMETER} \\
         senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -2107,6 +2100,7 @@ function up {
         --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
         --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
         --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
         --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_XTERM} \\
