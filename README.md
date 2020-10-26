@@ -4,7 +4,7 @@
 
 The [senzing-environment.py](senzing-environment.py) program
 creates shell scripts in a `docker-bin/` directory
-that are used to start and stop Senzing Docker containers.
+that are used to start, stop and restart Senzing Docker containers.
 
 ## Overview
 
