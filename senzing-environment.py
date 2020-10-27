@@ -757,7 +757,7 @@ export SENZING_ETC_DIR=${{SENZING_PROJECT_DIR}}/docker-etc
 export SENZING_G2_DIR=${{SENZING_PROJECT_DIR}}{senzing_project_dir_suffix}
 export SENZING_HORIZONTAL_RULE="=============================================================================="
 export SENZING_INPUT_URL="https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json"
-export SENZING_ODBCSYSINI_PARAMETER=""
+export SENZING_MSSQL_PARAMETERS=""
 export SENZING_OPT_IBM_DIR=${{SENZING_PROJECT_DIR}}/docker-db2
 export SENZING_OPT_MICROSOFT_DIR=${{SENZING_PROJECT_DIR}}/opt-microsoft
 export SENZING_PORTAINER_DIR=${{SENZING_PROJECT_DIR}}/var/portainer
@@ -976,7 +976,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_SENZING_API_SERVER} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_ODBCSYSINI_PARAMETER} \\
+        ${SENZING_MSSQL_PARAMETERS} \\
         senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER} \\
             -httpPort ${SENZING_DOCKER_PORT_SENZING_API_SERVER} \\
             -bindAddr all \\
@@ -1054,7 +1054,7 @@ ${SENZING_SUDO} docker run \\
     ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
     ${SENZING_DOCKER_RUN_PARAMETERS_CONSOLE} \\
     ${SENZING_NETWORK_PARAMETER} \\
-    ${SENZING_ODBCSYSINI_PARAMETER} \\
+    ${SENZING_MSSQL_PARAMETERS} \\
     senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE} /bin/bash
 """
     return 0
@@ -1149,7 +1149,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_DEBUG} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_ODBCSYSINI_PARAMETER} \\
+        ${SENZING_MSSQL_PARAMETERS} \\
         ${SENZING_RUNAS_USER_PARAMETER} \\
         senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-debug.log 2>&1
@@ -1279,7 +1279,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_ODBCSYSINI_PARAMETER} \\
+        ${SENZING_MSSQL_PARAMETERS} \\
         senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-init-container.log 2>&1
 
@@ -1350,7 +1350,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_JUPYTER} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_ODBCSYSINI_PARAMETER} \\
+        ${SENZING_MSSQL_PARAMETERS} \\
         senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER} start.sh jupyter notebook --NotebookApp.token='' \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-jupyter.log 2>&1
 
@@ -1452,6 +1452,7 @@ else
 fi
 """
     return 0
+
 
 def file_senzing_phppgadmin():
     """#!/usr/bin/env bash
@@ -1625,7 +1626,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_ODBCSYSINI_PARAMETER} \\
+        ${SENZING_MSSQL_PARAMETERS} \\
         senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-quickstart-demo.log 2>&1
 
@@ -1836,7 +1837,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_STREAM_LOADER} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_ODBCSYSINI_PARAMETER} \\
+        ${SENZING_MSSQL_PARAMETERS} \\
         senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-stream-loader.log 2>&1
 
@@ -2045,7 +2046,7 @@ function init {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_ODBCSYSINI_PARAMETER} \\
+        ${SENZING_MSSQL_PARAMETERS} \\
         senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -2071,7 +2072,7 @@ function init {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_ODBCSYSINI_PARAMETER} \\
+        ${SENZING_MSSQL_PARAMETERS} \\
         senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -2106,7 +2107,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_ODBCSYSINI_PARAMETER} \\
+        ${SENZING_MSSQL_PARAMETERS} \\
         senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -2181,7 +2182,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_XTERM} \\
         ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_ODBCSYSINI_PARAMETER} \\
+        ${SENZING_MSSQL_PARAMETERS} \\
         senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-xterm.log 2>&1
 
