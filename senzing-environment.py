@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.2.1"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-10-27'
+__updated__ = '2020-10-28'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -761,6 +761,7 @@ export SENZING_MSSQL_PARAMETERS=""
 export SENZING_OPT_IBM_DIR=${{SENZING_PROJECT_DIR}}/docker-db2
 export SENZING_OPT_MICROSOFT_DIR=${{SENZING_PROJECT_DIR}}/opt-microsoft
 export SENZING_PORTAINER_DIR=${{SENZING_PROJECT_DIR}}/var/portainer
+export SENZING_PRIVILEGED_PARAMETER="--privileged"
 export SENZING_PROJECT_NAME={project_name}
 export SENZING_RABBITMQ_PASSWORD=bitnami
 export SENZING_RABBITMQ_QUEUE=senzing-rabbitmq-queue
@@ -843,6 +844,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_PORTAINER} \\
         ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         portainer/portainer:${SENZING_DOCKER_IMAGE_VERSION_PORTAINER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/portainer.log 2>&1
 
@@ -906,6 +908,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_POSTGRES} \\
         ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         postgres:${SENZING_DOCKER_IMAGE_VERSION_POSTGRES} \\
         >> ${SENZING_PROJECT_DIR}/var/log/postgres.log 2>&1
 
@@ -977,6 +980,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_SENZING_API_SERVER} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_MSSQL_PARAMETERS} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER} \\
             -httpPort ${SENZING_DOCKER_PORT_SENZING_API_SERVER} \\
             -bindAddr all \\
@@ -1055,6 +1059,7 @@ ${SENZING_SUDO} docker run \\
     ${SENZING_DOCKER_RUN_PARAMETERS_CONSOLE} \\
     ${SENZING_NETWORK_PARAMETER} \\
     ${SENZING_MSSQL_PARAMETERS} \\
+    ${SENZING_PRIVILEGED_PARAMETER} \\
     senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE} /bin/bash
 """
     return 0
@@ -1081,6 +1086,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_DB2_DRIVER_INSTALLER} \\
         ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/db2-driver-installer:${SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-db2-driver-installer.log 2>&1
 
@@ -1150,6 +1156,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_DEBUG} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_MSSQL_PARAMETERS} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         ${SENZING_RUNAS_USER_PARAMETER} \\
         senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-debug.log 2>&1
@@ -1280,6 +1287,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_MSSQL_PARAMETERS} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-init-container.log 2>&1
 
@@ -1351,6 +1359,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_JUPYTER} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_MSSQL_PARAMETERS} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/jupyter:${SENZING_DOCKER_IMAGE_VERSION_JUPYTER} start.sh jupyter notebook --NotebookApp.token='' \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-jupyter.log 2>&1
 
@@ -1413,6 +1422,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_MSSQL_DRIVER_INSTALLER} \\
         ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/apt:${SENZING_DOCKER_IMAGE_VERSION_APT} -y install msodbcsql17 \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-mssql-driver-installer.log 2>&1
 
@@ -1499,6 +1509,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_PHPPGADMIN} \\
         ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/phppgadmin:${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-phppgadmin.log 2>&1
 
@@ -1560,6 +1571,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_POSTGRESQL_CLIENT} \\
         ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/postgresql-client:${SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-postgresql-init.log 2>&1
 
@@ -1627,6 +1639,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_MSSQL_PARAMETERS} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-quickstart-demo.log 2>&1
 
@@ -1695,6 +1708,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_RABBITMQ} \\
         ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         bitnami/rabbitmq:${SENZING_DOCKER_IMAGE_VERSION_RABBITMQ} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-rabbitmq.log 2>&1
 
@@ -1760,6 +1774,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_SQLITE_WEB} \\
         ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         coleifer/sqlite-web:${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-sqlite-web.log 2>&1
 
@@ -1838,6 +1853,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_STREAM_LOADER} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_MSSQL_PARAMETERS} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-stream-loader.log 2>&1
 
@@ -1907,6 +1923,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_STREAM_PRODUCER} \\
         ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-stream-producer.log 2>&1
 
@@ -1979,6 +1996,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_ENTITY_SEARCH_WEB_APP} \\
         ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp.log 2>&1
 
@@ -2047,6 +2065,7 @@ function init {
         ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_MSSQL_PARAMETERS} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -2073,6 +2092,7 @@ function init {
         ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_MSSQL_PARAMETERS} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -2108,6 +2128,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_MSSQL_PARAMETERS} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
 
@@ -2183,6 +2204,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_XTERM} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_MSSQL_PARAMETERS} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-xterm.log 2>&1
 
@@ -2254,6 +2276,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_YUM} \\
         ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM} \\
         >> ${SENZING_PROJECT_DIR}/var/log/senzing-yum.log 2>&1
 
@@ -2322,6 +2345,7 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_SWAGGERAPI_SWAGGER_UI} \\
         ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
         swaggerapi/swagger-ui:${SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI} \\
         >> ${SENZING_PROJECT_DIR}/var/log/swagger-ui.log 2>&1
 
