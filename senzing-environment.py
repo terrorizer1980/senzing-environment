@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.2.1"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-10-28'
+__updated__ = '2020-10-29'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -736,7 +736,7 @@ export SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB=latest
 export SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER=latest
 export SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER=latest
 export SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI=latest
-export SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO=latest
+export SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO=2.0.0
 export SENZING_DOCKER_IMAGE_VERSION_XTERM=latest
 export SENZING_DOCKER_IMAGE_VERSION_YUM=latest
 export SENZING_DOCKER_PORT_JUPYTER=9178
