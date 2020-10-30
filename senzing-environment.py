@@ -21,7 +21,7 @@ import sys
 import time
 
 __all__ = []
-__version__ = "1.2.1"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "1.2.2"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
 __updated__ = '2020-10-29'
 
@@ -736,7 +736,7 @@ export SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB=latest
 export SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER=latest
 export SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER=latest
 export SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI=latest
-export SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO=2.0.0
+export SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO=latest
 export SENZING_DOCKER_IMAGE_VERSION_XTERM=latest
 export SENZING_DOCKER_IMAGE_VERSION_YUM=latest
 export SENZING_DOCKER_PORT_JUPYTER=9178
@@ -1260,8 +1260,58 @@ echo "${SENZING_HORIZONTAL_RULE}"
     return 0
 
 
+def file_senzing_info():
+    """#!/usr/bin/env bash
+
+# --- Main --------------------------------------------------------------------
+
+SCRIPT_DIR="$( cd "$( dirname "${{BASH_SOURCE[0]}}" )" >/dev/null 2>&1 && pwd )"
+source ${{SCRIPT_DIR}}/docker-environment-vars.sh
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+COLUMN_WIDTH_1=${{#SENZING_PROJECT_NAME}}
+COLUMN_WIDTH=$((${{COLUMN_WIDTH_1}}+12))
+
+DOCKER_CONTAINERS=(
+    "${{SENZING_PROJECT_NAME}}-api-server;${{SENZING_DOCKER_PORT_SENZING_API_SERVER}}"
+    "${{SENZING_PROJECT_NAME}}-jupyter;${{SENZING_DOCKER_PORT_JUPYTER}}"
+    "${{SENZING_PROJECT_NAME}}-phppgadmin;${{SENZING_DOCKER_PORT_PHPPGADMIN_HTTP}}"
+    "${{SENZING_PROJECT_NAME}}-portainer;${{SENZING_DOCKER_PORT_PORTAINER}}"
+    "${{SENZING_PROJECT_NAME}}-quickstart;${{SENZING_DOCKER_PORT_WEB_APP_DEMO}}"
+    "${{SENZING_PROJECT_NAME}}-rabbit;${{SENZING_DOCKER_PORT_RABBITMQ_UI}}"
+    "${{SENZING_PROJECT_NAME}}-sqlite-web;${{SENZING_DOCKER_PORT_SENZING_SQLITE_WEB}}"
+    "${{SENZING_PROJECT_NAME}}-swagger-ui;${{SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI}}"
+    "${{SENZING_PROJECT_NAME}}-webapp;${{SENZING_DOCKER_PORT_WEB_APP_DEMO}}"
+    "${{SENZING_PROJECT_NAME}}-xterm;${{SENZING_DOCKER_PORT_XTERM}}"
+)
+
+echo "${{SENZING_HORIZONTAL_RULE}}"
+echo "${{SENZING_HORIZONTAL_RULE:0:2}} Version: {environment_version} Updated: {environment_updated}"
+echo "${{SENZING_HORIZONTAL_RULE:0:2}}"
+
+for DOCKER_CONTAINER in ${{DOCKER_CONTAINERS[@]}};
+do
+    IFS=";" read -r -a CONTAINER_DATA <<< "${{DOCKER_CONTAINER}}"
+    CONTAINER_NAME="${{CONTAINER_DATA[0]}}                           "
+    CONTAINER_PORT="${{CONTAINER_DATA[1]}}"
+    if [ "$( docker container inspect -f '{{{{.State.Status}}}}' ${{CONTAINER_NAME}} 2>/dev/null )" == "running" ]; then
+        printf "${{SENZING_HORIZONTAL_RULE:0:2}} %-${{COLUMN_WIDTH}}s   ${{GREEN}}up${{NC}} http://${{SENZING_DOCKER_HOST_IP_ADDR}}:${{CONTAINER_PORT}}\\n" ${{CONTAINER_NAME}}
+    else
+        printf "${{SENZING_HORIZONTAL_RULE:0:2}} %-${{COLUMN_WIDTH}}s ${{RED}}down${{NC}} http://${{SENZING_DOCKER_HOST_IP_ADDR}}:${{CONTAINER_PORT}}\\n" ${{CONTAINER_NAME}}
+    fi
+done
+
+echo "${{SENZING_HORIZONTAL_RULE}}"
+"""
+    return 0
+
+
 def file_senzing_init_container():
     """#!/usr/bin/env bash
+
 # --- Functions ---------------------------------------------------------------
 
 function up {
@@ -2591,6 +2641,8 @@ def project_create_docker_environment_vars(project_dir, project_name, docker_hos
         "database_protocol": parsed_database_connection.get("scheme", ""),
         "database_username": parsed_database_connection.get("username", ""),
         "docker_host_ip_addr": docker_host_ip_addr,
+        "environment_updated": __updated__,
+        "environment_version": __version__,
         "project_dir": project_dir,
         "project_name": project_name,
         "senzing_database_url": senzing_database_url,
@@ -2602,6 +2654,12 @@ def project_create_docker_environment_vars(project_dir, project_name, docker_hos
     with open(filename, 'w') as file:
         logging.info(message_warning(165, filename))
         file.write(file_docker_environment_vars.__doc__.format(**variables))
+    os.chmod(filename, 0o755)
+
+    filename = "{0}/senzing-info.sh".format(output_directory)
+    with open(filename, 'w') as file:
+        logging.info(message_warning(165, filename))
+        file.write(file_senzing_info.__doc__.format(**variables))
     os.chmod(filename, 0o755)
 
 
@@ -2630,6 +2688,8 @@ def project_create_docker_environment_vars_macos(project_dir, project_name, dock
         "database_protocol": parsed_database_url.get("protocol", ""),
         "database_username": parsed_database_url.get("username", ""),
         "docker_host_ip_addr": docker_host_ip_addr,
+        "environment_updated": __updated__,
+        "environment_version": __version__,
         "project_dir": project_dir,
         "project_name": project_name,
         "senzing_database_url": g2_database_url,
@@ -2643,6 +2703,11 @@ def project_create_docker_environment_vars_macos(project_dir, project_name, dock
         file.write(file_docker_environment_vars.__doc__.format(**variables))
     os.chmod(filename, 0o755)
 
+    filename = "{0}/senzing-info.sh".format(output_directory)
+    with open(filename, 'w') as file:
+        logging.info(message_warning(165, filename))
+        file.write(file_senzing_info.__doc__.format(**variables))
+    os.chmod(filename, 0o755)
 
 def project_create_setupenv_docker(config):
 
@@ -2803,6 +2868,7 @@ def do_add_docker_support_linux(args):
         "senzing-db2-driver-installer.sh": file_senzing_db2_driver_installer,
         "senzing-debug.sh": file_senzing_debug,
         "senzing-down.sh": file_senzing_down,
+        "senzing-info.sh": file_senzing_info,
         "senzing-init-container.sh": file_senzing_init_container,
         "senzing-jupyter.sh": file_senzing_jupyter,
         "senzing-mssql-driver-installer.sh": file_senzing_mssql_driver_installer,
@@ -2864,6 +2930,7 @@ def do_add_docker_support_macos(args):
         "senzing-db2-driver-installer.sh": file_senzing_db2_driver_installer,
         "senzing-debug.sh": file_senzing_debug,
         "senzing-down.sh": file_senzing_down,
+        "senzing-info.sh": file_senzing_info,
         "senzing-init-container.sh": file_senzing_init_container,
         "senzing-jupyter.sh": file_senzing_jupyter,
         "senzing-mssql-driver-installer.sh": file_senzing_mssql_driver_installer,
