@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.2.2"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-10-29'
+__updated__ = '2020-10-30'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -1285,6 +1285,7 @@ DOCKER_CONTAINERS=(
     "${{SENZING_PROJECT_NAME}}-sqlite-web;${{SENZING_DOCKER_PORT_SENZING_SQLITE_WEB}}"
     "${{SENZING_PROJECT_NAME}}-swagger-ui;${{SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI}}"
     "${{SENZING_PROJECT_NAME}}-webapp;${{SENZING_DOCKER_PORT_WEB_APP_DEMO}}"
+    "${{SENZING_PROJECT_NAME}}-web-app-demo;${{SENZING_DOCKER_PORT_WEB_APP_DEMO}}"
     "${{SENZING_PROJECT_NAME}}-xterm;${{SENZING_DOCKER_PORT_XTERM}}"
 )
 
