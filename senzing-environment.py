@@ -1289,7 +1289,7 @@ DOCKER_CONTAINERS=(
 )
 
 echo "${{SENZING_HORIZONTAL_RULE}}"
-echo "${{SENZING_HORIZONTAL_RULE:0:2}} senzing-environment version: {environment_version} updated: {environment_updated}"
+echo "${{SENZING_HORIZONTAL_RULE:0:2}} Version: {environment_version} Updated: {environment_updated}"
 echo "${{SENZING_HORIZONTAL_RULE:0:2}}"
 
 for DOCKER_CONTAINER in ${{DOCKER_CONTAINERS[@]}};
