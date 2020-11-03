@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.2.2"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-10-30'
+__updated__ = '2020-11-03'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -1276,21 +1276,25 @@ COLUMN_WIDTH_1=${{#SENZING_PROJECT_NAME}}
 COLUMN_WIDTH=$((${{COLUMN_WIDTH_1}}+12))
 
 DOCKER_CONTAINERS=(
-    "${{SENZING_PROJECT_NAME}}-api-server;${{SENZING_DOCKER_PORT_SENZING_API_SERVER}}"
-    "${{SENZING_PROJECT_NAME}}-jupyter;${{SENZING_DOCKER_PORT_JUPYTER}}"
-    "${{SENZING_PROJECT_NAME}}-phppgadmin;${{SENZING_DOCKER_PORT_PHPPGADMIN_HTTP}}"
-    "${{SENZING_PROJECT_NAME}}-portainer;${{SENZING_DOCKER_PORT_PORTAINER}}"
-    "${{SENZING_PROJECT_NAME}}-quickstart;${{SENZING_DOCKER_PORT_WEB_APP_DEMO}}"
-    "${{SENZING_PROJECT_NAME}}-rabbit;${{SENZING_DOCKER_PORT_RABBITMQ_UI}}"
-    "${{SENZING_PROJECT_NAME}}-sqlite-web;${{SENZING_DOCKER_PORT_SENZING_SQLITE_WEB}}"
-    "${{SENZING_PROJECT_NAME}}-swagger-ui;${{SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI}}"
-    "${{SENZING_PROJECT_NAME}}-webapp;${{SENZING_DOCKER_PORT_WEB_APP_DEMO}}"
-    "${{SENZING_PROJECT_NAME}}-web-app-demo;${{SENZING_DOCKER_PORT_WEB_APP_DEMO}}"
-    "${{SENZING_PROJECT_NAME}}-xterm;${{SENZING_DOCKER_PORT_XTERM}}"
+    "${{SENZING_PROJECT_NAME}}-api-server;${{SENZING_DOCKER_PORT_SENZING_API_SERVER}};senzing/senzing-api-server:${{SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}}"
+    "${{SENZING_PROJECT_NAME}}-jupyter;${{SENZING_DOCKER_PORT_JUPYTER}};senzing/jupyter:${{SENZING_DOCKER_IMAGE_VERSION_JUPYTER}}"
+    "${{SENZING_PROJECT_NAME}}-phppgadmin;${{SENZING_DOCKER_PORT_PHPPGADMIN_HTTP}};senzing/phppgadmin:${{SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}}"
+    "${{SENZING_PROJECT_NAME}}-portainer;${{SENZING_DOCKER_PORT_PORTAINER}};portainer/portainer:${{SENZING_DOCKER_IMAGE_VERSION_PORTAINER}}"
+    "${{SENZING_PROJECT_NAME}}-quickstart;${{SENZING_DOCKER_PORT_WEB_APP_DEMO}};senzing/web-app-demo:${{SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}}"
+    "${{SENZING_PROJECT_NAME}}-rabbit;${{SENZING_DOCKER_PORT_RABBITMQ_UI}};bitnami/rabbitmq:${{SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}}"
+    "${{SENZING_PROJECT_NAME}}-sqlite-web;${{SENZING_DOCKER_PORT_SENZING_SQLITE_WEB}};coleifer/sqlite-web:${{SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}}"
+    "${{SENZING_PROJECT_NAME}}-swagger-ui;${{SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI}};swaggerapi/swagger-ui:${{SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}}"
+    "${{SENZING_PROJECT_NAME}}-webapp;${{SENZING_DOCKER_PORT_WEB_APP_DEMO}};senzing/entity-search-web-app:${{SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}}"
+    "${{SENZING_PROJECT_NAME}}-xterm;${{SENZING_DOCKER_PORT_XTERM}};senzing/xterm:${{SENZING_DOCKER_IMAGE_VERSION_XTERM}}"
 )
 
 echo "${{SENZING_HORIZONTAL_RULE}}"
-echo "${{SENZING_HORIZONTAL_RULE:0:2}} Version: {environment_version} Updated: {environment_updated}"
+echo "${{SENZING_HORIZONTAL_RULE:0:2}} senzing-info.sh {environment_version} ({environment_updated})"
+if [[ ( -n "$(command -v jq)" ) ]]; then
+    SENZING_VERSION_API=$(jq --raw-output ".VERSION" ../g2/g2BuildVersion.json)
+    SENZING_VERSION_DATA=$(jq --raw-output ".DATA_VERSION" ../g2/g2BuildVersion.json)
+    echo "${{SENZING_HORIZONTAL_RULE:0:2}} senzing api: ${{SENZING_VERSION_API}}  data: ${{SENZING_VERSION_DATA}}"
+fi
 echo "${{SENZING_HORIZONTAL_RULE:0:2}}"
 
 for DOCKER_CONTAINER in ${{DOCKER_CONTAINERS[@]}};
@@ -1298,10 +1302,11 @@ do
     IFS=";" read -r -a CONTAINER_DATA <<< "${{DOCKER_CONTAINER}}"
     CONTAINER_NAME="${{CONTAINER_DATA[0]}}                           "
     CONTAINER_PORT="${{CONTAINER_DATA[1]}}"
+    CONTAINER_VERSION="${{CONTAINER_DATA[2]}}"
     if [ "$( docker container inspect -f '{{{{.State.Status}}}}' ${{CONTAINER_NAME}} 2>/dev/null )" == "running" ]; then
-        printf "${{SENZING_HORIZONTAL_RULE:0:2}} %-${{COLUMN_WIDTH}}s   ${{GREEN}}up${{NC}} http://${{SENZING_DOCKER_HOST_IP_ADDR}}:${{CONTAINER_PORT}}\\n" ${{CONTAINER_NAME}}
+        printf "${{SENZING_HORIZONTAL_RULE:0:2}} %-${{COLUMN_WIDTH}}s   ${{GREEN}}up${{NC}} http://${{SENZING_DOCKER_HOST_IP_ADDR}}:${{CONTAINER_PORT}}   ${{CONTAINER_VERSION}}\\n" ${{CONTAINER_NAME}}
     else
-        printf "${{SENZING_HORIZONTAL_RULE:0:2}} %-${{COLUMN_WIDTH}}s ${{RED}}down${{NC}} http://${{SENZING_DOCKER_HOST_IP_ADDR}}:${{CONTAINER_PORT}}\\n" ${{CONTAINER_NAME}}
+        printf "${{SENZING_HORIZONTAL_RULE:0:2}} %-${{COLUMN_WIDTH}}s ${{RED}}down${{NC}} http://${{SENZING_DOCKER_HOST_IP_ADDR}}:${{CONTAINER_PORT}}   ${{CONTAINER_VERSION}}\\n" ${{CONTAINER_NAME}}
     fi
 done
 
