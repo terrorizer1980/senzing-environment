@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.2.2"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-11-03'
+__updated__ = '2020-11-04'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -758,6 +758,7 @@ export SENZING_G2_DIR=${{SENZING_PROJECT_DIR}}{senzing_project_dir_suffix}
 export SENZING_HORIZONTAL_RULE="=============================================================================="
 export SENZING_INPUT_URL="https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json"
 export SENZING_MSSQL_PARAMETERS=""
+# export SENZING_NETWORK_PARAMETER="--net senzing-up"
 export SENZING_OPT_IBM_DIR=${{SENZING_PROJECT_DIR}}/docker-db2
 export SENZING_OPT_MICROSOFT_DIR=${{SENZING_PROJECT_DIR}}/opt-microsoft
 export SENZING_PORTAINER_DIR=${{SENZING_PROJECT_DIR}}/var/portainer
@@ -2714,6 +2715,7 @@ def project_create_docker_environment_vars_macos(project_dir, project_name, dock
         logging.info(message_warning(165, filename))
         file.write(file_senzing_info.__doc__.format(**variables))
     os.chmod(filename, 0o755)
+
 
 def project_create_setupenv_docker(config):
 
