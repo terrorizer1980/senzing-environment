@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.2.2"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-11-04'
+__updated__ = '2020-11-05'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -2036,7 +2036,7 @@ function up {
         --detach \\
         --env SENZING_API_SERVER_URL=${SENZING_API_SERVER_URL} \\
         --env SENZING_WEB_SERVER_ADMIN_AUTH_MODE='JWT' \\
-        --env SENZING_WEB_SERVER_ADMIN_AUTH_PATH="http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}" \
+        --env SENZING_WEB_SERVER_ADMIN_AUTH_PATH="http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}" \\
         --env SENZING_WEB_SERVER_PORT=${SENZING_DOCKER_PORT_WEB_APP_DEMO} \\
         --interactive \\
         --name ${SENZING_PROJECT_NAME}-webapp \\
