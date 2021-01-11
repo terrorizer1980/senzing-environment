@@ -14,6 +14,15 @@ These are "one-time tasks" which may already have been completed.
 1. The following software programs need to be installed:
     1. [docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md)
 
+## Demonstrations
+
+1. [Demonstration 1](#demonstration-1)
+    1. Show how to
+1. [Demonstration 2](#demonstration-2)
+    1. Bring up `docker-compose` formation.
+1. [Demonstration 3](#demonstration-3)
+    1. Show use of most `docker-bin` shell scripts.
+
 ## Demonstration 1
 
 Quick start demonstrations.
@@ -172,7 +181,7 @@ This Docker formation uses the docker-compose YAML file described in
    data in different phases of the data flow:
     1. [RabbitMQ](http://localhost:15672) (username: user  password: bitnami)
     1. [PostgreSQL](http://localhost:9171) (username: postgres password: postgres)
-    1. [Senzing API](http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml)
+    1. [Senzing API](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml)
     1. [Entity search webapp](http://localhost:8251/)
     1. [Jupyter notebooks](http://localhost:9178/)
     1. [X-Term](http://localhost:8254/) for Senzing command line tools
