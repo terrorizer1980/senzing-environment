@@ -53,9 +53,9 @@
     ```console
     $ ./docker-bin/portainer.sh up
     ==============================================================================
-    == portainer running on http://nnn.nnn.nnn.nnn:9170
+    == portainer running on http://0.0.0.0:9170
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#portainer
+    == http://hub.senzing.com/senzing-environment/reference#portainer
     ==============================================================================
     ```
 
@@ -76,11 +76,11 @@
 
     ```console
     $ ./postgres.sh up
-     :
     ==============================================================================
-    == postgres listening on nnn.nnn.nnn.nnn:5432
+    == postgres listening on 0.0.0.0:5432
+    == Username: na Password: na
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#postgres
+    == http://hub.senzing.com/senzing-environment/reference#postgres
     ==============================================================================
     ```
 
@@ -96,11 +96,17 @@
 
     ```console
     $ ./docker-bin/senzing-api-server.sh up
-     :
     ==============================================================================
-    == api-server running on http://nnn.nnn.nnn.nnn:8250
+    == api-server running on http://0.0.0.0:8250
+    == Try http://0.0.0.0:8250/heartbeat
+    == Mount information: (Format: in container > on host)
+    ==   /etc/opt/senzing  > /home/senzing/senzing-project/docker-etc
+    ==   /opt/senzing/data > /home/senzing/senzing-project/data
+    ==   /opt/senzing/g2   > /home/senzing/senzing-project
+    ==   /var/opt/senzing  > /home/senzing/senzing-project/var
+    == Log: /home/senzing/senzing-project/var/log/senzing-api-server.log
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#senzing-api-server
+    == http://hub.senzing.com/senzing-environment/reference#senzing-api-server
     ==============================================================================
     ```
 
@@ -141,8 +147,13 @@
     $ ./docker-bin/senzing-console.sh up
     ==============================================================================
     == To exit console, type 'exit'
+    == Mount information: (Format: in container > on host)
+    ==   /etc/opt/senzing  > /home/senzing/senzing-project/docker-etc
+    ==   /opt/senzing/data > /home/senzing/senzing-project/data
+    ==   /opt/senzing/g2   > /home/senzing/senzing-project
+    ==   /var/opt/senzing  > /home/senzing/senzing-project/var
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#senzing-console
+    == http://hub.senzing.com/senzing-environment/reference#senzing-console
     ==============================================================================
     I have no name!@aaaaaaaaaaaa:/app$
     ```
@@ -164,6 +175,9 @@
     sudo access is required to change file ownership.  Please enter your password:
     ==============================================================================
     == db2-driver-installer has completed.
+    == Log: /home/senzing/senzing-project/var/log/senzing-db2-driver-installer.log
+    == For more information:
+    == http://hub.senzing.com/senzing-environment/reference#senzing-db2-driver-installer
     ==============================================================================
     ```
 
@@ -188,8 +202,14 @@
     == debug is running.
     == To enter debug container, run:
     == sudo docker exec -it debug /bin/bash
+    == Mount information: (Format: in container > on host)
+    ==   /etc/opt/senzing  > /home/senzing/senzing-project/docker-etc
+    ==   /opt/senzing/data > /home/senzing/senzing-project/data
+    ==   /opt/senzing/g2   > /home/senzing/senzing-project
+    ==   /var/opt/senzing  > /home/senzing/senzing-project/var
+    == Log: /home/senzing/senzing-project/var/log/senzing-debug.log
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#senzing-debug
+    == http://hub.senzing.com/senzing-environment/reference#senzing-debug
     ==============================================================================
     ```
 
@@ -215,7 +235,7 @@
     ==============================================================================
     == Bringing down all docker containers.
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#senzing-down
+    == http://hub.senzing.com/senzing-environment/reference#senzing-down
     ==
     == Done.
     ==============================================================================
@@ -226,6 +246,43 @@
 1. **Synopsis:**
 
    Runs [senzing-environment](https://github.com/Senzing/senzing-environment) task.
+
+### senzing-info
+
+1. **Synopsis:**
+
+   Lists status of all Senzing containers. Format, by column:
+
+    1. Container name
+    1. Status:  **up** or **down**
+    1. Host name and port
+    1. Docker container image and version
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-info.sh
+    ==============================================================================
+    == senzing-info.sh M.m.P (yyyy-mm-dd)
+    == senzing api: M.m.P  data: M.m.P
+    ==
+    == api-server    up http://0.0.0.0:8250   senzing/senzing-api-server:latest
+    == jupyter     down http://0.0.0.0:9178   senzing/jupyter:latest
+    == phppgadmin  down http://0.0.0.0:9171   senzing/phppgadmin:1.0.0
+    == portainer   down http://0.0.0.0:9170   portainer/portainer:latest
+    == quickstart  down http://0.0.0.0:8251   senzing/web-app-demo:latest
+    == rabbit      down http://0.0.0.0:15672   bitnami/rabbitmq:3.8.2
+    == sqlite-web  down http://0.0.0.0:9174   coleifer/sqlite-web:latest
+    == swagger-ui  down http://0.0.0.0:9180   swaggerapi/swagger-ui:latest
+    == webapp      down http://0.0.0.0:8251   senzing/entity-search-web-app:latest
+    == xterm       down http://0.0.0.0:8254   senzing/xterm:latest
+    ==
+    == For more information:
+    == http://hub.senzing.com/senzing-environment/reference#senzing-info
+    ==============================================================================
+    ```
 
 ### senzing-init-container
 
@@ -241,6 +298,9 @@
     $ ./docker-bin/senzing-init-container.sh up
     ==============================================================================
     == init-container has completed.
+    == Log: /home/senzing/senzing-project/var/log/senzing-init-container.log
+    == For more information:
+    == http://hub.senzing.com/senzing-environment/reference#senzing-init-container
     ==============================================================================
     ```
 
@@ -257,9 +317,37 @@
     ```console
     $ ./docker-bin/senzing-jupyter.sh up
     ==============================================================================
-    == jupyter running on http://nnn.nnn.nnn.nnn:9178
+    == jupyter running on http://0.0.0.0:9178
+    == Mount information: (Format: in container > on host)
+    ==   /etc/opt/senzing  > /home/senzing/senzing-project/docker-etc
+    ==   /notebooks/shared > /home/senzing/senzing-project
+    ==   /opt/senzing/data > /home/senzing/senzing-project/data
+    ==   /opt/senzing/g2   > /home/senzing/senzing-project
+    ==   /var/opt/senzing  > /home/senzing/senzing-project/var
+    == Log: /home/senzing/senzing-project/var/log/senzing-jupyter.log
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#senzing-jupyter
+    == http://hub.senzing.com/senzing-environment/reference#senzing-jupyter
+    ==============================================================================
+    ```
+
+### senzing-mssql-driver-installer
+
+1. **Synopsis:**
+
+   Runs [apt](https://github.com/Senzing/docker-apt) install of `msodbcsql17`.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-mssql-driver-installer.sh up
+    sudo access is required to change file ownership.  Please enter your password:
+    ==============================================================================
+    == mssql-driver-installer has completed.
+    == Log: /home/senzing/senzing-project/var/log/senzing-mssql-driver-installer.log
+    == For more information:
+    == http://hub.senzing.com/senzing-environment/reference#senzing-mssql-driver-installer
     ==============================================================================
     ```
 
@@ -276,9 +364,10 @@
     ```console
     $ ./docker-bin/senzing-phppgadmin.sh up
     ==============================================================================
-    == phppgadmin running on http://nnn.nnn.nnn.nnn:9171
+    == phppgadmin running on http://0.0.0.0:9171
+    == Log: /home/senzing/senzing-project/var/log/senzing-phppgadmin.log
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#senzing-phppgadmin
+    == http://hub.senzing.com/senzing-environment/reference#senzing-phppgadmin
     ==============================================================================
     ```
 
@@ -298,6 +387,9 @@
     $ ./docker-bin/senzing-postgresql-init.sh up
     ==============================================================================
     == postgresql-init has completed.
+    == Log: /home/senzing/senzing-project/var/log/senzing-postgresql-init.log
+    == For more information:
+    == http://hub.senzing.com/senzing-environment/reference#senzing-postgresql-init
     ==============================================================================
     ```
 
@@ -314,9 +406,15 @@
     ```console
     $ ./docker-bin/senzing-quickstart-demo.sh up
     ==============================================================================
-    == quickstart running on http://nnn.nnn.nnn.nnn:8251
+    == quickstart running on http://0.0.0.0:8251
+    == Mount information: (Format: in container > on host)
+    ==   /etc/opt/senzing  > /home/senzing/senzing-project/docker-etc
+    ==   /opt/senzing/data > /home/senzing/senzing-project/data
+    ==   /opt/senzing/g2   > /home/senzing/senzing-project
+    ==   /var/opt/senzing  > /home/senzing/senzing-project/var
+    == Log: /home/senzing/senzing-project/var/log/senzing-quickstart-demo.log
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#senzing-quickstart-demo
+    == http://hub.senzing.com/senzing-environment/reference#senzing-quickstart-demo
     ==============================================================================
     ```
 
@@ -333,10 +431,13 @@
     ```console
     $ ./docker-bin/senzing-rabbitmq.sh up
     ==============================================================================
-    == rabbitmq running on http://nnn.nnn.nnn.nnn:15672
-    == Username: xxxxxxxx Password: xxxxxxxx
+    == rabbitmq running on http://0.0.0.0:15672
+    == Username: user Password: bitnami
+    == Mount information: (Format: in container > on host)
+    ==   /bitnami  > /home/senzing/senzing-project/var/rabbitmq
+    == Log: /home/senzing/senzing-project/var/log/senzing-rabbitmq.log
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#senzing-rabbitmq
+    == http://hub.senzing.com/senzing-environment/reference#senzing-rabbitmq
     ==============================================================================
     ```
 
@@ -352,11 +453,13 @@
 
     ```console
     $ ./docker-bin/senzing-sqlite-web.sh up
-     :
     ==============================================================================
-    == sqlite-web running on http://nnn.nnn.nnn.nnn:9174
+    == sqlite-web running on http://0.0.0.0:9174
+    == Mount information: (Format: in container > on host)
+    ==   /data  > /home/senzing/senzing-project/var/sqlite
+    == Log: /home/senzing/senzing-project/var/log/senzing-sqlite-web.log
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#senzing-sqlite-web
+    == http://hub.senzing.com/senzing-environment/reference#senzing-sqlite-web
     ==============================================================================
     ```
 
@@ -374,8 +477,14 @@
     $ ./docker-bin/senzing-stream-loader.sh up
     ==============================================================================
     == stream-loader is running.
-    For more information:
-    http://senzing.github.io/senzing-environment/reference#senzing-stream-loader
+    == Mount information: (Format: in container > on host)
+    ==   /etc/opt/senzing  > /home/senzing/senzing-project/docker-etc
+    ==   /opt/senzing/data > /home/senzing/senzing-project/data
+    ==   /opt/senzing/g2   > /home/senzing/senzing-project
+    ==   /var/opt/senzing  > /home/senzing/senzing-project/var
+    == Log: /home/senzing/senzing-project/var/log/senzing-stream-loader.log
+    == For more information:
+    == http://hub.senzing.com/senzing-environment/reference#senzing-stream-loader
     ==============================================================================
     ```
 
@@ -393,8 +502,9 @@
     $ ./docker-bin/senzing-stream-producer.sh up
     ==============================================================================
     == stream-producer is running.
+    == Log: /home/senzing/senzing-project/var/log/senzing-stream-producer.log
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#senzing-stream-producer
+    == http://hub.senzing.com/senzing-environment/reference#senzing-stream-producer
     ==============================================================================
     ```
 
@@ -414,10 +524,16 @@
     ```console
     $ ./docker-bin/senzing-webapp-demo.sh up
     ==============================================================================
-    == webapp running on http://nnn.nnn.nnn.nnn:8251
-    == api-server running on http://nnn.nnn.nnn.nnn:8250/heartbeat
+    == webapp running on http://0.0.0.0:8251
+    == api-server running on http://0.0.0.0:8250/heartbeat
+    == Mount information: (Format: in container > on host)
+    ==   /etc/opt/senzing  > /home/senzing/senzing-project/docker-etc
+    ==   /opt/senzing/data > /home/senzing/senzing-project/data
+    ==   /opt/senzing/g2   > /home/senzing/senzing-project
+    ==   /var/opt/senzing  > /home/senzing/senzing-project/var
+    == Log: /home/senzing/senzing-project/var/log/senzing-webapp-demo.log
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#senzing-webapp-demo
+    == http://hub.senzing.com/senzing-environment/reference#senzing-webapp-demo
     ==============================================================================
     ```
 
@@ -434,9 +550,15 @@
     ```console
     $ ./docker-bin/senzing-webapp.sh up
     ==============================================================================
-    == webapp running on http://nnn.nnn.nnn.nnn:8251
+    == webapp running on http://0.0.0.0:8251
+    == Mount information: (Format: in container > on host)
+    ==   /etc/opt/senzing  > /home/senzing/senzing-project/docker-etc
+    ==   /opt/senzing/data > /home/senzing/senzing-project/data
+    ==   /opt/senzing/g2   > /home/senzing/senzing-project
+    ==   /var/opt/senzing  > /home/senzing/senzing-project/var
+    == Log: /home/senzing/senzing-project/var/log/senzing-webapp.log
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#senzing-webapp
+    == http://hub.senzing.com/senzing-environment/reference#senzing-webapp
     ==============================================================================
     ```
 
@@ -453,11 +575,17 @@
     ```console
     $ ./docker-bin/senzing-xterm.sh up
     ==============================================================================
-    == xterm running on http://nnn.nnn.nnn.nnn:8254
+    == xterm running on http://0.0.0.0:8254
     == To enter xterm container, run:
     == docker exec -it xterm /bin/bash
+    == Mount information: (Format: in container > on host)
+    ==   /etc/opt/senzing  > /home/senzing/senzing-project/docker-etc
+    ==   /opt/senzing/data > /home/senzing/senzing-project/data
+    ==   /opt/senzing/g2   > /home/senzing/senzing-project
+    ==   /var/opt/senzing  > /home/senzing/senzing-project/var
+    == Log: /home/senzing/senzing-project/var/log/senzing-xterm.log
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#senzing-xterm
+    == http://hub.senzing.com/senzing-environment/reference#senzing-xterm
     ==============================================================================
     ```
 
@@ -488,11 +616,11 @@
 
     ```console
     $ ./docker-bin/swagger-ui.sh up
-     :
     ==============================================================================
-    == swagger-ui running on http://nnn.nnn.nnn.nnn:9180
+    == swagger-ui running on http://0.0.0.0:9180
+    == Log: /home/senzing/senzing-project/var/log/swagger-ui.log
     == For more information:
-    == http://senzing.github.io/senzing-environment/reference#swagger-ui
+    == http://hub.senzing.com/senzing-environment/reference#swagger-ui
     ==============================================================================
     ```
 
