@@ -185,18 +185,6 @@ This Docker formation uses the docker-compose YAML file described in
     1. [Entity search webapp](http://localhost:8251/)
     1. [Jupyter notebooks](http://localhost:9178/)
     1. [X-Term](http://localhost:8254/) for Senzing command line tools
-        1. Command:
-
-            ```console
-            poc_snapshot.py -o /var/opt/senzing/test-snapshot
-            ```
-
-        1. Where did it go on the workstation?
-           Answer:
-
-            ```console
-            ls ${SENZING_PROJECT_DIR}/var
-            ```
 
 ### Bring down Docker formation
 
