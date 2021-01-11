@@ -369,7 +369,7 @@ Depending on the distribution of Linux, there are different ways of installing S
 
 1. View [RabbitMQ](http://localhost:15672)
 
-### Bring up mock-data-generator
+### Bring up Senzing stream-producer
 
 1. Execute script to docker run `senzing/mock-data-generator`.
    This is a job that will run to completion and exit.
@@ -415,7 +415,7 @@ Depending on the distribution of Linux, there are different ways of installing S
     ~/senzing-demo-project-3/docker-bin/senzing-api-server.sh up
     ```
 
-1. View [Senzing API](http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml)
+1. View [Senzing API](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml)
 
 ### Bring up Senzing Entity Search WebApp
 
