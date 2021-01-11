@@ -21,9 +21,9 @@ import sys
 import time
 
 __all__ = []
-__version__ = "1.2.2"  # See https://www.python.org/dev/peps/pep-0396/
+__version__ = "1.2.3"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2020-11-05'
+__updated__ = '2021-01-11'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -993,6 +993,11 @@ function up {
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Try http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}/heartbeat"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on workstation)"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-api-server"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1041,6 +1046,11 @@ fi
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} To exit ${SENZING_PROJECT_NAME}-console, type 'exit'"
+echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on workstation)"
+echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
+echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
+echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
+echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
 echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-console"
 echo "${SENZING_HORIZONTAL_RULE}"
@@ -1166,6 +1176,11 @@ function up {
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-debug is running."
     echo "${SENZING_HORIZONTAL_RULE:0:2} To enter ${SENZING_PROJECT_NAME}-debug container, run:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} sudo docker exec -it ${SENZING_PROJECT_NAME}-debug /bin/bash"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on workstation)"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-debug"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1422,6 +1437,12 @@ function up {
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-jupyter running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_JUPYTER}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on workstation)"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /notebooks/shared > ${SENZING_PROJECT_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-jupyter"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1702,6 +1723,11 @@ function up {
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-quickstart running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on workstation)"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-quickstart-demo"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1772,6 +1798,8 @@ function up {
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-rabbitmq running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_RABBITMQ_UI}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Username: ${SENZING_RABBITMQ_USERNAME} Password: ${SENZING_RABBITMQ_PASSWORD}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on workstation)"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /bitnami  > ${RABBITMQ_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-rabbitmq"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1837,6 +1865,8 @@ function up {
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-sqlite-web running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_SQLITE_WEB}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on workstation)"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /data  > ${SENZING_VAR_DIR}/sqlite"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-sqlite-web"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1916,6 +1946,11 @@ function up {
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-stream-loader is running."
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on workstation)"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-stream-loader"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2059,6 +2094,11 @@ function up {
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on workstation)"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2156,6 +2196,11 @@ function init {
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}/heartbeat"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on workstation)"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-webapp-demo"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2269,6 +2314,11 @@ function up {
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-xterm running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_XTERM}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} To enter ${SENZING_PROJECT_NAME}-xterm container, run:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} docker exec -it ${SENZING_PROJECT_NAME}-xterm /bin/bash"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on workstation)"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} http://senzing.github.io/senzing-environment/reference#senzing-xterm"
     echo "${SENZING_HORIZONTAL_RULE}"
