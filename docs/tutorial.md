@@ -14,6 +14,15 @@ These are "one-time tasks" which may already have been completed.
 1. The following software programs need to be installed:
     1. [docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md)
 
+## Demonstrations
+
+1. [Demonstration 1](#demonstration-1)
+    1. Show how to
+1. [Demonstration 2](#demonstration-2)
+    1. Bring up `docker-compose` formation.
+1. [Demonstration 3](#demonstration-3)
+    1. Show use of most `docker-bin` shell scripts.
+
 ## Demonstration 1
 
 Quick start demonstrations.
@@ -24,7 +33,7 @@ See:
 
 ## Demonstration 2
 
-### Create second Senzing project with Docker support
+### Create Docker support for second Senzing project
 
 1. Specify the location of the Senzing project on the host system.
    Example:
@@ -109,17 +118,6 @@ See:
    Notice the addition of `docker-bin`, `docker-etc`, and `docker-setupEnv`.
    The rest of `${SENZING_PROJECT_DIR}` is not modified.
 
-1. Perform work-around for sym-link in sub-directories.
-   Example:
-
-    ```console
-    mv ${SENZING_PROJECT_DIR}/resources/config ${SENZING_PROJECT_DIR}/resources/config.$(date +%s)
-    mv ${SENZING_PROJECT_DIR}/resources/schema ${SENZING_PROJECT_DIR}/resources/schema.$(date +%s)
-
-    cp -r /opt/senzing/g2/resources/config/ ${SENZING_PROJECT_DIR}/resources/
-    cp -r /opt/senzing/g2/resources/schema/ ${SENZING_PROJECT_DIR}/resources/
-    ```
-
 ### Bring up Docker formation
 
 This Docker formation uses the docker-compose YAML file described in
@@ -183,22 +181,10 @@ This Docker formation uses the docker-compose YAML file described in
    data in different phases of the data flow:
     1. [RabbitMQ](http://localhost:15672) (username: user  password: bitnami)
     1. [PostgreSQL](http://localhost:9171) (username: postgres password: postgres)
-    1. [Senzing API](http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml)
+    1. [Senzing API](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml)
     1. [Entity search webapp](http://localhost:8251/)
     1. [Jupyter notebooks](http://localhost:9178/)
     1. [X-Term](http://localhost:8254/) for Senzing command line tools
-        1. Command:
-
-            ```console
-            poc_snapshot.py -o /var/opt/senzing/test-snapshot
-            ```
-
-        1. Where did it go on the workstation?
-           Answer:
-
-            ```console
-            ls ${SENZING_PROJECT_DIR}/var
-            ```
 
 ### Bring down Docker formation
 
@@ -254,12 +240,32 @@ Depending on the distribution of Linux, there are different ways of installing S
 ### Identify host IP address
 
 1. :pencil2: Set the [SENZING_DOCKER_HOST_IP_ADDR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_docker_host_ip_addr) environment variable.
-   See [SENZING_DOCKER_HOST_IP_ADDR](https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md#senzing_docker_host_ip_addr) for help.
    Example:
 
     ```console
     export SENZING_DOCKER_HOST_IP_ADDR=10.1.1.100
     ```
+
+    1. To find the value for `SENZING_DOCKER_HOST_IP_ADDR` use Python interactively:
+       Example:
+
+        ```console
+        python3
+        ```
+
+       Copy and paste the following lines into the Python REPL (Read-Evaluate-Print Loop):
+
+        ```python
+        import socket
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.connect(("8.8.8.8", 80))
+        print("export SENZING_DOCKER_HOST_IP_ADDR={0}".format(sock.getsockname()[0]))
+        sock.close()
+        quit()
+        ```
+
+       Copy and paste the printed `export` statement into the host terminal.
 
 ### Identify Senzing database
 
@@ -284,15 +290,15 @@ Depending on the distribution of Linux, there are different ways of installing S
 
     ```ini
     [PIPELINE]
-     SUPPORTPATH=/home/username/senzing-demo-project-1/data
-     CONFIGPATH=/home/username/senzing-demo-project-1/etc
-     RESOURCEPATH=/home/username/senzing-demo-project-1/resources
+     SUPPORTPATH=/home/username/senzing-demo-project-3/data
+     CONFIGPATH=/home/username/senzing-demo-project-3/etc
+     RESOURCEPATH=/home/username/senzing-demo-project-3/resources
 
     [SQL]
-     CONNECTION=postgresql://postgres:postgres@10.1.1.102:5432:G2/
+     CONNECTION=postgresql://postgres:postgres@10.1.1.100:5432:G2/
     ```
 
-### Create third Senzing project with Docker support
+### Create Docker support for third Senzing project
 
 1. Give the Senzing project a name.
    The name is used as a prefix in docker container names.
@@ -318,17 +324,6 @@ Depending on the distribution of Linux, there are different ways of installing S
       senzing/senzing-environment add-docker-support-linux
     ```
 
-1. Perform work-around for sym-link in sub-directories.
-   Example:
-
-    ```console
-    mv ${SENZING_PROJECT_DIR}/resources/config ${SENZING_PROJECT_DIR}/resources/config.$(date +%s)
-    mv ${SENZING_PROJECT_DIR}/resources/schema ${SENZING_PROJECT_DIR}/resources/schema.$(date +%s)
-
-    cp -r /opt/senzing/g2/resources/config/ ${SENZING_PROJECT_DIR}/resources/
-    cp -r /opt/senzing/g2/resources/schema/ ${SENZING_PROJECT_DIR}/resources/
-    ```
-
 ### Bring up PostgreSQL database
 
 :thinking: **Optional:** If a PostgreSQL is not already available,
@@ -339,14 +334,14 @@ Depending on the distribution of Linux, there are different ways of installing S
    Example:
 
     ```console
-    ~/senzing-demo-project-3/docker-bin/postgres.sh
+    ~/senzing-demo-project-3/docker-bin/postgres.sh up
     ```
 
 1. Bring up phpPgAdmin.
    Example:
 
     ```console
-    ~/senzing-demo-project-3/docker-bin/senzing-phppgadmin.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-phppgadmin.sh up
     ```
 
 1. View [phpPgAdmin](http://localhost:9171)
@@ -356,7 +351,7 @@ Depending on the distribution of Linux, there are different ways of installing S
    Example:
 
     ```console
-    ~/senzing-demo-project-3/docker-bin/senzing-postgresql-init.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-postgresql-init.sh up
     ```
 
 ### Bring up RabbitMQ
@@ -366,19 +361,19 @@ Depending on the distribution of Linux, there are different ways of installing S
    Example:
 
     ```console
-    ~/senzing-demo-project-3/docker-bin/senzing-rabbitmq.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-rabbitmq.sh up
     ```
 
 1. View [RabbitMQ](http://localhost:15672)
 
-### Bring up mock-data-generator
+### Bring up Senzing stream-producer
 
 1. Execute script to docker run `senzing/mock-data-generator`.
    This is a job that will run to completion and exit.
    Example:
 
     ```console
-    ~/senzing-demo-project-3/docker-bin/senzing-mock-data-generator.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-stream-producer.sh up
     ```
 
 ### Bring up Senzing init container
@@ -396,7 +391,7 @@ Depending on the distribution of Linux, there are different ways of installing S
    Example:
 
     ```console
-    ~/senzing-demo-project-3/docker-bin/senzing-init-container.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-init-container.sh up
     ```
 
 ### Bring up Senzing stream-loader
@@ -405,7 +400,7 @@ Depending on the distribution of Linux, there are different ways of installing S
    Example:
 
     ```console
-    ~/senzing-demo-project-3/docker-bin/senzing-stream-loader.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-stream-loader.sh up
     ```
 
 ### Bring up Senzing API Server
@@ -414,10 +409,10 @@ Depending on the distribution of Linux, there are different ways of installing S
    Example:
 
     ```console
-    ~/senzing-demo-project-3/docker-bin/senzing-api-server.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-api-server.sh up
     ```
 
-1. View [Senzing API](http://editor.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml)
+1. View [Senzing API](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml)
 
 ### Bring up Senzing Entity Search WebApp
 
@@ -425,7 +420,7 @@ Depending on the distribution of Linux, there are different ways of installing S
    Example:
 
     ```console
-    ~/senzing-demo-project-3/docker-bin/senzing-webapp.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-webapp.sh up
     ```
 
 1. View  [Entity search webapp](http://localhost:8251/)
@@ -436,7 +431,7 @@ Depending on the distribution of Linux, there are different ways of installing S
    Example:
 
     ```console
-    ~/senzing-demo-project-3/docker-bin/senzing-jupyter.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-jupyter.sh up
     ```
 
 1. View [Jupyter notebooks](http://localhost:9178/)
@@ -447,30 +442,56 @@ Depending on the distribution of Linux, there are different ways of installing S
    Example:
 
     ```console
-    ~/senzing-demo-project-3/docker-bin/senzing-xterm.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-xterm.sh up
     ```
 
 1. View [X-Term](http://localhost:8254/)
 
-1. "ssh" into x-term docker container.
+### Bring up Swagger UI
+
+1. Execute script to docker run `senzing/xterm`.
    Example:
 
     ```console
-    ~/senzing-demo-project-3/docker-bin/senzing-xterm-shell.sh
+    ~/senzing-demo-project-3/docker-bin/swagger-ui.sh up
     ```
 
-### Bring up Senzing debug
+1. View [Swagger UI](http://localhost:9180/)
 
-1. Execute script to docker run `senzing/senzing-debug`.
+### Show info
+
+1. Execute script to view status of docker containers.
    Example:
 
     ```console
-    ~/senzing-demo-project-3/docker-bin/senzing-debug.sh
+    ~/senzing-demo-project-3/docker-bin/senzing-info.sh
     ```
 
-1. Enter the Senzing debug docker container.
+1. View [X-Term](http://localhost:8254/)
+
+### Bring up Senzing console
+
+1. Execute script to docker run `senzing/senzing-console`.
    Example:
 
     ```console
-    docker exec -it ${SENZING_PROJECT_NAME}-debug /bin/bash
+    ~/senzing-demo-project-3/docker-bin/senzing-console.sh up
+    ```
+
+1. When done, type "exit".
+
+### Bring down everything
+
+1. Execute script to stop all containers in this demonstration.
+   Example:
+
+    ```console
+    ~/senzing-demo-project-3/docker-bin/senzing-down.sh
+    ```
+
+1. Verify containers are down.
+   Example:
+
+    ```console
+    ~/senzing-demo-project-3/docker-bin/senzing-info.sh
     ```
