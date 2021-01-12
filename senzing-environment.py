@@ -705,6 +705,9 @@ def file_docker_environment_vars():
 # For more information about the environment variables, see
 # https://github.com/Senzing/knowledge-base/blob/master/lists/environment-variables.md
 
+# NOTE:  SENZING_DOCKER_HOST_IP_ADDR cannot be "localhost",
+#        that would tell containers to look inside the container
+#        rather than the host.
 export SENZING_DOCKER_HOST_IP_ADDR={docker_host_ip_addr}
 export SENZING_PROJECT_DIR={project_dir}
 

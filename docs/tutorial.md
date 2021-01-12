@@ -456,6 +456,8 @@ Depending on the distribution of Linux, there are different ways of installing S
     ~/senzing-demo-project-3/docker-bin/swagger-ui.sh up
     ```
 
+1. View [Swagger UI](http://localhost:9180/)
+
 ### Show info
 
 1. Execute script to view status of docker containers.
