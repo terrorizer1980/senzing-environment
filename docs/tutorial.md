@@ -447,6 +447,26 @@ Depending on the distribution of Linux, there are different ways of installing S
 
 1. View [X-Term](http://localhost:8254/)
 
+### Bring up Swagger UI
+
+1. Execute script to docker run `senzing/xterm`.
+   Example:
+
+    ```console
+    ~/senzing-demo-project-3/docker-bin/swagger-ui.sh up
+    ```
+
+### Show info
+
+1. Execute script to view status of docker containers.
+   Example:
+
+    ```console
+    ~/senzing-demo-project-3/docker-bin/senzing-info.sh
+    ```
+
+1. View [X-Term](http://localhost:8254/)
+
 ### Bring up Senzing console
 
 1. Execute script to docker run `senzing/senzing-console`.
@@ -454,4 +474,22 @@ Depending on the distribution of Linux, there are different ways of installing S
 
     ```console
     ~/senzing-demo-project-3/docker-bin/senzing-console.sh up
+    ```
+
+1. When done, type "exit".
+
+### Bring down everything
+
+1. Execute script to stop all containers in this demonstration.
+   Example:
+
+    ```console
+    ~/senzing-demo-project-3/docker-bin/senzing-down.sh
+    ```
+
+1. Verify containers are down.
+   Example:
+
+    ```console
+    ~/senzing-demo-project-3/docker-bin/senzing-info.sh
     ```
