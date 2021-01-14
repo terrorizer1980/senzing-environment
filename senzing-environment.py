@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.2.3"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2021-01-13'
+__updated__ = '2021-01-14'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -773,7 +773,7 @@ export SENZING_DOCKER_PORT_RABBITMQ_UI=15672
 export SENZING_DOCKER_PORT_SENZING_API_SERVER=8250
 export SENZING_DOCKER_PORT_SENZING_SQLITE_WEB=9174
 export SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI=9180
-export SENZING_DOCKER_PORT_WEB_APP_DEMO=8251
+export SENZING_DOCKER_PORT_ENTITY_SEARCH_WEB_APP=8251
 export SENZING_DOCKER_PORT_XTERM=8254
 export SENZING_DOCKER_REGISTRY_URL=docker.io
 export SENZING_DOCKER_SOCKET=/var/run/docker.sock
@@ -1413,8 +1413,8 @@ DOCKER_CONTAINERS=(
     "${{SENZING_PROJECT_NAME}}-stream-loader;----;senzing/stream-loader:${{SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}}"
     "${{SENZING_PROJECT_NAME}}-stream-producer;----;senzing/stream-producer:${{SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}}"
     "${{SENZING_PROJECT_NAME}}-swagger-ui;${{SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI}};swaggerapi/swagger-ui:${{SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}}"
-    "${{SENZING_PROJECT_NAME}}-webapp;${{SENZING_DOCKER_PORT_WEB_APP_DEMO}};senzing/entity-search-web-app:${{SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}}"
-    "${{SENZING_PROJECT_NAME}}-web-app-demo;${{SENZING_DOCKER_PORT_WEB_APP_DEMO}};senzing/web-app-demo:${{SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}}"
+    "${{SENZING_PROJECT_NAME}}-webapp;${{SENZING_DOCKER_PORT_ENTITY_SEARCH_WEB_APP}};senzing/entity-search-web-app:${{SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}}"
+    "${{SENZING_PROJECT_NAME}}-web-app-demo;${{SENZING_DOCKER_PORT_ENTITY_SEARCH_WEB_APP}};senzing/web-app-demo:${{SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}}"
     "${{SENZING_PROJECT_NAME}}-xterm;${{SENZING_DOCKER_PORT_XTERM}};senzing/xterm:${{SENZING_DOCKER_IMAGE_VERSION_XTERM}}"
 )
 
@@ -1908,7 +1908,7 @@ source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 CONTAINER_LOG="${SENZING_LOG_QUICKSTART}"
 CONTAINER_NAME="${SENZING_DOCKER_CONTAINER_NAME_QUICKSTART}"
-CONTAINER_PORT="${SENZING_DOCKER_PORT_WEB_APP_DEMO}"
+CONTAINER_PORT="${SENZING_DOCKER_PORT_ENTITY_SEARCH_WEB_APP}"
 CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}"
 
 if [ "$1" == "up" ]; then
@@ -2170,13 +2170,10 @@ def file_senzing_stream_producer():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    if [ "${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}" == "latest" ]
+    if [ "${CONTAINER_VERSION}" == "latest" ]
     then
-        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER} >> ${SENZING_PROJECT_DIR}/var/log/senzing-stream-producer.log 2>&1
+        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-producer:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
     fi
-
-    CONTAINER_NAME="${SENZING_PROJECT_NAME}-stream-producer"
-    CONTAINER_LOG="${SENZING_PROJECT_DIR}/var/log/xxx.log"
 
     ${SENZING_SUDO} docker run \\
         --detach \\
@@ -2198,20 +2195,20 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_STREAM_PRODUCER} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_PRIVILEGED_PARAMETER} \\
-        senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER} \\
-        >> ${SENZING_PROJECT_DIR}/var/log/senzing-stream-producer.log 2>&1
+        senzing/stream-producer:${CONTAINER_VERSION} \\
+        >> ${CONTAINER_LOG} 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} is running."
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${SENZING_PROJECT_DIR}/var/log/senzing-stream-producer.log"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-stream-producer"
     echo "${SENZING_HORIZONTAL_RULE}"
 }
 
 function down {
-    ${SENZING_SUDO} docker stop ${SENZING_PROJECT_NAME}-stream-producer >> ${SENZING_PROJECT_DIR}/var/log/senzing-stream-producer.log 2>&1
-    ${SENZING_SUDO} docker rm   ${SENZING_PROJECT_NAME}-stream-producer >> ${SENZING_PROJECT_DIR}/var/log/senzing-stream-producer.log 2>&1
+    ${SENZING_SUDO} docker stop ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
+    ${SENZING_SUDO} docker rm   ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
 }
 
 function usage {
@@ -2225,10 +2222,9 @@ function usage {
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-CONTAINER_NAME="${SENZING_PROJECT_NAME}-xxx"
-CONTAINER_LOG="${SENZING_LOG_XXX}"
-CONTAINER_PORT="${SENZING_DOCKER_PORT_XXX}"
-CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_XXX}"
+CONTAINER_LOG="${SENZING_LOG_STREAM_PRODUCER}"
+CONTAINER_NAME="${SENZING_DOCKER_CONTAINER_NAME_STREAM_PRODUCER}"
+CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}"
 
 if [ "$1" == "up" ]; then
     up
@@ -2250,23 +2246,20 @@ def file_senzing_webapp():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    if [ "${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}" == "latest" ]
+    if [ "${CONTAINER_VERSION}" == "latest" ]
     then
-        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP} >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp.log 2>&1
+        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
     fi
-
-    CONTAINER_NAME="${SENZING_PROJECT_NAME}-webapp"
-    CONTAINER_LOG="${SENZING_PROJECT_DIR}/var/log/xxx.log"
 
     ${SENZING_SUDO} docker run \\
         --detach \\
         --env SENZING_API_SERVER_URL=${SENZING_API_SERVER_URL} \\
         --env SENZING_WEB_SERVER_ADMIN_AUTH_MODE='JWT' \\
-        --env SENZING_WEB_SERVER_ADMIN_AUTH_PATH="http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}" \\
-        --env SENZING_WEB_SERVER_PORT=${SENZING_DOCKER_PORT_WEB_APP_DEMO} \\
+        --env SENZING_WEB_SERVER_ADMIN_AUTH_PATH="http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_ENTITY_SEARCH_WEB_APP}" \\
+        --env SENZING_WEB_SERVER_PORT=${CONTAINER_PORT} \\
         --interactive \\
         --name ${CONTAINER_NAME} \\
-        --publish ${SENZING_DOCKER_PORT_WEB_APP_DEMO}:${SENZING_DOCKER_PORT_WEB_APP_DEMO} \\
+        --publish ${CONTAINER_PORT}:${CONTAINER_PORT} \\
         --restart always \\
         --tty \\
         --user 0 \\
@@ -2280,25 +2273,25 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_ENTITY_SEARCH_WEB_APP} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_PRIVILEGED_PARAMETER} \\
-        senzing/entity-search-web-app:${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP} \\
-        >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp.log 2>&1
+        senzing/entity-search-web-app:${CONTAINER_VERSION} \\
+        >> ${CONTAINER_LOG} 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on host)"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${SENZING_PROJECT_DIR}/var/log/senzing-webapp.log"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-webapp"
     echo "${SENZING_HORIZONTAL_RULE}"
 }
 
 function down {
-    ${SENZING_SUDO} docker stop ${SENZING_PROJECT_NAME}-webapp >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp.log 2>&1
-    ${SENZING_SUDO} docker rm   ${SENZING_PROJECT_NAME}-webapp >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp.log 2>&1
+    ${SENZING_SUDO} docker stop ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
+    ${SENZING_SUDO} docker rm   ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
 }
 
 function usage {
@@ -2312,10 +2305,10 @@ function usage {
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-CONTAINER_NAME="${SENZING_PROJECT_NAME}-xxx"
-CONTAINER_LOG="${SENZING_LOG_XXX}"
-CONTAINER_PORT="${SENZING_DOCKER_PORT_XXX}"
-CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_XXX}"
+CONTAINER_LOG="${SENZING_LOG_WEBAPP}"
+CONTAINER_NAME="${SENZING_DOCKER_CONTAINER_NAME_ENTITY_SEARCH_WEB_APP}"
+CONTAINER_PORT="${SENZING_DOCKER_PORT_ENTITY_SEARCH_WEB_APP}"
+CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}"
 
 if [ "$1" == "up" ]; then
     up
@@ -2339,14 +2332,14 @@ def file_senzing_webapp_demo():
 function init {
     if [ "${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}" == "latest" ]
     then
-        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
+        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} >> ${CONTAINER_LOG} 2>&1
     fi
 
     ${SENZING_SUDO} docker run \\
         --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
         --env SENZING_GID=$(id -g) \\
         --env SENZING_UID=$(id -u) \\
-        --name ${SENZING_PROJECT_NAME}-init-container \\
+        --name ${SENZING_DOCKER_CONTAINER_NAME_INIT_CONTAINER} \\
         --rm \\
         --user 0 \\
         --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
@@ -2361,61 +2354,21 @@ function init {
         ${SENZING_MSSQL_PARAMETERS} \\
         ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
-        >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
-
-    if [ "${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}" == "latest" ]
-    then
-        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
-    fi
-
-    ${SENZING_SUDO} docker run \\
-        --detach \\
-        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-        --name ${SENZING_PROJECT_NAME}-web-app-demo \\
-        --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:8250 \\
-        --publish ${SENZING_DOCKER_PORT_WEB_APP_DEMO}:8251 \\
-        --restart always \\
-        --user $(id -u):$(id -g) \\
-        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
-        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
-        ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
-        ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_MSSQL_PARAMETERS} \\
-        ${SENZING_PRIVILEGED_PARAMETER} \\
-        senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
-        >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
-
-    echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}/heartbeat"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on host)"
-    echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-webapp-demo"
-    echo "${SENZING_HORIZONTAL_RULE}"
+        >> ${CONTAINER_LOG} 2>&1
 }
 
 function up {
-    if [ "${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}" == "latest" ]
+    if [ "${CONTAINER_VERSION}" == "latest" ]
     then
-        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
+        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
     fi
 
     ${SENZING_SUDO} docker run \\
         --detach \\
         --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-        --name ${SENZING_PROJECT_NAME}-web-app-demo \\
+        --name ${CONTAINER_NAME} \\
         --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:8250 \\
-        --publish ${SENZING_DOCKER_PORT_WEB_APP_DEMO}:8251 \\
+        --publish ${CONTAINER_PORT}:8251 \\
         --restart always \\
         --user $(id -u):$(id -g) \\
         --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
@@ -2429,28 +2382,28 @@ function up {
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_MSSQL_PARAMETERS} \\
         ${SENZING_PRIVILEGED_PARAMETER} \\
-        senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO} \\
-        >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
+        senzing/web-app-demo:${CONTAINER_VERSION} \\
+        >> ${CONTAINER_LOG} 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-webapp running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_WEB_APP_DEMO}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_PROJECT_NAME}-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}/heartbeat"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} entity-search-web-app running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} senzing-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}/heartbeat"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on host)"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-webapp-demo"
     echo "${SENZING_HORIZONTAL_RULE}"
 }
 
 function down {
-    ${SENZING_SUDO} docker stop ${SENZING_PROJECT_NAME}-init-container >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
-    ${SENZING_SUDO} docker rm   ${SENZING_PROJECT_NAME}-init-container >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
-    ${SENZING_SUDO} docker stop ${SENZING_PROJECT_NAME}-web-app-demo   >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
-    ${SENZING_SUDO} docker rm   ${SENZING_PROJECT_NAME}-web-app-demo   >> ${SENZING_PROJECT_DIR}/var/log/senzing-webapp-demo.log 2>&1
+    ${SENZING_SUDO} docker stop ${SENZING_DOCKER_CONTAINER_NAME_INIT_CONTAINER} >> ${CONTAINER_LOG} 2>&1
+    ${SENZING_SUDO} docker rm   ${SENZING_DOCKER_CONTAINER_NAME_INIT_CONTAINER} >> ${CONTAINER_LOG} 2>&1
+    ${SENZING_SUDO} docker stop ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
+    ${SENZING_SUDO} docker rm   ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
 }
 
 function usage {
@@ -2464,10 +2417,10 @@ function usage {
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-CONTAINER_NAME="${SENZING_PROJECT_NAME}-xxx"
-CONTAINER_LOG="${SENZING_LOG_XXX}"
-CONTAINER_PORT="${SENZING_DOCKER_PORT_XXX}"
-CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_XXX}"
+CONTAINER_LOG="${SENZING_LOG_WEB_APP_DEMO}"
+CONTAINER_NAME="${SENZING_DOCKER_CONTAINER_NAME_WEB_APP_DEMO}"
+CONTAINER_PORT="${SENZING_DOCKER_PORT_ENTITY_SEARCH_WEB_APP}"
+CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}"
 
 if [ "$1" == "up" ]; then
     up
@@ -2476,6 +2429,7 @@ elif [ "$1" == "down" ]; then
 elif [ "$1" == "init" ]; then
     down
     init
+    up
 elif [ "$1" == "restart" ]; then
     down
     up
@@ -2492,19 +2446,16 @@ def file_senzing_xterm():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    if [ "${SENZING_DOCKER_IMAGE_VERSION_XTERM}" == "latest" ]
+    if [ "${CONTAINER_VERSION}" == "latest" ]
     then
-        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM} >> ${SENZING_PROJECT_DIR}/var/log/senzing-xterm.log 2>&1
+        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/xterm:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
     fi
-
-    CONTAINER_NAME="${SENZING_PROJECT_NAME}-xterm"
-    CONTAINER_LOG="${SENZING_PROJECT_DIR}/var/log/xxx.log"
 
     ${SENZING_SUDO} docker run \\
         --detach \\
         --interactive \\
         --name ${CONTAINER_NAME} \\
-        --publish ${SENZING_DOCKER_PORT_XTERM}:5000 \\
+        --publish ${CONTAINER_PORT}:5000 \\
         --restart always \\
         --tty \\
         --user $(id -u):$(id -g) \\
@@ -2519,27 +2470,27 @@ function up {
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_MSSQL_PARAMETERS} \\
         ${SENZING_PRIVILEGED_PARAMETER} \\
-        senzing/xterm:${SENZING_DOCKER_IMAGE_VERSION_XTERM} \\
-        >> ${SENZING_PROJECT_DIR}/var/log/senzing-xterm.log 2>&1
+        senzing/xterm:${CONTAINER_VERSION} \\
+        >> ${CONTAINER_LOG} 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_XTERM}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} To enter ${SENZING_PROJECT_NAME}-xterm container, run:"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} docker exec -it ${SENZING_PROJECT_NAME}-xterm /bin/bash"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} To enter ${CONTAINER_NAME} container, run:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} docker exec -it ${CONTAINER_NAME} /bin/bash"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on host)"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${SENZING_PROJECT_DIR}/var/log/senzing-xterm.log"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-xterm"
     echo "${SENZING_HORIZONTAL_RULE}"
 }
 
 function down {
-    ${SENZING_SUDO} docker stop ${SENZING_PROJECT_NAME}-xterm >> ${SENZING_PROJECT_DIR}/var/log/senzing-xterm.log 2>&1
-    ${SENZING_SUDO} docker rm   ${SENZING_PROJECT_NAME}-xterm >> ${SENZING_PROJECT_DIR}/var/log/senzing-xterm.log 2>&1
+    ${SENZING_SUDO} docker stop ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
+    ${SENZING_SUDO} docker rm   ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
 }
 
 function usage {
@@ -2553,10 +2504,10 @@ function usage {
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-CONTAINER_NAME="${SENZING_PROJECT_NAME}-xxx"
-CONTAINER_LOG="${SENZING_LOG_XXX}"
-CONTAINER_PORT="${SENZING_DOCKER_PORT_XXX}"
-CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_XXX}"
+CONTAINER_LOG="${SENZING_LOG_XTERM}"
+CONTAINER_NAME="${SENZING_DOCKER_CONTAINER_NAME_XTERM}"
+CONTAINER_PORT="${SENZING_DOCKER_PORT_XTERM}"
+CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_XTERM}"
 
 if [ "$1" == "up" ]; then
     up
@@ -2578,9 +2529,9 @@ def file_senzing_yum():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    if [ "${SENZING_DOCKER_IMAGE_VERSION_YUM}" == "latest" ]
+    if [ "${CONTAINER_VERSION}" == "latest" ]
     then
-        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM} >> ${SENZING_PROJECT_DIR}/var/log/senzing-yum.log 2>&1
+        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/yum:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
     fi
 
     # Remove symbolic links.
@@ -2593,7 +2544,7 @@ function up {
     ${SENZING_SUDO} docker run \\
         --env SENZING_ACCEPT_EULA=${SENZING_ACCEPT_EULA} \\
         --interactive \\
-        --name ${SENZING_PROJECT_NAME}-yum \\
+        --name ${CONTAINER_NAME} \\
         --rm \\
         --tty \\
         --user $(id -u):$(id -g) \\
@@ -2602,8 +2553,8 @@ function up {
         ${SENZING_DOCKER_RUN_PARAMETERS_YUM} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_PRIVILEGED_PARAMETER} \\
-        senzing/yum:${SENZING_DOCKER_IMAGE_VERSION_YUM} \\
-        >> ${SENZING_PROJECT_DIR}/var/log/senzing-yum.log 2>&1
+        senzing/yum:${CONTAINER_VERSION} \\
+        >> ${CONTAINER_LOG} 2>&1
 
     # Create symbolic links to timestamped directories.
 
@@ -2621,8 +2572,8 @@ function up {
 }
 
 function down {
-    ${SENZING_SUDO} docker stop ${SENZING_PROJECT_NAME}-yum >> ${SENZING_PROJECT_DIR}/var/log/senzing-yum.log 2>&1
-    ${SENZING_SUDO} docker rm   ${SENZING_PROJECT_NAME}-yum >> ${SENZING_PROJECT_DIR}/var/log/senzing-yum.log 2>&1
+    ${SENZING_SUDO} docker stop ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
+    ${SENZING_SUDO} docker rm   ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
 }
 
 function usage {
@@ -2636,10 +2587,9 @@ function usage {
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-CONTAINER_NAME="${SENZING_PROJECT_NAME}-xxx"
-CONTAINER_LOG="${SENZING_LOG_XXX}"
-CONTAINER_PORT="${SENZING_DOCKER_PORT_XXX}"
-CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_XXX}"
+CONTAINER_LOG="${SENZING_LOG_YUM}"
+CONTAINER_NAME="${SENZING_DOCKER_CONTAINER_NAME_YUM}"
+CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_YUM}"
 
 if [ "$1" == "up" ]; then
     up
@@ -2661,38 +2611,35 @@ def file_swagger_ui():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    if [ "${SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}" == "latest" ]
+    if [ "${CONTAINER_VERSION}" == "latest" ]
     then
-        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/swaggerapi/swagger-ui:${SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI} >> ${SENZING_PROJECT_DIR}/var/log/swagger-ui.log 2>&1
+        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/swaggerapi/swagger-ui:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
     fi
-
-    CONTAINER_NAME="${SENZING_PROJECT_NAME}-swagger-ui"
-    CONTAINER_LOG="${SENZING_PROJECT_DIR}/var/log/xxx.log"
 
     ${SENZING_SUDO} docker run \\
         --detach \\
         --env URL=https://raw.githubusercontent.com/Senzing/senzing-rest-api-specification/master/senzing-rest-api.yaml \\
         --name ${CONTAINER_NAME} \\
-        --publish ${SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI}:8080 \\
+        --publish ${CONTAINER_PORT}:8080 \\
         --restart always \\
         ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
         ${SENZING_DOCKER_RUN_PARAMETERS_SWAGGERAPI_SWAGGER_UI} \\
         ${SENZING_NETWORK_PARAMETER} \\
         ${SENZING_PRIVILEGED_PARAMETER} \\
-        swaggerapi/swagger-ui:${SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI} \\
-        >> ${SENZING_PROJECT_DIR}/var/log/swagger-ui.log 2>&1
+        swaggerapi/swagger-ui:${CONTAINER_VERSION} \\
+        >> ${CONTAINER_LOG} 2>&1
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${SENZING_PROJECT_DIR}/var/log/swagger-ui.log"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#swagger-ui"
     echo "${SENZING_HORIZONTAL_RULE}"
 }
 
 function down {
-    ${SENZING_SUDO} docker stop ${SENZING_PROJECT_NAME}-swagger-ui >> ${SENZING_PROJECT_DIR}/var/log/swagger-ui.log 2>&1
-    ${SENZING_SUDO} docker rm   ${SENZING_PROJECT_NAME}-swagger-ui >> ${SENZING_PROJECT_DIR}/var/log/swagger-ui.log 2>&1
+    ${SENZING_SUDO} docker stop ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
+    ${SENZING_SUDO} docker rm   ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
 }
 
 function usage {
@@ -2706,10 +2653,10 @@ function usage {
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-CONTAINER_NAME="${SENZING_PROJECT_NAME}-xxx"
-CONTAINER_LOG="${SENZING_LOG_XXX}"
-CONTAINER_PORT="${SENZING_DOCKER_PORT_XXX}"
-CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_XXX}"
+CONTAINER_LOG="${SENZING_LOG_SWAGGERAPI_SWAGGER_UI}"
+CONTAINER_NAME="${SENZING_DOCKER_CONTAINER_NAME_SWAGGERAPI_SWAGGER_UI}"
+CONTAINER_PORT="${SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI}"
+CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}"
 
 if [ "$1" == "up" ]; then
     up
