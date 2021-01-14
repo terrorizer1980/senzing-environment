@@ -876,6 +876,8 @@ def file_portainer():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/portainer/portainer:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -917,7 +919,9 @@ function up {
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#portainer"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -964,6 +968,8 @@ def file_postgres():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/postgres:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -1008,7 +1014,9 @@ function up {
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} listening on ${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Username: ${DATABASE_USERNAME} Password: ${DATABASE_PASSWORD}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#postgres"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1055,6 +1063,8 @@ def file_senzing_api_server():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-api-server:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -1107,16 +1117,19 @@ function up {
         sleep 5
         CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
     done
+    sleep 10
 
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_VERSION}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Try http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}/heartbeat"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on host)"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-api-server"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1210,6 +1223,8 @@ def file_senzing_db2_driver_installer():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/db2-driver-installer:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -1254,7 +1269,9 @@ function up {
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} has completed."
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-db2-driver-installer"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1300,6 +1317,8 @@ def file_senzing_debug():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-debug:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -1356,7 +1375,9 @@ function up {
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-debug"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1410,6 +1431,7 @@ echo "${SENZING_HORIZONTAL_RULE:0:2}"
 
 DOCKER_CONTAINERS=(
     "${SENZING_DOCKER_CONTAINER_NAME_DB2_DRIVER_INSTALLER};${SENZING_LOG_DB2_DRIVER_INSTALLER}"
+    "${SENZING_DOCKER_CONTAINER_NAME_ENTITY_SEARCH_WEB_APP};${SENZING_LOG_WEBAPP}"
     "${SENZING_DOCKER_CONTAINER_NAME_INIT_CONTAINER};${SENZING_LOG_INIT_CONTAINER}"
     "${SENZING_DOCKER_CONTAINER_NAME_JUPYTER};${SENZING_LOG_JUPYTER}"
     "${SENZING_DOCKER_CONTAINER_NAME_MSSQL_DRIVER_INSTALLER};${SENZING_LOG_MSSQL_DRIVER_INSTALLER}"
@@ -1524,6 +1546,8 @@ def file_senzing_init_container():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -1550,33 +1574,14 @@ function up {
         senzing/init-container:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
 
-    COUNTER=0
-    COUNTER_NOTICE=5
-    TIME_STRING=".."
-    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
-    while [ "${CONTAINER_STATUS}" != "running" ]; do
-        COUNTER=$((${COUNTER}+1))
-        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
-            echo -ne "\033[2K"
-            echo ""
-            echo "To see what is happening behind-the-scenes, view the log at"
-            echo "${CONTAINER_LOG}"
-            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
-            echo ""
-        fi
-        TIME_STRING="${TIME_STRING}."
-        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
-        sleep 5
-        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
-    done
-
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} has completed."
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-init-container"
     echo "${SENZING_HORIZONTAL_RULE}"
-
 }
 
 function down {
@@ -1619,6 +1624,8 @@ def file_senzing_jupyter():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     chmod -R 777 ${SENZING_PROJECT_DIR}/var/sqlite/
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
@@ -1677,7 +1684,9 @@ function up {
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-jupyter"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1724,6 +1733,8 @@ def file_senzing_mssql_driver_installer():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/apt:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -1769,7 +1780,9 @@ function up {
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} has completed."
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-mssql-driver-installer"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1815,6 +1828,8 @@ def file_senzing_phppgadmin():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/phppgadmin:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -1880,7 +1895,9 @@ function up {
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-phppgadmin"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -1903,7 +1920,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
 CONTAINER_LOG="${SENZING_LOG_PHPPGADMIN}"
-CONTAINER_NAME="${SENZING_PROJECT_NAME}"
+CONTAINER_NAME="${SENZING_DOCKER_CONTAINER_NAME_PHPPGADMIN}"
 CONTAINER_PORT="${SENZING_DOCKER_PORT_PHPPGADMIN_HTTP}"
 CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}"
 
@@ -1927,6 +1944,8 @@ def file_senzing_postgresql_init():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/postgresql-client:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -1946,29 +1965,11 @@ function up {
         senzing/postgresql-client:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
 
-    COUNTER=0
-    COUNTER_NOTICE=5
-    TIME_STRING=".."
-    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
-    while [ "${CONTAINER_STATUS}" != "running" ]; do
-        COUNTER=$((${COUNTER}+1))
-        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
-            echo -ne "\033[2K"
-            echo ""
-            echo "To see what is happening behind-the-scenes, view the log at"
-            echo "${CONTAINER_LOG}"
-            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
-            echo ""
-        fi
-        TIME_STRING="${TIME_STRING}."
-        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
-        sleep 5
-        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
-    done
-
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} has completed."
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-postgresql-init"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2014,6 +2015,8 @@ def file_senzing_quickstart_demo():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -2068,7 +2071,9 @@ function up {
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-quickstart-demo"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2115,6 +2120,8 @@ def file_senzing_rabbitmq():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     mkdir -p ${RABBITMQ_DIR}
     chmod 777 ${RABBITMQ_DIR}
 
@@ -2160,13 +2167,16 @@ function up {
         sleep 5
         CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
     done
+    sleep 10
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Username: ${SENZING_RABBITMQ_USERNAME} Password: ${SENZING_RABBITMQ_PASSWORD}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on host)"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /bitnami  > ${RABBITMQ_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-rabbitmq"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2213,6 +2223,8 @@ def file_senzing_sqlite_web():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/coleifer/sqlite-web:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -2259,7 +2271,9 @@ function up {
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on host)"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /data  > ${SENZING_VAR_DIR}/sqlite"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-sqlite-web"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2306,6 +2320,8 @@ def file_senzing_stream_loader():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-loader:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -2369,7 +2385,9 @@ function up {
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-stream-loader"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2414,6 +2432,8 @@ def file_senzing_stream_producer():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-producer:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -2464,7 +2484,9 @@ function up {
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} is running."
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-stream-producer"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2510,6 +2532,8 @@ def file_senzing_webapp():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/entity-search-web-app:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -2567,7 +2591,9 @@ function up {
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-webapp"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2642,6 +2668,8 @@ function init {
 }
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -2697,7 +2725,9 @@ function up {
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-webapp-demo"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2750,6 +2780,8 @@ def file_senzing_xterm():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/xterm:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -2806,7 +2838,9 @@ function up {
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
     echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-xterm"
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2853,6 +2887,8 @@ def file_senzing_yum():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/yum:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -2955,6 +2991,8 @@ def file_swagger_ui():
 # --- Functions ---------------------------------------------------------------
 
 function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/swaggerapi/swagger-ui:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -2975,7 +3013,9 @@ function up {
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
     echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#swagger-ui"
     echo "${SENZING_HORIZONTAL_RULE}"
