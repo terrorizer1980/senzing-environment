@@ -985,6 +985,26 @@ function up {
         postgres:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
 
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
+
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} listening on ${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Username: ${DATABASE_USERNAME} Password: ${DATABASE_PASSWORD}"
@@ -1209,6 +1229,26 @@ function up {
         senzing/db2-driver-installer:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
 
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
+
     sudo -p "sudo access is required to change file ownership.  Please enter your password:  " docker info >> /dev/null 2>&1
     sudo chown -R $(id -u):$(id -g) ${SENZING_OPT_IBM_DIR}
 
@@ -1286,6 +1326,26 @@ function up {
         ${SENZING_RUNAS_USER_PARAMETER} \\
         senzing/senzing-debug:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
+
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} is running."
@@ -1488,6 +1548,26 @@ function up {
         senzing/init-container:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
 
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
+
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} has completed."
     echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
@@ -1567,6 +1647,26 @@ function up {
         senzing/jupyter:${CONTAINER_VERSION} start.sh jupyter notebook --NotebookApp.token='' \\
         >> ${CONTAINER_LOG} 2>&1
 
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
+
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on host)"
@@ -1641,6 +1741,26 @@ function up {
         ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/apt:${CONTAINER_VERSION} -y install msodbcsql17 \\
         >> ${CONTAINER_LOG} 2>&1
+
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
 
     sudo -p "sudo access is required to change file ownership.  Please enter your password:  " docker info >> /dev/null 2>&1
     sudo chown -R $(id -u):$(id -g) ${SENZING_OPT_MICROSOFT_DIR}
@@ -1736,6 +1856,26 @@ function up {
         senzing/phppgadmin:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
 
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
+
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
@@ -1803,6 +1943,26 @@ function up {
         ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/postgresql-client:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
+
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} has completed."
@@ -1878,6 +2038,26 @@ function up {
         ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/web-app-demo:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
+
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
@@ -1959,6 +2139,26 @@ function up {
         bitnami/rabbitmq:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
 
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
+
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} Username: ${SENZING_RABBITMQ_USERNAME} Password: ${SENZING_RABBITMQ_PASSWORD}"
@@ -2032,6 +2232,26 @@ function up {
         ${SENZING_PRIVILEGED_PARAMETER} \\
         coleifer/sqlite-web:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
+
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
@@ -2120,6 +2340,26 @@ function up {
         senzing/stream-loader:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
 
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
+
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} is running."
     echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on host)"
@@ -2200,6 +2440,26 @@ function up {
         senzing/stream-producer:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
 
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
+
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} is running."
     echo "${SENZING_HORIZONTAL_RULE:0:2} Log: ${CONTAINER_LOG}"
@@ -2277,6 +2537,26 @@ function up {
         ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/entity-search-web-app:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
+
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
 
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
@@ -2387,6 +2667,26 @@ function up {
         senzing/web-app-demo:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
 
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
+
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} entity-search-web-app running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} senzing-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}/heartbeat"
@@ -2475,6 +2775,26 @@ function up {
         senzing/xterm:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
 
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
+
     echo "${SENZING_HORIZONTAL_RULE}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
     echo "${SENZING_HORIZONTAL_RULE:0:2} To enter ${CONTAINER_NAME} container, run:"
@@ -2557,6 +2877,26 @@ function up {
         ${SENZING_PRIVILEGED_PARAMETER} \\
         senzing/yum:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
+
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
 
     # Create symbolic links to timestamped directories.
 
