@@ -876,7 +876,7 @@ def file_portainer():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -968,7 +968,7 @@ def file_postgres():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -1063,7 +1063,7 @@ def file_senzing_api_server():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -1180,6 +1180,8 @@ CONTAINER_LOG="${SENZING_LOG_SENZING_CONSOLE}"
 CONTAINER_NAME="${SENZING_DOCKER_CONTAINER_NAME_SENZING_CONSOLE}"
 CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}"
 
+echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
+
 if [ "${CONTAINER_VERSION}" == "latest" ]
 then
     ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-console:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
@@ -1223,7 +1225,7 @@ def file_senzing_db2_driver_installer():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -1317,7 +1319,7 @@ def file_senzing_debug():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -1546,7 +1548,7 @@ def file_senzing_init_container():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -1624,7 +1626,7 @@ def file_senzing_jupyter():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     chmod -R 777 ${SENZING_PROJECT_DIR}/var/sqlite/
 
@@ -1733,7 +1735,7 @@ def file_senzing_mssql_driver_installer():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -1828,7 +1830,7 @@ def file_senzing_phppgadmin():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -1944,7 +1946,7 @@ def file_senzing_postgresql_init():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -2015,7 +2017,7 @@ def file_senzing_quickstart_demo():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -2120,7 +2122,7 @@ def file_senzing_rabbitmq():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     mkdir -p ${RABBITMQ_DIR}
     chmod 777 ${RABBITMQ_DIR}
@@ -2223,7 +2225,7 @@ def file_senzing_sqlite_web():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -2320,7 +2322,7 @@ def file_senzing_stream_loader():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -2432,7 +2434,7 @@ def file_senzing_stream_producer():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -2532,7 +2534,7 @@ def file_senzing_webapp():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -2668,7 +2670,7 @@ function init {
 }
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -2780,7 +2782,7 @@ def file_senzing_xterm():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -2887,7 +2889,7 @@ def file_senzing_yum():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
@@ -2991,7 +2993,7 @@ def file_swagger_ui():
 # --- Functions ---------------------------------------------------------------
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: Starting...\r"
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
