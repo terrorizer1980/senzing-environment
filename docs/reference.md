@@ -463,6 +463,36 @@
     ==============================================================================
     ```
 
+### senzing-sshd
+
+1. **Synopsis:**
+
+   Brings up [sshd](https://github.com/Senzing/docker-sshd) container.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    $ ./docker-bin/senzing-sshd.sh up
+    ==============================================================================
+    == sshd is running.
+    == To enter sshd container, run:
+    == ssh root@localhost -p 9181
+    ==     Password: passw0rd
+    == Mount information: (Format: in container > on host)
+    ==   /etc/opt/senzing  > /home/senzing/senzing-project/docker-etc
+    ==   /opt/senzing/data > /home/senzing/senzing-project/data
+    ==   /opt/senzing/g2   > /home/senzing/senzing-project
+    ==   /var/opt/senzing  > /home/senzing/senzing-project/var
+    == Logs:
+    ==   /home/senzing/senzing-project/var/log/senzing-sshd.log
+    ==   and/or run 'docker logs sshd'
+    == For more information:
+    == http://hub.senzing.com/senzing-environment/reference#senzing-sshd
+    ==============================================================================
+    ```
+
 ### senzing-stream-loader
 
 1. **Synopsis:**
