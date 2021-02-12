@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.2.3"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2021-01-14'
+__updated__ = '2021-02-12'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -738,6 +738,7 @@ export SENZING_DOCKER_CONTAINER_NAME_SENZING_API_SERVER="${{SENZING_PROJECT_NAME
 export SENZING_DOCKER_CONTAINER_NAME_SENZING_CONSOLE="${{SENZING_PROJECT_NAME}}-console"
 export SENZING_DOCKER_CONTAINER_NAME_SENZING_DEBUG="${{SENZING_PROJECT_NAME}}-debug"
 export SENZING_DOCKER_CONTAINER_NAME_SQLITE_WEB="${{SENZING_PROJECT_NAME}}-sqlite-web"
+export SENZING_DOCKER_CONTAINER_NAME_SSHD="${{SENZING_PROJECT_NAME}}-sshd"
 export SENZING_DOCKER_CONTAINER_NAME_STREAM_LOADER="${{SENZING_PROJECT_NAME}}-stream-loader"
 export SENZING_DOCKER_CONTAINER_NAME_STREAM_PRODUCER="${{SENZING_PROJECT_NAME}}-stream-producer"
 export SENZING_DOCKER_CONTAINER_NAME_SWAGGERAPI_SWAGGER_UI="${{SENZING_PROJECT_NAME}}-swagger-ui"
@@ -758,6 +759,7 @@ export SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER=latest
 export SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE=latest
 export SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG=latest
 export SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB=latest
+export SENZING_DOCKER_IMAGE_VERSION_SSHD=latest
 export SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER=latest
 export SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER=latest
 export SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI=latest
@@ -775,6 +777,7 @@ export SENZING_DOCKER_PORT_RABBITMQ_UI=15672
 export SENZING_DOCKER_PORT_SENZING_API_SERVER=8250
 export SENZING_DOCKER_PORT_SENZING_SQLITE_WEB=9174
 export SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI=9180
+export SENZING_DOCKER_PORT_SSHD=9181
 export SENZING_DOCKER_PORT_XTERM=8254
 export SENZING_DOCKER_REGISTRY_URL=docker.io
 export SENZING_DOCKER_SOCKET=/var/run/docker.sock
@@ -796,11 +799,12 @@ export SENZING_LOG_SENZING_API_SERVER="${{SENZING_PROJECT_DIR}}/var/log/senzing-
 export SENZING_LOG_SENZING_CONSOLE="${{SENZING_PROJECT_DIR}}/var/log/senzing-console.log"
 export SENZING_LOG_SENZING_DEBUG="${{SENZING_PROJECT_DIR}}/var/log/senzing-debug.log"
 export SENZING_LOG_SQLITE_WEB="${{SENZING_PROJECT_DIR}}/var/log/senzing-sqlite-web.log"
+export SENZING_LOG_SSHD="${{SENZING_PROJECT_DIR}}/var/log/senzing-sshd.log"
 export SENZING_LOG_STREAM_LOADER="${{SENZING_PROJECT_DIR}}/var/log/senzing-stream-loader.log"
 export SENZING_LOG_STREAM_PRODUCER="${{SENZING_PROJECT_DIR}}/var/log/senzing-stream-producer.log"
-export SENZING_LOG_SWAGGERAPI_SWAGGER_UI="${{SENZING_PROJECT_DIR}}/var/log/swagger-ui.log.log"
+export SENZING_LOG_SWAGGERAPI_SWAGGER_UI="${{SENZING_PROJECT_DIR}}/var/log/swagger-ui.log"
 export SENZING_LOG_WEBAPP="${{SENZING_PROJECT_DIR}}/var/log/senzing-webapp.log"
-export SENZING_LOG_WEB_APP_DEMO="${{SENZING_PROJECT_DIR}}/var/log/senzing-webapp-demo.log.log"
+export SENZING_LOG_WEB_APP_DEMO="${{SENZING_PROJECT_DIR}}/var/log/senzing-webapp-demo.log"
 export SENZING_LOG_XTERM="${{SENZING_PROJECT_DIR}}/var/log/senzing-xterm.log"
 export SENZING_LOG_YUM="${{SENZING_PROJECT_DIR}}/var/log/senzing-yum.log"
 export SENZING_MSSQL_PARAMETERS=""
@@ -815,6 +819,7 @@ export SENZING_RABBITMQ_USERNAME=user
 export SENZING_RECORD_MAX=5000
 export SENZING_REFERENCE_URL="http://hub.senzing.com/senzing-environment/reference"
 export SENZING_SQL_CONNECTION="{sql_connection}"
+export SENZING_SSHD_PASSWORD=passw0rd
 export SENZING_SUDO=""
 export SENZING_VAR_DIR=${{SENZING_PROJECT_DIR}}/var
 
@@ -856,6 +861,7 @@ ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/postgresql-cl
 ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-api-server:${SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}
 ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-console:${SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}
 ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/senzing-debug:${SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}
+${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/sshd:${SENZING_DOCKER_IMAGE_VERSION_SSHD}
 ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-loader:${SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}
 ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/stream-producer:${SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}
 ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}
@@ -1446,6 +1452,7 @@ DOCKER_CONTAINERS=(
     "${SENZING_DOCKER_CONTAINER_NAME_SENZING_API_SERVER};${SENZING_LOG_SENZING_API_SERVER}"
     "${SENZING_DOCKER_CONTAINER_NAME_SENZING_DEBUG};${SENZING_LOG_SENZING_DEBUG}"
     "${SENZING_DOCKER_CONTAINER_NAME_SQLITE_WEB};${SENZING_LOG_SQLITE_WEB}"
+    "${SENZING_DOCKER_CONTAINER_NAME_SSHD};${SENZING_LOG_SSHD}"
     "${SENZING_DOCKER_CONTAINER_NAME_STREAM_LOADER};${SENZING_LOG_STREAM_LOADER}"
     "${SENZING_DOCKER_CONTAINER_NAME_STREAM_PRODUCER};${SENZING_LOG_STREAM_PRODUCER}"
     "${SENZING_DOCKER_CONTAINER_NAME_SWAGGERAPI_SWAGGER_UI};${SENZING_LOG_SWAGGERAPI_SWAGGER_UI}"
@@ -1497,6 +1504,7 @@ DOCKER_CONTAINERS=(
     "${{SENZING_DOCKER_CONTAINER_NAME_POSTGRES}};${{SENZING_DOCKER_PORT_POSTGRES}};postgres:${{SENZING_DOCKER_IMAGE_VERSION_POSTGRES}}"
     "${{SENZING_DOCKER_CONTAINER_NAME_QUICKSTART}};${{SENZING_DOCKER_PORT_ENTITY_SEARCH_WEB_APP}};senzing/web-app-demo:${{SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}}"
     "${{SENZING_DOCKER_CONTAINER_NAME_SQLITE_WEB}};${{SENZING_DOCKER_PORT_SENZING_SQLITE_WEB}};coleifer/sqlite-web:${{SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}}"
+    "${{SENZING_DOCKER_CONTAINER_NAME_SSHD}};${{SENZING_DOCKER_PORT_SSHD}};senzing/sshd:${{SENZING_DOCKER_IMAGE_VERSION_SSHD}}"
     "${{SENZING_DOCKER_CONTAINER_NAME_STREAM_LOADER}};----;senzing/stream-loader:${{SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}}"
     "${{SENZING_DOCKER_CONTAINER_NAME_STREAM_PRODUCER}};----;senzing/stream-producer:${{SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}}"
     "${{SENZING_DOCKER_CONTAINER_NAME_SWAGGERAPI_SWAGGER_UI}};${{SENZING_DOCKER_PORT_SENZING_SWAGGERAPI_SWAGGER_UI}};swaggerapi/swagger-ui:${{SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}}"
@@ -2301,6 +2309,115 @@ CONTAINER_LOG="${SENZING_LOG_SQLITE_WEB}"
 CONTAINER_NAME="${SENZING_DOCKER_CONTAINER_NAME_SQLITE_WEB}"
 CONTAINER_PORT="${SENZING_DOCKER_PORT_SENZING_SQLITE_WEB}"
 CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}"
+
+if [ "$1" == "up" ]; then
+    up
+elif [ "$1" == "down" ]; then
+    down
+elif [ "$1" == "restart" ]; then
+    down
+    up
+else
+    usage
+fi
+"""
+    return 0
+
+
+def file_senzing_sshd():
+    """#!/usr/bin/env bash
+
+# --- Functions ---------------------------------------------------------------
+
+function up {
+    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
+
+    if [ "${CONTAINER_VERSION}" == "latest" ]
+    then
+        ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/sshd:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
+    fi
+
+    ${SENZING_SUDO} docker run \\
+        --detach \\
+        --env ROOT_PASSWORD=${SENZING_SSHD_PASSWORD} \\
+        --interactive \\
+        --name ${CONTAINER_NAME} \\
+        --publish ${CONTAINER_PORT}:22 \\
+        --restart always \\
+        --tty \\
+        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
+        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+        ${SENZING_DOCKER_RUN_PARAMETERS_DEBUG} \\
+        ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_MSSQL_PARAMETERS} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
+        ${SENZING_RUNAS_USER_PARAMETER} \\
+        senzing/sshd:${CONTAINER_VERSION} \\
+        >> ${CONTAINER_LOG} 2>&1
+
+    COUNTER=0
+    COUNTER_NOTICE=5
+    TIME_STRING=".."
+    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    while [ "${CONTAINER_STATUS}" != "running" ]; do
+        COUNTER=$((${COUNTER}+1))
+        if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
+            echo -ne "\033[2K"
+            echo ""
+            echo "To see what is happening behind-the-scenes, view the log at"
+            echo "${CONTAINER_LOG}"
+            echo "and/or run 'docker logs ${CONTAINER_NAME}'"
+            echo ""
+        fi
+        TIME_STRING="${TIME_STRING}."
+        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        sleep 5
+        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    done
+
+    echo "${SENZING_HORIZONTAL_RULE}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${CONTAINER_NAME} is running."
+    echo "${SENZING_HORIZONTAL_RULE:0:2} To enter ${CONTAINER_NAME} container, run:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ssh root@localhost -p ${CONTAINER_PORT}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}     Password: ${SENZING_SSHD_PASSWORD}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on host)"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
+    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-sshd"
+    echo "${SENZING_HORIZONTAL_RULE}"
+}
+
+function down {
+    ${SENZING_SUDO} docker stop ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
+    ${SENZING_SUDO} docker rm   ${CONTAINER_NAME} >> ${CONTAINER_LOG} 2>&1
+}
+
+function usage {
+    echo "usage: $0 [up | down | restart]"
+    echo "For more information:"
+    echo "${SENZING_REFERENCE_URL}#senzing-debug"
+}
+
+# --- Main --------------------------------------------------------------------
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+CONTAINER_LOG="${SENZING_LOG_SSHD}"
+CONTAINER_NAME="${SENZING_DOCKER_CONTAINER_NAME_SSHD}"
+CONTAINER_PORT="${SENZING_DOCKER_PORT_SSHD}"
+CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_SSHD}"
 
 if [ "$1" == "up" ]; then
     up
@@ -3500,6 +3617,7 @@ def do_add_docker_support_linux(args):
         "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
         "senzing-rabbitmq.sh": file_senzing_rabbitmq,
         "senzing-sqlite-web.sh": file_senzing_sqlite_web,
+        "senzing-sshd.sh": file_senzing_sshd,
         "senzing-stream-loader.sh": file_senzing_stream_loader,
         "senzing-stream-producer.sh": file_senzing_stream_producer,
         "senzing-webapp-demo.sh": file_senzing_webapp_demo,
@@ -3562,6 +3680,7 @@ def do_add_docker_support_macos(args):
         "senzing-quickstart-demo.sh": file_senzing_quickstart_demo,
         "senzing-rabbitmq.sh": file_senzing_rabbitmq,
         "senzing-sqlite-web.sh": file_senzing_sqlite_web,
+        "senzing-sshd.sh": file_senzing_sshd,
         "senzing-stream-loader.sh": file_senzing_stream_loader,
         "senzing-stream-producer.sh": file_senzing_stream_producer,
         "senzing-webapp-demo.sh": file_senzing_webapp_demo,
