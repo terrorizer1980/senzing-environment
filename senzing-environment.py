@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.2.3"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2021-02-12'
+__updated__ = '2021-03-16'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -827,11 +827,99 @@ export POSTGRES_HOST=${{SENZING_DOCKER_HOST_IP_ADDR}}
 export POSTGRES_DATABASE=G2
 export SENZING_API_SERVER_URL="http://${{SENZING_DOCKER_HOST_IP_ADDR}}:${{SENZING_DOCKER_PORT_SENZING_API_SERVER}}"
 
+export DOCKER_IMAGE_NAMES=(
+  "bitnami/rabbitmq:${{SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}}"
+  "coleifer/sqlite-web:${{SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}}"
+  "portainer/portainer:${{SENZING_DOCKER_IMAGE_VERSION_PORTAINER}}"
+  "postgres:${{SENZING_DOCKER_IMAGE_VERSION_POSTGRES}}"
+  "senzing/apt:${{SENZING_DOCKER_IMAGE_VERSION_APT}}"
+  "senzing/db2-driver-installer:${{SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}}"
+  "senzing/entity-search-web-app:${{SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}}"
+  "senzing/init-container:${{SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}}"
+  "senzing/jupyter:${{SENZING_DOCKER_IMAGE_VERSION_JUPYTER}}"
+  "senzing/phppgadmin:${{SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}}"
+  "senzing/postgresql-client:${{SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}}"
+  "senzing/senzing-api-server:${{SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}}"
+  "senzing/senzing-console:${{SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}}"
+  "senzing/senzing-debug:${{SENZING_DOCKER_IMAGE_VERSION_SENZING_DEBUG}}"
+  "senzing/sshd:${{SENZING_DOCKER_IMAGE_VERSION_SSHD}}"
+  "senzing/stream-loader:${{SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}}"
+  "senzing/stream-producer:${{SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}}"
+  "senzing/web-app-demo:${{SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}}"
+  "senzing/xterm:${{SENZING_DOCKER_IMAGE_VERSION_XTERM}}"
+  "senzing/yum:${{SENZING_DOCKER_IMAGE_VERSION_YUM}}"
+  "swaggerapi/swagger-ui:${{SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}}"
+)
+
 if [ "${{DATABASE_DATABASE}}" != "G2C.db" ]
 then
     export POSTGRES_DATABASE=${{DATABASE_DATABASE}}
 fi
 
+"""
+    return 0
+
+def file_docker_images_load():
+    """#! /usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+export OUTPUT_DIR=${SENZING_VAR_DIR}/docker/images
+
+echo "${SENZING_HORIZONTAL_RULE}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} Load docker images from ${OUTPUT_DIR}."
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#docker-images-load"
+
+for DOCKER_IMAGE_NAME in ${OUTPUT_DIR}/*;
+do
+
+  echo ${DOCKER_IMAGE_NAME}
+  echo "Loading ${OUTPUT_DIR}/${DOCKER_OUTPUT_FILENAME}"
+  docker load --input ${DOCKER_IMAGE_NAME}
+
+done
+
+echo "${SENZING_HORIZONTAL_RULE:0:2}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} Done."
+echo "${SENZING_HORIZONTAL_RULE}"
+"""
+    return 0
+
+
+def file_docker_images_save():
+    """#! /usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+echo "${SENZING_HORIZONTAL_RULE}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} Save docker images for ${SENZING_PROJECT_NAME}."
+echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#docker-images-save"
+
+export OUTPUT_DIR=${SENZING_VAR_DIR}/docker/images
+mkdir -p ${OUTPUT_DIR}
+
+for DOCKER_IMAGE_NAME in ${DOCKER_IMAGE_NAMES[@]};
+do
+
+  DOCKER_OUTPUT_FILENAME=$(echo ${DOCKER_IMAGE_NAME} | tr "/:" "--").tar
+  DOCKER_OUTPUT_PATHNAME=${OUTPUT_DIR}/${DOCKER_OUTPUT_FILENAME}
+
+  echo "Pulling ${DOCKER_IMAGE_NAME} from DockerHub."
+  docker pull ${DOCKER_IMAGE_NAME}
+
+  echo "Creating ${OUTPUT_DIR}/${DOCKER_OUTPUT_FILENAME}"
+  docker save ${DOCKER_IMAGE_NAME} --output ${DOCKER_OUTPUT_PATHNAME}
+  chmod +rx ${DOCKER_OUTPUT_PATHNAME}
+
+done
+
+echo "${SENZING_HORIZONTAL_RULE:0:2}"
+echo "${SENZING_HORIZONTAL_RULE:0:2} Done."
+echo "${SENZING_HORIZONTAL_RULE}"
 """
     return 0
 
@@ -3600,6 +3688,8 @@ def do_add_docker_support_linux(args):
     # Identify files to be created in <project>/docker-bin
 
     docker_bin_files = {
+        "docker-images-load.sh": file_docker_images_load,
+        "docker-images-save.sh": file_docker_images_save,
         "docker-pull-latest.sh": file_docker_pull_latest,
         "portainer.sh": file_portainer,
         "postgres.sh": file_postgres,
@@ -3663,6 +3753,8 @@ def do_add_docker_support_macos(args):
     # Identify files to be created in <project>/docker-bin
 
     docker_bin_files = {
+        "docker-images-load.sh": file_docker_images_load,
+        "docker-images-save.sh": file_docker_images_save,
         "docker-pull-latest.sh": file_docker_pull_latest,
         "portainer.sh": file_portainer,
         "postgres.sh": file_postgres,
