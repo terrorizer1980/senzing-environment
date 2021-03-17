@@ -859,6 +859,7 @@ fi
 """
     return 0
 
+
 def file_docker_images_load():
     """#! /usr/bin/env bash
 
