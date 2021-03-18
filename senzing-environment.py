@@ -23,7 +23,7 @@ import time
 __all__ = []
 __version__ = "1.2.3"  # See https://www.python.org/dev/peps/pep-0396/
 __date__ = '2020-04-23'
-__updated__ = '2021-03-16'
+__updated__ = '2021-03-17'
 
 SENZING_PRODUCT_ID = "5015"  # See https://github.com/Senzing/knowledge-base/blob/master/lists/senzing-product-ids.md
 log_format = '%(asctime)s %(message)s'
@@ -876,9 +876,8 @@ echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#docker-images-load
 for DOCKER_IMAGE_NAME in ${OUTPUT_DIR}/*;
 do
 
-  echo ${DOCKER_IMAGE_NAME}
-  echo "Loading ${OUTPUT_DIR}/${DOCKER_OUTPUT_FILENAME}"
-  docker load --input ${DOCKER_IMAGE_NAME}
+  echo "Loading ${DOCKER_IMAGE_NAME}"
+  ${SENZING_SUDO} docker load --input ${DOCKER_IMAGE_NAME}
 
 done
 
@@ -910,10 +909,10 @@ do
   DOCKER_OUTPUT_PATHNAME=${OUTPUT_DIR}/${DOCKER_OUTPUT_FILENAME}
 
   echo "Pulling ${DOCKER_IMAGE_NAME} from DockerHub."
-  docker pull ${DOCKER_IMAGE_NAME}
+  ${SENZING_SUDO} docker pull ${DOCKER_IMAGE_NAME}
 
   echo "Creating ${OUTPUT_DIR}/${DOCKER_OUTPUT_FILENAME}"
-  docker save ${DOCKER_IMAGE_NAME} --output ${DOCKER_OUTPUT_PATHNAME}
+  ${SENZING_SUDO} docker save ${DOCKER_IMAGE_NAME} --output ${DOCKER_OUTPUT_PATHNAME}
   chmod +rx ${DOCKER_OUTPUT_PATHNAME}
 
 done
