@@ -894,6 +894,11 @@ def file_docker_images_save():
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
 
+SUFFIX=$1
+SUFFIX_UPPER_CASE=$(echo "${SUFFIX:-ALL}" | tr '[:lower:]' '[:upper:]' )
+DOCKER_IMAGE_NAMES_STRING=("DOCKER_IMAGE_NAMES_${SUFFIX_UPPER_CASE}")
+DOCKER_IMAGE_NAMES=${!DOCKER_IMAGE_NAMES_STRING}
+
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} Save docker images for ${SENZING_PROJECT_NAME}."
 echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
