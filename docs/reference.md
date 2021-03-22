@@ -23,6 +23,42 @@
     export SENZING_INPUT_URL="https://example.com/my/dataset.json"
      ```
 
+### docker-images-load
+
+1. **Synopsis:**
+
+   Does a `docker load` of images found in the `./var/docker/images` directory.
+
+1. **Invocation:**
+
+   Example:
+
+    ```console
+    ./docker-bin/docker-images-load.sh
+    ```
+
+### docker-images-save
+
+1. **Synopsis:**
+
+   Does a `docker save` of images listed in the `./docker-bin/docker-environment-vars.sh` file's `DOCKER_IMAGE_NAMES_xxxx` environment variables.
+
+1. **Invocation:**
+
+   Save images listed in the `DOCKER_IMAGE_NAMES_ALL` variable.
+   Example:
+
+    ```console
+    ./docker-bin/docker-images-save.sh ALL
+    ```
+
+   Save images listed in the `DOCKER_IMAGE_NAMES_REST` variable.
+   Example:
+
+    ```console
+    ./docker-bin/docker-images-save.sh REST
+    ```
+
 ### docker-pull-latest
 
 1. **Synopsis:**

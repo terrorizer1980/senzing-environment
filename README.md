@@ -13,6 +13,8 @@ The [senzing-environment.py](senzing-environment.py) program creates a `docker-b
 ```console
 docker-bin
 ├── docker-environment-vars.sh
+├── docker-images-load.sh
+├── docker-images-save.sh
 ├── docker-pull-latest.sh
 ├── portainer.sh
 ├── postgres.sh
@@ -21,13 +23,16 @@ docker-bin
 ├── senzing-db2-driver-installer.sh
 ├── senzing-debug.sh
 ├── senzing-down.sh
+├── senzing-info.sh
 ├── senzing-init-container.sh
 ├── senzing-jupyter.sh
+├── senzing-mssql-driver-installer.sh
 ├── senzing-phppgadmin.sh
 ├── senzing-postgresql-init.sh
 ├── senzing-quickstart-demo.sh
 ├── senzing-rabbitmq.sh
 ├── senzing-sqlite-web.sh
+├── senzing-sshd.sh
 ├── senzing-stream-loader.sh
 ├── senzing-stream-producer.sh
 ├── senzing-webapp-demo.sh
