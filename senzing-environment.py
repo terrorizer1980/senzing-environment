@@ -827,7 +827,7 @@ export POSTGRES_HOST=${{SENZING_DOCKER_HOST_IP_ADDR}}
 export POSTGRES_DATABASE=G2
 export SENZING_API_SERVER_URL="http://${{SENZING_DOCKER_HOST_IP_ADDR}}:${{SENZING_DOCKER_PORT_SENZING_API_SERVER}}"
 
-export DOCKER_IMAGE_NAMES=(
+export DOCKER_IMAGE_NAMES_ALL=(
   "bitnami/rabbitmq:${{SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}}"
   "coleifer/sqlite-web:${{SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}}"
   "portainer/portainer:${{SENZING_DOCKER_IMAGE_VERSION_PORTAINER}}"
@@ -848,6 +848,26 @@ export DOCKER_IMAGE_NAMES=(
   "senzing/web-app-demo:${{SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}}"
   "senzing/xterm:${{SENZING_DOCKER_IMAGE_VERSION_XTERM}}"
   "senzing/yum:${{SENZING_DOCKER_IMAGE_VERSION_YUM}}"
+  "swaggerapi/swagger-ui:${{SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}}"
+)
+
+export DOCKER_IMAGE_NAMES_DB2=(
+  "senzing/db2-driver-installer:${{SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}}"
+)
+
+export DOCKER_IMAGE_NAMES_POSTGRESQL=(
+  "postgres:${{SENZING_DOCKER_IMAGE_VERSION_POSTGRES}}"
+  "senzing/phppgadmin:${{SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}}"
+  "senzing/postgresql-client:${{SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}}"
+)
+
+export DOCKER_IMAGE_NAMES_REST=(
+  "senzing/entity-search-web-app:${{SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}}"
+  "senzing/init-container:${{SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}}"  
+  "senzing/senzing-api-server:${{SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}}"
+  "senzing/senzing-console:${{SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}}"
+  "senzing/sshd:${{SENZING_DOCKER_IMAGE_VERSION_SSHD}}"
+  "senzing/web-app-demo:${{SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}}"
   "swaggerapi/swagger-ui:${{SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}}"
 )
 
@@ -893,6 +913,11 @@ def file_docker_images_save():
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${SCRIPT_DIR}/docker-environment-vars.sh
+
+SUFFIX=$1
+SUFFIX_UPPER_CASE=$(echo "${SUFFIX:-ALL}" | tr '[:lower:]' '[:upper:]' )
+DOCKER_IMAGE_NAMES_STRING="DOCKER_IMAGE_NAMES_${SUFFIX_UPPER_CASE}"
+eval "DOCKER_IMAGE_NAMES=(\"\${${DOCKER_IMAGE_NAMES_STRING}[@]}\")"
 
 echo "${SENZING_HORIZONTAL_RULE}"
 echo "${SENZING_HORIZONTAL_RULE:0:2} Save docker images for ${SENZING_PROJECT_NAME}."
