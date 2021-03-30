@@ -217,7 +217,7 @@ message_dictionary = {
     "106": "   Removed  {0}.{1}",
     "119": "{0} - Modified. {1}",
     "151": "{0} - Changing permissions from {1:o} to {2:o}",
-    "173": "{0} - Changing owner from {1} to {2}",
+    "152": "{0} - Changing owner from {1} to {2}",
     "153": "{0} - Changing group from {1} to {2}",
     "154": "{0} - Creating file by copying {1}",
     "155": "{0} - Deleting",
