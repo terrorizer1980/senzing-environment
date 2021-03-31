@@ -2959,24 +2959,24 @@ function init {
     fi
 
     ${SENZING_SUDO} docker run \
-        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \
-        --env SENZING_GID=$(id -g) \
-        --env SENZING_UID=$(id -u) \
-        --name ${SENZING_DOCKER_CONTAINER_NAME_INIT_CONTAINER} \
-        --rm \
-        --user 0 \
-        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
-        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
-        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
-        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \
-        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \
-        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \
-        ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \
-        ${SENZING_NETWORK_PARAMETER} \
-        ${SENZING_MSSQL_PARAMETERS} \
-        ${SENZING_PRIVILEGED_PARAMETER} \
-        senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \
+        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+        --env SENZING_GID=$(id -g) \\
+        --env SENZING_UID=$(id -u) \\
+        --name ${SENZING_DOCKER_CONTAINER_NAME_INIT_CONTAINER} \\
+        --rm \\
+        --user 0 \\
+        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
+        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+        ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \\
+        ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_MSSQL_PARAMETERS} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
+        senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
         >> ${CONTAINER_LOG} 2>&1
 }
 
@@ -2989,26 +2989,26 @@ function up {
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
     fi
 
-    ${SENZING_SUDO} docker run \
-        --detach \
-        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \
-        --name ${CONTAINER_NAME} \
-        --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:8250 \
-        --publish ${CONTAINER_PORT}:8251 \
-        --restart always \
-        --user $(id -u):$(id -g) \
-        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
-        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
-        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
-        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \
-        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \
-        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
-        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \
-        ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \
-        ${SENZING_NETWORK_PARAMETER} \
-        ${SENZING_MSSQL_PARAMETERS} \
-        ${SENZING_PRIVILEGED_PARAMETER} \
-        senzing/web-app-demo:${CONTAINER_VERSION} \
+    ${SENZING_SUDO} docker run \\
+        --detach \\
+        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
+        --name ${CONTAINER_NAME} \\
+        --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:8250 \\
+        --publish ${CONTAINER_PORT}:8251 \\
+        --restart always \\
+        --user $(id -u):$(id -g) \\
+        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
+        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
+        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
+        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
+        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
+        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
+        ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
+        ${SENZING_NETWORK_PARAMETER} \\
+        ${SENZING_MSSQL_PARAMETERS} \\
+        ${SENZING_PRIVILEGED_PARAMETER} \\
+        senzing/web-app-demo:${CONTAINER_VERSION} \\
         >> ${CONTAINER_LOG} 2>&1
 
     COUNTER=0
