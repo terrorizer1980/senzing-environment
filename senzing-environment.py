@@ -4,7 +4,6 @@
 # senzing-environment.py
 # -----------------------------------------------------------------------------
 
-from urllib.parse import urlparse, urlunparse
 import argparse
 import configparser
 import json
@@ -19,6 +18,7 @@ import stat
 import string
 import sys
 import time
+from urllib.parse import urlparse, urlunparse
 
 __all__ = []
 __version__ = "1.2.3"  # See https://www.python.org/dev/peps/pep-0396/
@@ -851,6 +851,24 @@ export DOCKER_IMAGE_NAMES_ALL=(
   "swaggerapi/swagger-ui:${{SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}}"
 )
 
+export DOCKER_IMAGE_NAMES_WEBAPPDEMO=(
+  "senzing/g2loader:${{SENZING_DOCKER_IMAGE_VERSION_G2LOADER}}"
+  "senzing/init-container:${{SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}}"
+  "senzing/senzing-console:${{SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}}"
+  "senzing/web-app-demo:${{SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}}"
+  "senzing/yum:${{SENZING_DOCKER_IMAGE_VERSION_YUM}}"
+)
+
+export DOCKER_IMAGE_NAMES_REST=(
+  "senzing/entity-search-web-app:${{SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}}"
+  "senzing/init-container:${{SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}}"
+  "senzing/senzing-api-server:${{SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}}"
+  "senzing/senzing-console:${{SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}}"
+  "senzing/sshd:${{SENZING_DOCKER_IMAGE_VERSION_SSHD}}"
+  "senzing/web-app-demo:${{SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}}"
+  "swaggerapi/swagger-ui:${{SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}}"
+)
+
 export DOCKER_IMAGE_NAMES_DB2=(
   "senzing/db2-driver-installer:${{SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}}"
 )
@@ -861,13 +879,76 @@ export DOCKER_IMAGE_NAMES_POSTGRESQL=(
   "senzing/postgresql-client:${{SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}}"
 )
 
-export DOCKER_IMAGE_NAMES_REST=(
-  "senzing/entity-search-web-app:${{SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}}"
-  "senzing/init-container:${{SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}}"  
-  "senzing/senzing-api-server:${{SENZING_DOCKER_IMAGE_VERSION_SENZING_API_SERVER}}"
+export DOCKER_IMAGE_NAMES_DB2=(
+  "senzing/db2-driver-installer:${{SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}}"
+)
+
+export DOCKER_IMAGE_NAMES_POSTGRESQL=(
+  "postgres:${{SENZING_DOCKER_IMAGE_VERSION_POSTGRES}}"
+  "senzing/phppgadmin:${{SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}}"
+  "senzing/postgresql-client:${{SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}}"
+)
+
+export DOCKER_IMAGE_NAMES_POSTGRESQLCLIENT=(
+  "senzing/postgresql-client:${{SENZING_DOCKER_IMAGE_VERSION_POSTGRESQL_CLIENT}}"
+)
+
+export DOCKER_IMAGE_NAMES_DEBUG=(
+  "portainer/portainer:${{SENZING_DOCKER_IMAGE_VERSION_PORTAINER}}"
   "senzing/senzing-console:${{SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}}"
   "senzing/sshd:${{SENZING_DOCKER_IMAGE_VERSION_SSHD}}"
+  "senzing/xterm:${{SENZING_DOCKER_IMAGE_VERSION_XTERM}}"
+)
+
+export DOCKER_IMAGE_NAMES_RABBITMQ=(
+  "bitnami/rabbitmq:${{SENZING_DOCKER_IMAGE_VERSION_RABBITMQ}}"
+)
+
+export DOCKER_IMAGE_NAMES_SQLITEWEB=(
+  "coleifer/sqlite-web:${{SENZING_DOCKER_IMAGE_VERSION_SQLITE_WEB}}"
+)
+
+export DOCKER_IMAGE_NAMES_DB2DRIVER=(
+  "senzing/db2-driver-installer:${{SENZING_DOCKER_IMAGE_VERSION_DB2_DRIVER_INSTALLER}}"
+)
+
+export DOCKER_IMAGE_NAMES_ENTITYSEARCHWEBAPP=(
+  "senzing/entity-search-web-app:${{SENZING_DOCKER_IMAGE_VERSION_ENTITY_SEARCH_WEB_APP}}"
+)
+
+export DOCKER_IMAGE_NAMES_G2LOADER=(
+  "senzing/g2loader:${{SENZING_DOCKER_IMAGE_VERSION_G2LOADER}}"
+)
+
+export DOCKER_IMAGE_NAMES_JUPYTER=(
+  "senzing/jupyter:${{SENZING_DOCKER_IMAGE_VERSION_JUPYTER}}"
+)
+
+export DOCKER_IMAGE_NAMES_PHPPGADMIN=(
+  "senzing/phppgadmin:${{SENZING_DOCKER_IMAGE_VERSION_PHPPGADMIN}}"
+)
+
+export DOCKER_IMAGE_NAMES_SENZINGCONSOLE=(
+  "senzing/senzing-console:${{SENZING_DOCKER_IMAGE_VERSION_SENZING_CONSOLE}}"
+)
+
+export DOCKER_IMAGE_NAMES_SSHD=(
+  "senzing/sshd:${{SENZING_DOCKER_IMAGE_VERSION_SSHD}}"
+)
+
+export DOCKER_IMAGE_NAMES_STREAMLOADER=(
+  "senzing/stream-loader:${{SENZING_DOCKER_IMAGE_VERSION_STREAM_LOADER}}"
+)
+
+export DOCKER_IMAGE_NAMES_STREAMPRODUCER=(
+  "senzing/stream-producer:${{SENZING_DOCKER_IMAGE_VERSION_STREAM_PRODUCER}}"
+)
+
+export DOCKER_IMAGE_NAMES_XTERM=(
   "senzing/web-app-demo:${{SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}}"
+)
+
+export DOCKER_IMAGE_NAMES_SWAGGER=(
   "swaggerapi/swagger-ui:${{SENZING_DOCKER_IMAGE_VERSION_SWAGGERAPI_SWAGGER_UI}}"
 )
 
@@ -880,73 +961,73 @@ fi
     return 0
 
 
-def file_docker_images_load():
-    """#! /usr/bin/env bash
+# def file_docker_images_load():
+#     """#! /usr/bin/env bash
+#
+# SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+# source ${SCRIPT_DIR}/docker-environment-vars.sh
+#
+# export OUTPUT_DIR=${SENZING_VAR_DIR}/docker/images
+#
+# echo "${SENZING_HORIZONTAL_RULE}"
+# echo "${SENZING_HORIZONTAL_RULE:0:2} Load docker images from ${OUTPUT_DIR}."
+# echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+# echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#docker-images-load"
+#
+# for DOCKER_IMAGE_NAME in ${OUTPUT_DIR}/*;
+# do
+#
+#   echo "Loading ${DOCKER_IMAGE_NAME}"
+#   ${SENZING_SUDO} docker load --input ${DOCKER_IMAGE_NAME}
+#
+# done
+#
+# echo "${SENZING_HORIZONTAL_RULE:0:2}"
+# echo "${SENZING_HORIZONTAL_RULE:0:2} Done."
+# echo "${SENZING_HORIZONTAL_RULE}"
+# """
+#     return 0
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source ${SCRIPT_DIR}/docker-environment-vars.sh
 
-export OUTPUT_DIR=${SENZING_VAR_DIR}/docker/images
-
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} Load docker images from ${OUTPUT_DIR}."
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#docker-images-load"
-
-for DOCKER_IMAGE_NAME in ${OUTPUT_DIR}/*;
-do
-
-  echo "Loading ${DOCKER_IMAGE_NAME}"
-  ${SENZING_SUDO} docker load --input ${DOCKER_IMAGE_NAME}
-
-done
-
-echo "${SENZING_HORIZONTAL_RULE:0:2}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} Done."
-echo "${SENZING_HORIZONTAL_RULE}"
-"""
-    return 0
-
-
-def file_docker_images_save():
-    """#! /usr/bin/env bash
-
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source ${SCRIPT_DIR}/docker-environment-vars.sh
-
-SUFFIX=$1
-SUFFIX_UPPER_CASE=$(echo "${SUFFIX:-ALL}" | tr '[:lower:]' '[:upper:]' )
-DOCKER_IMAGE_NAMES_STRING="DOCKER_IMAGE_NAMES_${SUFFIX_UPPER_CASE}"
-eval "DOCKER_IMAGE_NAMES=(\"\${${DOCKER_IMAGE_NAMES_STRING}[@]}\")"
-
-echo "${SENZING_HORIZONTAL_RULE}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} Save docker images for ${SENZING_PROJECT_NAME}."
-echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#docker-images-save"
-
-export OUTPUT_DIR=${SENZING_VAR_DIR}/docker/images
-mkdir -p ${OUTPUT_DIR}
-
-for DOCKER_IMAGE_NAME in ${DOCKER_IMAGE_NAMES[@]};
-do
-
-  DOCKER_OUTPUT_FILENAME=$(echo ${DOCKER_IMAGE_NAME} | tr "/:" "--").tar
-  DOCKER_OUTPUT_PATHNAME=${OUTPUT_DIR}/${DOCKER_OUTPUT_FILENAME}
-
-  echo "Pulling ${DOCKER_IMAGE_NAME} from DockerHub."
-  ${SENZING_SUDO} docker pull ${DOCKER_IMAGE_NAME}
-
-  echo "Creating ${OUTPUT_DIR}/${DOCKER_OUTPUT_FILENAME}"
-  ${SENZING_SUDO} docker save ${DOCKER_IMAGE_NAME} --output ${DOCKER_OUTPUT_PATHNAME}
-  chmod +rx ${DOCKER_OUTPUT_PATHNAME}
-
-done
-
-echo "${SENZING_HORIZONTAL_RULE:0:2}"
-echo "${SENZING_HORIZONTAL_RULE:0:2} Done."
-echo "${SENZING_HORIZONTAL_RULE}"
-"""
-    return 0
+# def file_docker_images_save():
+#     """#! /usr/bin/env bash
+#
+# SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+# source ${SCRIPT_DIR}/docker-environment-vars.sh
+#
+# SUFFIX=$1
+# SUFFIX_UPPER_CASE=$(echo "${SUFFIX:-ALL}" | tr '[:lower:]' '[:upper:]' )
+# DOCKER_IMAGE_NAMES_STRING="DOCKER_IMAGE_NAMES_${SUFFIX_UPPER_CASE}"
+# eval "DOCKER_IMAGE_NAMES=(\"\${${DOCKER_IMAGE_NAMES_STRING}[@]}\")"
+#
+# echo "${SENZING_HORIZONTAL_RULE}"
+# echo "${SENZING_HORIZONTAL_RULE:0:2} Save docker images for ${SENZING_PROJECT_NAME}."
+# echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
+# echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#docker-images-save"
+#
+# export OUTPUT_DIR=${SENZING_VAR_DIR}/docker/images
+# mkdir -p ${OUTPUT_DIR}
+#
+# for DOCKER_IMAGE_NAME in ${DOCKER_IMAGE_NAMES[@]};
+# do
+#
+#   DOCKER_OUTPUT_FILENAME=$(echo ${DOCKER_IMAGE_NAME} | tr "/:" "--").tar
+#   DOCKER_OUTPUT_PATHNAME=${OUTPUT_DIR}/${DOCKER_OUTPUT_FILENAME}
+#
+#   echo "Pulling ${DOCKER_IMAGE_NAME} from DockerHub."
+#   ${SENZING_SUDO} docker pull ${DOCKER_IMAGE_NAME}
+#
+#   echo "Creating ${OUTPUT_DIR}/${DOCKER_OUTPUT_FILENAME}"
+#   ${SENZING_SUDO} docker save ${DOCKER_IMAGE_NAME} --output ${DOCKER_OUTPUT_PATHNAME}
+#   chmod +rx ${DOCKER_OUTPUT_PATHNAME}
+#
+# done
+#
+# echo "${SENZING_HORIZONTAL_RULE:0:2}"
+# echo "${SENZING_HORIZONTAL_RULE:0:2} Done."
+# echo "${SENZING_HORIZONTAL_RULE}"
+# """
+#     return 0
 
 
 def file_docker_pull_latest():
@@ -2877,66 +2958,67 @@ function init {
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} >> ${CONTAINER_LOG} 2>&1
     fi
 
-    ${SENZING_SUDO} docker run \\
-        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-        --env SENZING_GID=$(id -g) \\
-        --env SENZING_UID=$(id -u) \\
-        --name ${SENZING_DOCKER_CONTAINER_NAME_INIT_CONTAINER} \\
-        --rm \\
-        --user 0 \\
-        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
-        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
-        ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \\
-        ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_MSSQL_PARAMETERS} \\
-        ${SENZING_PRIVILEGED_PARAMETER} \\
-        senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
+    ${SENZING_SUDO} docker run \
+        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \
+        --env SENZING_GID=$(id -g) \
+        --env SENZING_UID=$(id -u) \
+        --name ${SENZING_DOCKER_CONTAINER_NAME_INIT_CONTAINER} \
+        --rm \
+        --user 0 \
+        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
+        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
+        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
+        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \
+        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
+        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \
+        ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \
+        ${SENZING_NETWORK_PARAMETER} \
+        ${SENZING_MSSQL_PARAMETERS} \
+        ${SENZING_PRIVILEGED_PARAMETER} \
+        senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \
         >> ${CONTAINER_LOG} 2>&1
 }
 
 function up {
-    echo -ne "\033[2K${CONTAINER_NAME} status: starting...\r"
+    echo -ne "[2K${CONTAINER_NAME} status: starting...
+"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
     fi
 
-    ${SENZING_SUDO} docker run \\
-        --detach \\
-        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-        --name ${CONTAINER_NAME} \\
-        --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:8250 \\
-        --publish ${CONTAINER_PORT}:8251 \\
-        --restart always \\
-        --user $(id -u):$(id -g) \\
-        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
-        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
-        ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
-        ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_MSSQL_PARAMETERS} \\
-        ${SENZING_PRIVILEGED_PARAMETER} \\
-        senzing/web-app-demo:${CONTAINER_VERSION} \\
+    ${SENZING_SUDO} docker run \
+        --detach \
+        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \
+        --name ${CONTAINER_NAME} \
+        --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:8250 \
+        --publish ${CONTAINER_PORT}:8251 \
+        --restart always \
+        --user $(id -u):$(id -g) \
+        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
+        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
+        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
+        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \
+        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
+        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \
+        ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \
+        ${SENZING_NETWORK_PARAMETER} \
+        ${SENZING_MSSQL_PARAMETERS} \
+        ${SENZING_PRIVILEGED_PARAMETER} \
+        senzing/web-app-demo:${CONTAINER_VERSION} \
         >> ${CONTAINER_LOG} 2>&1
 
     COUNTER=0
     COUNTER_NOTICE=5
     TIME_STRING=".."
-    CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+    CONTAINER_STATUS="$(${SENZING_SUDO} docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
     while [ "${CONTAINER_STATUS}" != "running" ]; do
         COUNTER=$((${COUNTER}+1))
         if [ "${COUNTER}" -eq "${COUNTER_NOTICE}" ]; then
-            echo -ne "\033[2K"
+            echo -ne "[2K"
             echo ""
             echo "To see what is happening behind-the-scenes, view the log at"
             echo "${CONTAINER_LOG}"
@@ -2944,9 +3026,10 @@ function up {
             echo ""
         fi
         TIME_STRING="${TIME_STRING}."
-        echo -ne "\033[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}\r"
+        echo -ne "[2K${CONTAINER_NAME} status: ${CONTAINER_STATUS}${TIME_STRING}
+"
         sleep 5
-        CONTAINER_STATUS="$( docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
+        CONTAINER_STATUS="$(${SENZING_SUDO} docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
     done
 
     echo "${SENZING_HORIZONTAL_RULE}"
@@ -2987,6 +3070,13 @@ CONTAINER_LOG="${SENZING_LOG_WEB_APP_DEMO}"
 CONTAINER_NAME="${SENZING_DOCKER_CONTAINER_NAME_WEB_APP_DEMO}"
 CONTAINER_PORT="${SENZING_DOCKER_PORT_ENTITY_SEARCH_WEB_APP}"
 CONTAINER_VERSION="${SENZING_DOCKER_IMAGE_VERSION_WEB_APP_DEMO}"
+
+# Used when senzing-up calls this script, senzing-up prompts for sudo if required.
+# User running senzing-up could be using password less sudo, without this and before modifying SENZING_SUDO
+# in docker-environment-vars.sh this script could fail on docker permissions
+if [[ -z ${SENZING_SUDO} && $2 == 'SUDO'  ]]; then
+    export SENZING_SUDO="sudo"
+fi
 
 if [ "$1" == "up" ]; then
     up
