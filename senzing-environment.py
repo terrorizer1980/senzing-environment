@@ -3803,8 +3803,8 @@ def do_add_docker_support_linux(args):
     # Identify files to be created in <project>/docker-bin
 
     docker_bin_files = {
-        "docker-images-load.sh": file_docker_images_load,
-        "docker-images-save.sh": file_docker_images_save,
+#        "docker-images-load.sh": file_docker_images_load,
+#        "docker-images-save.sh": file_docker_images_save,
         "docker-pull-latest.sh": file_docker_pull_latest,
         "portainer.sh": file_portainer,
         "postgres.sh": file_postgres,
@@ -3868,8 +3868,8 @@ def do_add_docker_support_macos(args):
     # Identify files to be created in <project>/docker-bin
 
     docker_bin_files = {
-        "docker-images-load.sh": file_docker_images_load,
-        "docker-images-save.sh": file_docker_images_save,
+#        "docker-images-load.sh": file_docker_images_load,
+#        "docker-images-save.sh": file_docker_images_save,
         "docker-pull-latest.sh": file_docker_pull_latest,
         "portainer.sh": file_portainer,
         "postgres.sh": file_postgres,
