@@ -818,6 +818,7 @@ export SENZING_RABBITMQ_QUEUE=senzing-rabbitmq-queue
 export SENZING_RABBITMQ_USERNAME=user
 export SENZING_RECORD_MAX=5000
 export SENZING_REFERENCE_URL="http://hub.senzing.com/senzing-environment/reference"
+export SENZING_SCRIPT_OUTPUT=${SENZING_HORIZONTAL_RULE:0:2}
 export SENZING_SQL_CONNECTION="{sql_connection}"
 export SENZING_SSHD_PASSWORD=passw0rd
 export SENZING_SUDO=""
@@ -2953,62 +2954,63 @@ def file_senzing_webapp_demo():
 # --- Functions ---------------------------------------------------------------
 
 function init {
+
     if [ "${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} >> ${CONTAINER_LOG} 2>&1
     fi
 
     ${SENZING_SUDO} docker run \
-        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-        --env SENZING_GID=$(id -g) \\
-        --env SENZING_UID=$(id -u) \\
-        --name ${SENZING_DOCKER_CONTAINER_NAME_INIT_CONTAINER} \\
-        --rm \\
-        --user 0 \\
-        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
-        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
-        ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \\
-        ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_MSSQL_PARAMETERS} \\
-        ${SENZING_PRIVILEGED_PARAMETER} \\
-        senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \\
+        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \
+        --env SENZING_GID=$(id -g) \
+        --env SENZING_UID=$(id -u) \
+        --name ${SENZING_DOCKER_CONTAINER_NAME_INIT_CONTAINER} \
+        --rm \
+        --user 0 \
+        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
+        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
+        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
+        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \
+        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
+        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \
+        ${SENZING_DOCKER_RUN_PARAMETERS_INIT_CONTAINER} \
+        ${SENZING_NETWORK_PARAMETER} \
+        ${SENZING_MSSQL_PARAMETERS} \
+        ${SENZING_PRIVILEGED_PARAMETER} \
+        senzing/init-container:${SENZING_DOCKER_IMAGE_VERSION_INIT_CONTAINER} \
         >> ${CONTAINER_LOG} 2>&1
 }
 
 function up {
-    echo -ne "[2K${CONTAINER_NAME} status: starting...
-"
+
+    echo -ne "[2K${CONTAINER_NAME} status: starting...\n"
 
     if [ "${CONTAINER_VERSION}" == "latest" ]
     then
         ${SENZING_SUDO} docker pull ${SENZING_DOCKER_REGISTRY_URL}/senzing/web-app-demo:${CONTAINER_VERSION} >> ${CONTAINER_LOG} 2>&1
     fi
 
-    ${SENZING_SUDO} docker run \\
-        --detach \\
-        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \\
-        --name ${CONTAINER_NAME} \\
-        --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:8250 \\
-        --publish ${CONTAINER_PORT}:8251 \\
-        --restart always \\
-        --user $(id -u):$(id -g) \\
-        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \\
-        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \\
-        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \\
-        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \\
-        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \\
-        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \\
-        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \\
-        ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \\
-        ${SENZING_NETWORK_PARAMETER} \\
-        ${SENZING_MSSQL_PARAMETERS} \\
-        ${SENZING_PRIVILEGED_PARAMETER} \\
-        senzing/web-app-demo:${CONTAINER_VERSION} \\
+    ${SENZING_SUDO} docker run \
+        --detach \
+        --env SENZING_DATABASE_URL=${SENZING_DATABASE_URL} \
+        --name ${CONTAINER_NAME} \
+        --publish ${SENZING_DOCKER_PORT_SENZING_API_SERVER}:8250 \
+        --publish ${CONTAINER_PORT}:8251 \
+        --restart always \
+        --user $(id -u):$(id -g) \
+        --volume ${SENZING_DATA_VERSION_DIR}:/opt/senzing/data \
+        --volume ${SENZING_ETC_DIR}:/etc/opt/senzing \
+        --volume ${SENZING_G2_DIR}:/opt/senzing/g2 \
+        --volume ${SENZING_OPT_IBM_DIR}:/opt/IBM \
+        --volume ${SENZING_OPT_MICROSOFT_DIR}:/opt/microsoft \
+        --volume ${SENZING_VAR_DIR}:/var/opt/senzing \
+        ${SENZING_DOCKER_RUN_PARAMETERS_GLOBAL} \
+        ${SENZING_DOCKER_RUN_PARAMETERS_WEB_APP_DEMO} \
+        ${SENZING_NETWORK_PARAMETER} \
+        ${SENZING_MSSQL_PARAMETERS} \
+        ${SENZING_PRIVILEGED_PARAMETER} \
+        senzing/web-app-demo:${CONTAINER_VERSION} \
         >> ${CONTAINER_LOG} 2>&1
 
     COUNTER=0
@@ -3032,19 +3034,25 @@ function up {
         CONTAINER_STATUS="$(${SENZING_SUDO} docker container inspect -f '{{.State.Status}}' ${CONTAINER_NAME})"
     done
 
+    echo
     echo "${SENZING_HORIZONTAL_RULE}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} entity-search-web-app running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} senzing-api-server running on http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}/heartbeat"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Mount information: (Format: in container > on host)"
-    echo "${SENZING_HORIZONTAL_RULE:0:2}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} Logs:"
-    echo "${SENZING_HORIZONTAL_RULE:0:2}   ${CONTAINER_LOG}"
-    echo "${SENZING_HORIZONTAL_RULE:0:2}   and/or run 'docker logs ${CONTAINER_NAME}'"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} For more information:"
-    echo "${SENZING_HORIZONTAL_RULE:0:2} ${SENZING_REFERENCE_URL}#senzing-webapp-demo"
+    echo "${SENZING_SCRIPT_OUTPUT}"
+    echo "${SENZING_SCRIPT_OUTPUT} entity-search-web-app running on:  http://${SENZING_DOCKER_HOST_IP_ADDR}:${CONTAINER_PORT}"
+    echo "${SENZING_SCRIPT_OUTPUT} senzing-api-server running on:     http://${SENZING_DOCKER_HOST_IP_ADDR}:${SENZING_DOCKER_PORT_SENZING_API_SERVER}/heartbeat"
+    echo "${SENZING_SCRIPT_OUTPUT}"
+    echo "${SENZING_SCRIPT_OUTPUT} Mount information: (Format: in container > on host)"
+    echo "${SENZING_SCRIPT_OUTPUT}   /etc/opt/senzing  > ${SENZING_ETC_DIR}"
+    echo "${SENZING_SCRIPT_OUTPUT}   /opt/senzing/data > ${SENZING_DATA_VERSION_DIR}"
+    echo "${SENZING_SCRIPT_OUTPUT}   /opt/senzing/g2   > ${SENZING_G2_DIR}"
+    echo "${SENZING_SCRIPT_OUTPUT}   /var/opt/senzing  > ${SENZING_VAR_DIR}"
+    echo "${SENZING_SCRIPT_OUTPUT}"
+    echo "${SENZING_SCRIPT_OUTPUT} Logs:"
+    echo "${SENZING_SCRIPT_OUTPUT}   ${CONTAINER_LOG}"
+    echo "${SENZING_SCRIPT_OUTPUT}   and/or run 'docker logs ${CONTAINER_NAME}'"
+    echo "${SENZING_SCRIPT_OUTPUT}"
+    echo "${SENZING_SCRIPT_OUTPUT} For more information:"
+    echo "${SENZING_SCRIPT_OUTPUT}   ${SENZING_REFERENCE_URL}#senzing-webapp-demo"
+    echo "${SENZING_SCRIPT_OUTPUT}"
     echo "${SENZING_HORIZONTAL_RULE}"
 }
 
@@ -3092,6 +3100,7 @@ elif [ "$1" == "restart" ]; then
 else
     usage
 fi
+
 """
     return 0
 
