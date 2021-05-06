@@ -3267,7 +3267,7 @@ function up {
     ln -s g2.${TIMESTAMP} g2
 
     mv data data-backup
-    mv data-backup/1.0.0 data.${TIMESTAMP}
+    mv data-backup/2.0.0 data.${TIMESTAMP}
     rmdir data-backup
     ln -s data.${TIMESTAMP} data
     popd
@@ -3432,7 +3432,7 @@ def log_environment_variables():
         "RABBITMQ_USERNAME": "user",
         "RABBITMQ_PASSWORD": "bitnami",
         "SENZING_DATA_SOURCE": "TEST",
-        "SENZING_DATA_VERSION_DIR": "/opt/senzing/data/1.0.0",
+        "SENZING_DATA_VERSION_DIR": "/opt/senzing/data/2.0.0",
         "SENZING_ENTITY_TYPE": "GENERIC",
         "SENZING_ETC_DIR": "/etc/opt/senzing",
         "SENZING_G2_DIR": "/opt/senzing/g2",
